@@ -1,14 +1,37 @@
-# Netlify Configuration
+# Netlify Configuration for Next.js 16
 
 [build]
   command = "npm run build"
+  # publish = ".next"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
+# Security headers
 [[headers]]
   for = "/*"
   [headers.values]
     X-Frame-Options = "DENY"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
+    X-XSS-Protection = "1; mode=block"
+    Permissions-Policy = "geolocation=(), microphone=(), camera=()"
+
+# Environment variable placeholders (set these in Netlify Dashboard)
+# Required:
+# - DATABASE_URL
+# - NEXT_PUBLIC_SUPABASE_URL
+# - NEXT_PUBLIC_SUPABASE_ANON_KEY
+# - SUPABASE_SERVICE_ROLE_KEY
+# - NEXTAUTH_SECRET
+# - NEXTAUTH_URL (your production URL)
+# - PAYSTACK_SECRET_KEY
+# - PAYSTACK_PUBLIC_KEY
+# - NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY
+#
+# Optional:
+# - RESEND_API_KEY
+# - GOOGLE_CLIENT_ID
+# - GOOGLE_CLIENT_SECRET
+# - GOOGLE_REDIRECT_URI
+

@@ -6,7 +6,7 @@ import crypto from 'crypto';
 export async function POST(req: NextRequest) {
     try {
         const reqjson = await req.json();
-        const { name, email, password, role, phone, referralCode } = reqjson;
+        const { name, email, password, role, phone } = reqjson;
 
         // Check if user already exists
         const { data: existingUser } = await supabaseAdmin
@@ -56,48 +56,12 @@ export async function POST(req: NextRequest) {
 
         // If commissioner or developer, create additional profile
         if (role === 'commissioner') {
-            const referralCode = `REF-${name.substring(0, 3).toUpperCase()}-${crypto.randomBytes(3).toString('hex').toUpperCase()}`;
-
-            let parentId = null;
-            if (reqjson.referralCode) {
-                // Lookup parent commissioner
-                const { data: parentComm } = await supabaseAdmin
-                    .from('commissioners')
-                    .select('id')
-                    .eq('referral_code', reqjson.referralCode)
-                    .single();
-
-                if (parentComm) {
-                    parentId = parentComm.id;
-                }
-            }
-
             const { error: commError } = await supabaseAdmin.from('commissioners').insert({
                 user_id: newUser.id,
                 tier: 'tier1',
                 rate_percent: 25.0,
-                referral_code: referralCode,
-                parent_commissioner_id: parentId,
                 verified_at: null // Explicitly pending
             });
-
-            // If there's a parent, create a referral record
-            if (parentId) {
-                // Fetch the new commissioner ID (we need it for the referral table)
-                const { data: newComm } = await supabaseAdmin
-                    .from('commissioners')
-                    .select('id')
-                    .eq('user_id', newUser.id)
-                    .single();
-
-                if (newComm) {
-                    await supabaseAdmin.from('referrals').insert({
-                        referrer_id: parentId,
-                        referee_id: newComm.id,
-                        override_percent: 5.00
-                    });
-                }
-            }
 
             if (commError) {
                 console.error('Commissioner creation error:', commError);

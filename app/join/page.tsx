@@ -1,21 +1,11 @@
 'use client';
 
-import { useEffect, useState, Suspense } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Users, DollarSign, Rocket, CheckCircle, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
-import Cookies from 'js-cookie';
 
-function JoinPageContent() {
-    const searchParams = useSearchParams();
-    const referralCode = searchParams.get('ref');
-
-    useEffect(() => {
-        if (referralCode) {
-            Cookies.set('referral_code', referralCode, { expires: 7 });
-        }
-    }, [referralCode]);
-
+export default function JoinPage() {
     return (
         <div className="min-h-screen bg-[var(--bg-card)]">
             {/* Navigation */}
@@ -41,12 +31,6 @@ function JoinPageContent() {
             <div className="relative overflow-hidden pt-20 pb-32">
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[600px] bg-gradient-to-b from-indigo-50/50 to-transparent -z-10"></div>
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-8">
-                    {referralCode && (
-                        <div className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-50 border border-indigo-100 rounded-full animate-bounce">
-                            <Users className="w-4 h-4 text-indigo-600" />
-                            <span className="text-xs font-bold text-indigo-700 uppercase tracking-widest">Invited by a partner</span>
-                        </div>
-                    )}
                     <h1 className="text-5xl md:text-7xl font-black text-gray-900 tracking-tight leading-[1.1]">
                         Earn up to <span className="text-indigo-600">30% Commission</span><br />
                         by managing digital projects.
@@ -56,7 +40,7 @@ function JoinPageContent() {
                     </p>
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
                         <Link
-                            href={`/signup?role=commissioner${referralCode ? `&ref=${referralCode}` : ''}`}
+                            href="/signup?role=commissioner"
                             className="w-full sm:w-auto px-10 py-5 bg-indigo-600 text-white rounded-2xl font-bold text-lg hover:bg-indigo-700 transition-all shadow-2xl shadow-indigo-200 flex items-center justify-center gap-2 group"
                         >
                             Become a Commissioner
@@ -154,17 +138,5 @@ function JoinPageContent() {
                 </div>
             </footer>
         </div>
-    );
-}
-
-export default function JoinPage() {
-    return (
-        <Suspense fallback={
-            <div className="min-h-screen flex items-center justify-center bg-gray-50">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600"></div>
-            </div>
-        }>
-            <JoinPageContent />
-        </Suspense>
     );
 }

@@ -1,31 +1,52 @@
-// Login Page with Google OAuth
+// Login Page with improved UX
 'use client';
 
 import { signIn } from 'next-auth/react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Mail, Lock } from 'lucide-react';
+import { Mail, Lock, X } from 'lucide-react';
 
 export default function LoginPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
+    const [remember, setRemember] = useState(false);
+    const [error, setError] = useState('');
+
+    // Load saved email if exists
+    useEffect(() => {
+        const savedEmail = localStorage.getItem('saved_email');
+        if (savedEmail) {
+            setEmail(savedEmail);
+            setRemember(true);
+        }
+    }, []);
 
     const handleEmailLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
+        setError('');
+
+        // Save email if remember is checked
+        if (remember) {
+            localStorage.setItem('saved_email', email);
+        } else {
+            localStorage.removeItem('saved_email');
+        }
 
         const result = await signIn('credentials', {
             email,
             password,
-            callbackUrl: '/dashboard'
+            callbackUrl: '/dashboard',
+            redirect: false  // Don't auto-redirect so we can show errors
         });
 
-        if (!result?.error) {
-            // Success - NextAuth will redirect
-        } else {
-            alert('Login failed. Please check your credentials.');
+        if (result?.error) {
+            setError('Incorrect email or password. Please try again.');
             setLoading(false);
+        } else {
+            // Success - manually redirect
+            window.location.href = '/dashboard';
         }
     };
 
@@ -45,7 +66,20 @@ export default function LoginPage() {
                 </div>
 
                 {/* Main Card */}
-                <div className="bg-white rounded-2xl shadow-2xl p-8">
+                <div className="bg-white rounded-2xl shadow-2xl p-8 relative">
+                    {/* Error Overlay */}
+                    {error && (
+                        <div className="absolute -top-4 left-4 right-4 bg-red-500 text-white px-4 py-3 rounded-lg shadow-lg flex items-center justify-between  animate-in slide-in-from-top duration-300">
+                            <span className="text-sm font-medium">{error}</span>
+                            <button
+                                onClick={() => setError('')}
+                                className="text-white hover:text-red-100 transition"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+                    )}
+
                     <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">
                         Welcome back
                     </h2>
@@ -120,6 +154,20 @@ export default function LoginPage() {
                                     required
                                 />
                             </div>
+                        </div>
+
+                        {/* Remember Me */}
+                        <div className="flex items-center">
+                            <input
+                                type="checkbox"
+                                id="remember"
+                                checked={remember}
+                                onChange={(e) => setRemember(e.target.checked)}
+                                className="w-4 h-4 text-[#1f7a5a] border-gray-300 rounded focus:ring-[#1f7a5a]"
+                            />
+                            <label htmlFor="remember" className="ml-2 text-sm text-gray-600">
+                                Remember my email
+                            </label>
                         </div>
 
                         <button

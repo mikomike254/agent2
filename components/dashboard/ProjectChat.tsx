@@ -6,6 +6,7 @@ import { Card } from '@/components/ui/card';
 import { supabaseClient } from '@/lib/db';
 import { Send, User as UserIcon, Loader2 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import UserAvatar from '@/components/UserAvatar';
 
 interface Message {
     id: string;
@@ -129,9 +130,38 @@ export default function ProjectChat({ projectId, currentUserId }: ProjectChatPro
 
     return (
         <Card className="flex flex-col h-[600px] border-none shadow-none bg-[var(--bg-card)]">
-            <div className="p-4 border-b border-[var(--bg-input)]">
-                <h3 className="font-bold text-[var(--text-primary)]">Project Communication</h3>
-                <p className="text-xs text-[var(--text-secondary)]">Secure channel between Commissioner, Developer & Client</p>
+            <div className="p-4 border-b border-[var(--bg-input)] flex items-center justify-between">
+                <div>
+                    <h3 className="font-bold text-[var(--text-primary)]">Project Communication</h3>
+                    <p className="text-xs text-[var(--text-secondary)]">Secure channel between Commissioner, Developer & Client</p>
+                </div>
+                <button
+                    onClick={async () => {
+                        if (confirm('Create a new project from this conversation?')) {
+                            try {
+                                const res = await fetch('/api/projects', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({
+                                        title: 'New Project',
+                                        description: 'Project created from chat',
+                                        budget: 0
+                                    })
+                                });
+                                const result = await res.json();
+                                if (result.success) {
+                                    alert('Project created! Redirecting...');
+                                    window.location.href = `/dashboard/projects/${result.data.id}`;
+                                }
+                            } catch (error) {
+                                alert('Failed to create project');
+                            }
+                        }
+                    }}
+                    className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-semibold hover:bg-indigo-700 transition"
+                >
+                    Create Project
+                </button>
             </div>
 
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
@@ -149,14 +179,14 @@ export default function ProjectChat({ projectId, currentUserId }: ProjectChatPro
                         const isMe = msg.sender_id === currentUserId;
                         return (
                             <div key={msg.id} className={`flex gap-3 ${isMe ? 'flex-row-reverse' : ''}`}>
-                                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${isMe ? 'bg-[var(--primary)] text-white' : 'bg-[var(--bg-input)] text-[var(--text-secondary)]'
-                                    }`}>
-                                    {msg.sender?.avatar_url ? (
-                                        <img src={msg.sender.avatar_url} alt={msg.sender.name} className="w-full h-full rounded-full object-cover" />
-                                    ) : (
-                                        msg.sender?.name?.[0]?.toUpperCase() || <UserIcon className="w-4 h-4" />
-                                    )}
-                                </div>
+                                <UserAvatar
+                                    user={{
+                                        name: msg.sender?.name || 'Unknown',
+                                        avatar_url: msg.sender?.avatar_url,
+                                        role: msg.sender?.role
+                                    }}
+                                    size="sm"
+                                />
                                 <div className={`max-w-[80%] space-y-1 ${isMe ? 'items-end' : 'items-start'} flex flex-col`}>
                                     <div className="flex items-center gap-2">
                                         <span className="text-xs font-bold text-[var(--text-primary)]">
