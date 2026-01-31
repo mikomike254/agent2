@@ -17,7 +17,7 @@ This document summarizes all unfinished or partially implemented plans from `imp
 ## 🖥️ 2. Frontend Development (Missing Pages)
 
 ### Core Missing Routes
-- [ ] **Public Job Board**: Create `/app/jobs/page.tsx` to display open leads to the public/unauthenticated users.
+- [x] **Public Job Board**: Create `/app/jobs/page.tsx` to display open leads to the public/unauthenticated users.
 - [ ] **Public User Profiles**: Create `/app/profile/[userId]/page.tsx` for shared project visibility.
 - [ ] **Commissioner Profile**: Create `/app/commissioner/[userId]/page.tsx` specifically for showcasing commissioner track records.
 
