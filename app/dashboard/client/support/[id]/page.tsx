@@ -1,14 +1,15 @@
 'use client';
 
+import { use } from 'react';
 import { useSession } from 'next-auth/react';
 import TicketChat from '@/components/support/TicketChat';
 import Link from 'next/link';
 import { ArrowLeft, Clock, Hash } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
-export default function TicketDetailPage({ params }: { params: { id: string } }) {
+export default function TicketDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { data: session } = useSession();
-    const { id } = params;
+    const { id } = use(params);
     const [ticket, setTicket] = useState<any>(null);
 
     // Note: In Next 15 params is a promise, but for Next 14/13 it's an object. 

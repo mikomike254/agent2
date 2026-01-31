@@ -1,3 +1,8 @@
 'use client';
+
+import { use } from 'react';
 import TicketDetailView from '@/components/support/TicketDetailView';
-export default function CommissionerTicketDetail({ params }: { params: { id: string } }) { return <TicketDetailView id={params.id} role="commissioner" />; }
+export default function CommissionerTicketDetail({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = use(params);
+    return <TicketDetailView id={id} role="commissioner" />;
+}

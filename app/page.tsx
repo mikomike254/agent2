@@ -23,7 +23,7 @@ export default function HomePage() {
 
           <div className="flex items-center gap-4">
             <Link href="/login" className="text-sm font-medium hover:text-black hidden sm:block">Log in</Link>
-            <Link href="/find-commissioner" className="text-sm font-medium border border-black rounded-full px-5 py-2 hover:bg-black hover:text-white transition-colors">
+            <Link href="/signup" className="text-sm font-medium border border-black rounded-full px-5 py-2 hover:bg-black hover:text-white transition-colors">
               Get Started — It's Free
             </Link>
           </div>
@@ -231,7 +231,7 @@ export default function HomePage() {
                 </div>
               </div>
 
-              <Link href="/find-commissioner" className="inline-flex items-center gap-2 mt-8 text-sm font-semibold text-black hover:gap-3 transition-all">
+              <Link href="/jobs" className="inline-flex items-center gap-2 mt-8 text-sm font-semibold text-black hover:gap-3 transition-all">
                 Get Started Today <ChevronRight className="w-4 h-4" />
               </Link>
             </div>
@@ -275,7 +275,7 @@ export default function HomePage() {
                 </div>
               </div>
 
-              <Link href="/find-commissioner" className="bg-[#1f7a5a] text-white px-8 py-4 rounded-full font-semibold hover:bg-[#176549] transition-colors inline-flex items-center gap-2">
+              <Link href="/signup" className="bg-[#1f7a5a] text-white px-8 py-4 rounded-full font-semibold hover:bg-[#176549] transition-colors inline-flex items-center gap-2">
                 Start Your Project <ChevronRight className="w-4 h-4" />
               </Link>
             </div>
@@ -358,8 +358,8 @@ export default function HomePage() {
           <h2 className="font-serif text-4xl md:text-5xl font-bold mb-6">Ready to Build Your Project?</h2>
           <p className="text-lg text-gray-700 mb-8 max-w-2xl mx-auto">Connect with verified commissioners and start your secure development project today with escrow protection.</p>
           <div className="flex flex-wrap items-center justify-center gap-4">
-            <Link href="/find-commissioner" className="bg-black text-white px-8 py-4 rounded-full font-semibold hover:bg-gray-800 transition-colors">
-              Find a Commissioner
+            <Link href="/jobs" className="bg-black text-white px-8 py-4 rounded-full font-semibold hover:bg-gray-800 transition-colors">
+              Browse Open Jobs
             </Link>
             <Link href="/join" className="border border-black px-8 py-4 rounded-full font-semibold hover:bg-black hover:text-white transition-colors">
               Become a Commissioner
@@ -382,8 +382,8 @@ export default function HomePage() {
               <h4 className="font-semibold mb-4">Platform</h4>
               <ul className="space-y-2 text-sm text-gray-600">
                 <li><Link href="/how-it-works" className="hover:text-black">How It Works</Link></li>
-                <li><Link href="/services" className="hover:text-black">Services</Link></li>
-                <li><Link href="/find-commissioner" className="hover:text-black">Find Commissioner</Link></li>
+                <li><Link href="/jobs" className="hover:text-black">Open Jobs</Link></li>
+                <li><Link href="/signup" className="hover:text-black">Get Started</Link></li>
               </ul>
             </div>
 

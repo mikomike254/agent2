@@ -41,6 +41,10 @@
   --shadow-hover: 0 10px 30px -5px rgba(99, 102, 241, 0.2);
 }
 
+.font-serif {
+  font-family: 'Playfair Display', serif;
+}
+
 :root[class~="dark"] {
   /* Dark Mode - Improved Colors */
   --bg-app: #0f1419;

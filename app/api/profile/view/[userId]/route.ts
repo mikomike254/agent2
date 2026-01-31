@@ -4,10 +4,10 @@ import { supabaseAdmin } from '@/lib/db';
 
 export async function GET(
     req: NextRequest,
-    { params }: { params: { userId: string } }
+    { params }: { params: Promise<{ userId: string }> }
 ) {
     try {
-        const { userId } = params;
+        const { userId } = await params;
 
         // Fetch user basic info
         const { data: user, error } = await supabaseAdmin

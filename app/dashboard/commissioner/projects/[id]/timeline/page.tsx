@@ -1,5 +1,7 @@
 'use client';
 
+import { use } from 'react';
+
 import { Card } from '@/components/ui/card';
 import { ChevronLeft, Calendar, CheckCircle, Clock, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
@@ -22,8 +24,9 @@ const projectData = {
 
 const totalDays = 40; // Total timeline view
 
-export default function TimelinePage({ params }: { params: { id: string } }) {
-    // In real app, fetch project by params.id
+export default function TimelinePage({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = use(params);
+    // In real app, fetch project by id
 
     return (
         <div className="space-y-6">

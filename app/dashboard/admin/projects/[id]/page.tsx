@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { use, useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import {
@@ -17,7 +17,7 @@ import {
 import { Card } from '@/components/ui/card';
 import ProjectFileManager from '@/components/projects/ProjectFileManager';
 
-export default function AdminProjectDetailPage({ params }: { params: { id: string } }) {
+export default function AdminProjectDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { data: session } = useSession();
     const router = useRouter();
     const [project, setProject] = useState<any>(null);
@@ -27,8 +27,7 @@ export default function AdminProjectDetailPage({ params }: { params: { id: strin
     const [assigning, setAssigning] = useState<string | null>(null);
 
     // Unwrap params 
-    // Note: Next.js 15+ convention for async params, but using simpler prop access for now unless strict
-    const { id } = params;
+    const { id } = use(params);
 
     useEffect(() => {
         const fetchProject = async () => {
