@@ -17,7 +17,7 @@ export default function HomePage() {
 
           <div className="hidden md:flex items-center gap-8 text-sm text-gray-700">
             <Link href="/how-it-works" className="hover:text-black">How It Works</Link>
-            <Link href="/services" className="hover:text-black">Services</Link>
+            <Link href="/jobs" className="hover:text-black font-semibold text-indigo-600">Explore Jobs</Link>
             <Link href="/join" className="hover:text-black">Join as Commissioner</Link>
           </div>
 
@@ -64,12 +64,11 @@ export default function HomePage() {
               </div>
 
               <div className="flex flex-wrap items-center gap-4 pt-4">
+                <Link href="/jobs" className="bg-indigo-600 text-white px-8 py-4 rounded-full font-semibold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200">
+                  Browse Jobs
+                </Link>
                 <Link href="/find-commissioner" className="bg-black text-white px-8 py-4 rounded-full font-semibold hover:bg-gray-800 transition-colors">
                   Find a Commissioner
-                </Link>
-                <Link href="/how-it-works" className="text-sm font-medium hover:underline flex items-center gap-1">
-                  Learn More
-                  <span className="text-lg">→</span>
                 </Link>
               </div>
             </div>
