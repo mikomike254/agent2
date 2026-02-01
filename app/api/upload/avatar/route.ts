@@ -34,8 +34,9 @@ export async function POST(request: NextRequest) {
         const buffer = Buffer.from(arrayBuffer);
 
         // Upload to Supabase Storage
+        const bucketName = process.env.NEXT_PUBLIC_SUPABASE_STORAGE_BUCKET || 'project-files';
         const { data, error } = await supabase.storage
-            .from('uploads')
+            .from(bucketName)
             .upload(filePath, buffer, {
                 contentType: file.type,
                 upsert: true,
@@ -45,7 +46,7 @@ export async function POST(request: NextRequest) {
 
         // Get public URL
         const { data: { publicUrl } } = supabase.storage
-            .from('uploads')
+            .from(bucketName)
             .getPublicUrl(filePath);
 
         return NextResponse.json({

@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
                 client_phone,
                 client_email,
                 project_summary,
-                budget,
+                budget: budget ? parseFloat(budget.toString()) : null,
                 status // Use dynamic status
             })
             .select('*')

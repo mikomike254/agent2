@@ -25,9 +25,21 @@ const columns: { title: string; status: ProjectStatus; color: string }[] = [
     { title: 'Completed', status: 'completed', color: 'bg-green-50 border-green-100' },
 ];
 
+import { NewProjectModal } from '@/components/dashboard/NewProjectModal';
+import { useSession } from 'next-auth/react';
+
 export default function PipelinePage() {
+    const { data: session } = useSession();
     const [projects, setProjects] = useState<ProjectCard[]>([]);
     const [loading, setLoading] = useState(true);
+    const [isNewProjectOpen, setIsNewProjectOpen] = useState(false);
+    const commissionerId = (session?.user as any)?.roleData?.id || null; // This might need better retrieval if not in session
+
+    // ... (rest of the state and refresh logic is fine, just replacing the return primarily)
+
+    // We already have fetchProjects and refreshProjects. 
+    // Wait, I need to make sure I don't delete the existing logic.
+    // I will replace the component body to include the state and modal.
 
     useEffect(() => {
         const fetchProjects = async () => {
@@ -80,7 +92,10 @@ export default function PipelinePage() {
                     </Link>
                     <h2 className="text-3xl font-black text-gray-900 tracking-tight">Project Pipeline</h2>
                 </div>
-                <button className="px-4 py-2 bg-gray-900 text-white rounded-lg font-bold text-sm hover:bg-black flex items-center gap-2">
+                <button
+                    onClick={() => setIsNewProjectOpen(true)}
+                    className="px-4 py-2 bg-gray-900 text-white rounded-lg font-bold text-sm hover:bg-black flex items-center gap-2"
+                >
                     <Plus className="w-4 h-4" /> New Project
                 </button>
             </div>
@@ -139,6 +154,13 @@ export default function PipelinePage() {
                     })}
                 </div>
             </div>
+
+            <NewProjectModal
+                isOpen={isNewProjectOpen}
+                onClose={() => setIsNewProjectOpen(false)}
+                commissionerId={commissionerId}
+                onSuccess={refreshProjects}
+            />
         </div>
     );
 }

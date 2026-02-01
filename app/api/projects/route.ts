@@ -92,28 +92,48 @@ export async function POST(request: NextRequest) {
         const userRole = (session.user as any).role;
 
         // Get or create client record
-        let { data: client } = await supabaseAdmin
-            .from('clients')
-            .select('id')
-            .eq('user_id', userId)
-            .single();
+        let client;
 
-        // If client doesn't exist and user is a client, create one
-        if (!client && userRole === 'client') {
-            const { data: newClient, error: clientError } = await supabaseAdmin
+        if (userRole === 'commissioner' && body.clientId) {
+            // If commissioner is creating project, use provided clientId
+            // First verify the client exists
+            const { data: targetClient } = await supabaseAdmin
                 .from('clients')
-                .insert({
-                    user_id: userId,
-                    contact_person: (session.user as any).name || 'Unknown'
-                })
-                .select()
+                .select('id')
+                .eq('id', body.clientId)
                 .single();
 
-            if (clientError) {
-                console.error('Error creating client record:', clientError);
-                return NextResponse.json({ error: 'Failed to create client profile' }, { status: 500 });
+            if (!targetClient) {
+                return NextResponse.json({ error: 'Selected client not found.' }, { status: 404 });
             }
-            client = newClient;
+            client = targetClient;
+        } else {
+            // If client is creating project, resolve from session
+            const { data: myClient } = await supabaseAdmin
+                .from('clients')
+                .select('id')
+                .eq('user_id', userId)
+                .single();
+
+            // If client doesn't exist and user is a client, create one
+            if (!myClient && userRole === 'client') {
+                const { data: newClient, error: clientError } = await supabaseAdmin
+                    .from('clients')
+                    .insert({
+                        user_id: userId,
+                        contact_person: (session.user as any).name || 'Unknown'
+                    })
+                    .select()
+                    .single();
+
+                if (clientError) {
+                    console.error('Error creating client record:', clientError);
+                    return NextResponse.json({ error: 'Failed to create client profile' }, { status: 500 });
+                }
+                client = newClient;
+            } else {
+                client = myClient;
+            }
         }
 
         if (!client) {

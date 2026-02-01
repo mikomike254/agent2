@@ -127,8 +127,6 @@ export async function POST(request: NextRequest) {
         if (phone !== undefined) userUpdates.phone = phone;
         if (bio !== undefined) userUpdates.bio = bio;
         if (avatar_url !== undefined) userUpdates.avatar_url = avatar_url;
-        if (company !== undefined) userUpdates.company = company;
-        if (industry !== undefined) userUpdates.industry = industry;
         if (location !== undefined) userUpdates.location = location;
         if (timezone !== undefined) userUpdates.timezone = timezone;
         if (linkedin_url !== undefined) userUpdates.linkedin_url = linkedin_url;
