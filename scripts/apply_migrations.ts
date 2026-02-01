@@ -4,9 +4,27 @@ import fs from 'fs';
 import path from 'path';
 
 const migrations = [
+    '001_initial_schema.sql',
+    '002_client_onboarding_system.sql',
+    '002_crm_messaging.sql',
+    '003_commission_updates.sql',
+    '004_invoices.sql',
+    '005_developer_system.sql',
+    '006_full_system_update.sql',
+    '006_simplify_leads.sql',
+    '007_schema_fixes.sql',
+    '008_comprehensive_schema.sql',
+    '009_fix_leads_schema.sql',
+    '010_create_messages_table.sql',
+    '010_remove_referrals.sql',
+    '011_add_milestone_checklist.sql',
     '011_enhanced_job_project_system.sql',
     '012_rls_policies.sql',
-    '013_helper_functions.sql'
+    '013_helper_functions.sql',
+    '014_avatar_storage.sql',
+    '015_client_onboarding.sql',
+    '017_profile_enhancements.sql',
+    '018_messaging_system.sql'
 ];
 
 async function applyMigrations() {
