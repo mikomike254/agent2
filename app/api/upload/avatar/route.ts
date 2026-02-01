@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
         const buffer = Buffer.from(arrayBuffer);
 
         // Upload to Supabase Storage
-        const bucketName = process.env.NEXT_PUBLIC_SUPABASE_STORAGE_BUCKET || 'project-files';
+        const bucketName = 'avatars';
         const { data, error } = await supabase.storage
             .from(bucketName)
             .upload(filePath, buffer, {

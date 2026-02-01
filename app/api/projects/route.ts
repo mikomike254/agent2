@@ -155,7 +155,6 @@ export async function POST(request: NextRequest) {
                 title,
                 description,
                 total_value: budget || 0,
-                budget,
                 timeline,
                 skills: skills || [],
                 status: projectType === 'direct' ? 'active' : 'lead',

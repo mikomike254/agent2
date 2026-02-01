@@ -60,11 +60,19 @@ export default function NewProjectPage() {
     const handleSubmit = async () => {
         setSubmitting(true);
         try {
+            // Parse numeric budget from range string (e.g., "50000-150000" -> 50000)
+            let numericBudget = 0;
+            if (formData.budget) {
+                const match = formData.budget.match(/\d+/);
+                if (match) numericBudget = parseInt(match[0]);
+            }
+
             const response = await fetch('/api/projects', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     ...formData,
+                    budget: numericBudget,
                     client_id: (session?.user as any)?.id,
                 }),
             });
@@ -91,8 +99,8 @@ export default function NewProjectPage() {
                     <div key={s} className="flex items-center flex-1">
                         <div
                             className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${step >= s
-                                    ? 'bg-[var(--primary)] text-white'
-                                    : 'bg-[var(--bg-input)] text-[var(--text-secondary)]'
+                                ? 'bg-[var(--primary)] text-white'
+                                : 'bg-[var(--bg-input)] text-[var(--text-secondary)]'
                                 }`}
                         >
                             {step > s ? <CheckCircle className="w-6 h-6" /> : s}
@@ -119,8 +127,8 @@ export default function NewProjectPage() {
                             <button
                                 onClick={() => setFormData({ ...formData, projectType: 'direct' })}
                                 className={`p-8 rounded-2xl border-2 transition-all text-left ${formData.projectType === 'direct'
-                                        ? 'border-[var(--primary)] bg-[var(--primary)]/5'
-                                        : 'border-[var(--bg-input)] hover:border-[var(--primary)]/30'
+                                    ? 'border-[var(--primary)] bg-[var(--primary)]/5'
+                                    : 'border-[var(--bg-input)] hover:border-[var(--primary)]/30'
                                     }`}
                             >
                                 <Briefcase className="w-12 h-12 text-[var(--primary)] mb-4" />
@@ -132,8 +140,8 @@ export default function NewProjectPage() {
                             <button
                                 onClick={() => setFormData({ ...formData, projectType: 'open' })}
                                 className={`p-8 rounded-2xl border-2 transition-all text-left ${formData.projectType === 'open'
-                                        ? 'border-[var(--primary)] bg-[var(--primary)]/5'
-                                        : 'border-[var(--bg-input)] hover:border-[var(--primary)]/30'
+                                    ? 'border-[var(--primary)] bg-[var(--primary)]/5'
+                                    : 'border-[var(--bg-input)] hover:border-[var(--primary)]/30'
                                     }`}
                             >
                                 <Briefcase className="w-12 h-12 text-[var(--accent)] mb-4" />
@@ -196,8 +204,8 @@ export default function NewProjectPage() {
                                             key={range.value}
                                             onClick={() => setFormData({ ...formData, budget: range.value })}
                                             className={`p-4 rounded-xl border-2 text-left transition-all ${formData.budget === range.value
-                                                    ? 'border-[var(--primary)] bg-[var(--primary)]/5'
-                                                    : 'border-[var(--bg-input)] hover:border-[var(--primary)]/30'
+                                                ? 'border-[var(--primary)] bg-[var(--primary)]/5'
+                                                : 'border-[var(--bg-input)] hover:border-[var(--primary)]/30'
                                                 }`}
                                         >
                                             {range.label}
@@ -232,8 +240,8 @@ export default function NewProjectPage() {
                                     key={skill}
                                     onClick={() => toggleSkill(skill)}
                                     className={`px-4 py-2 rounded-xl font-medium transition-all ${formData.skills.includes(skill)
-                                            ? 'bg-[var(--primary)] text-white'
-                                            : 'bg-[var(--bg-input)] text-[var(--text-secondary)] hover:bg-[var(--bg-input)]/70'
+                                        ? 'bg-[var(--primary)] text-white'
+                                        : 'bg-[var(--bg-input)] text-[var(--text-secondary)] hover:bg-[var(--bg-input)]/70'
                                         }`}
                                 >
                                     {skill}
