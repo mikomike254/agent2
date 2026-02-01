@@ -24,30 +24,26 @@ export const authOptions: NextAuthOptions = {
                 }
 
                 try {
-                    const { data: user, error } = await supabaseAdmin
+                    // Authenticate directly with Supabase Auth
+                    const { data: authData, error: authError } = await supabaseAdmin.auth.signInWithPassword({
+                        email: credentials.email,
+                        password: credentials.password
+                    });
+
+                    if (authError || !authData.user) {
+                        console.error('Supabase Auth error:', authError?.message);
+                        return null;
+                    }
+
+                    // Get user profile from public table
+                    const { data: user, error: profileError } = await supabaseAdmin
                         .from('users')
                         .select('*')
-                        .eq('email', credentials.email)
+                        .eq('id', authData.user.id)
                         .single();
 
-                    if (error) {
-                        console.error('Database error during login:', error.message);
-                        return null;
-                    }
-
-                    if (!user) {
-                        console.log('User not found in database');
-                        return null;
-                    }
-
-                    // Verify password hash
-                    const passwordHash = crypto
-                        .createHash('sha256')
-                        .update(credentials.password)
-                        .digest('hex');
-
-                    if (user.password_hash !== passwordHash) {
-                        console.log('Password mismatch');
+                    if (profileError || !user) {
+                        console.error('Profile not found for authenticated user');
                         return null;
                     }
 
@@ -55,7 +51,7 @@ export const authOptions: NextAuthOptions = {
                     return {
                         id: user.id,
                         email: user.email,
-                        name: user.name,
+                        name: user.name || authData.user.user_metadata.full_name,
                         role: user.role,
                         image: user.avatar_url
                     };
