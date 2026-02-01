@@ -5,6 +5,8 @@ import { useSession } from 'next-auth/react';
 import { useState, useEffect } from 'react';
 import { ArrowLeft, Users, DollarSign, Calendar, CheckCircle, Clock, MessageSquare, Loader2, Link as LinkIcon, Briefcase } from 'lucide-react';
 import { Card } from '@/components/ui/card';
+import { useRealtime } from '@/hooks/useRealtime';
+import { useCallback } from 'react';
 import Link from 'next/link';
 import ProjectFileManager from '@/components/projects/ProjectFileManager';
 import ProjectChat from '@/components/dashboard/ProjectChat';
@@ -58,6 +60,25 @@ export default function CommissionerProjectDetailPage() {
             setLoading(false);
         }
     };
+
+    // Real-time integration
+    const refreshProject = useCallback(() => {
+        if (!params.id) return;
+
+        // We can optimize this later to fetch just one project if API supports it
+        // For now, re-fetching list is safe as per current implementation
+        fetchProject();
+    }, [params.id]);
+
+    useRealtime(
+        { table: 'projects', event: '*', filter: `id=eq.${params.id}`, enabled: !!params.id },
+        refreshProject
+    );
+
+    useRealtime(
+        { table: 'project_milestones', event: '*', filter: `project_id=eq.${params.id}`, enabled: !!params.id },
+        refreshProject
+    );
 
     if (loading) {
         return (

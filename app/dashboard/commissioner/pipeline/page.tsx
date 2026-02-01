@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { useRealtime } from '@/hooks/useRealtime';
 import { Card } from '@/components/ui/card';
 import { MoreHorizontal, Plus, ChevronLeft, Calendar, DollarSign, User, Loader2 } from 'lucide-react';
 import Link from 'next/link';
@@ -44,6 +45,23 @@ export default function PipelinePage() {
         };
         fetchProjects();
     }, []);
+
+    // Real-time integration
+    const refreshProjects = useCallback(() => {
+        fetch('/api/projects')
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    setProjects(data.data);
+                }
+            })
+            .catch(error => console.error('Error refreshing pipeline:', error));
+    }, []);
+
+    useRealtime(
+        { table: 'projects', event: '*', enabled: true },
+        refreshProjects
+    );
 
     if (loading) {
         return (

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
 import {
     CheckCircle,
@@ -21,6 +21,7 @@ import {
 import { Card } from '@/components/ui/card';
 import Link from 'next/link';
 import { TopUpModal } from '@/components/projects/TopUpModal';
+import { useRealtime } from '@/hooks/useRealtime';
 
 export default function ClientDashboard() {
     const { data: session } = useSession();
@@ -75,6 +76,53 @@ export default function ClientDashboard() {
             fetchDashboardData();
         }
     }, [session]);
+
+    // Real-time updates for client dashboard
+    const refreshClientData = useCallback(() => {
+        if (!session) return;
+
+        // Refresh projects
+        fetch('/api/projects').then(res => res.json()).then(data => {
+            if (data.success) {
+                const projects = data.data || [];
+                setStats(prev => ({
+                    ...prev,
+                    activeProjects: projects.filter((p: any) => p.status === 'active').length,
+                    pendingProposals: projects.filter((p: any) => p.status === 'pending').length,
+                    teamMembers: projects.reduce((acc: number, p: any) =>
+                        acc + (p.team_members?.length || 0), 0
+                    ),
+                }));
+            }
+        });
+
+        // Refresh payments
+        fetch('/api/payments').then(res => res.json()).then(data => {
+            if (data.success) {
+                const payments = data.data || [];
+                const total = payments
+                    .filter((p: any) => p.status === 'verified' || p.status === 'released')
+                    .reduce((acc: number, p: any) => acc + Number(p.amount), 0);
+                setStats(prev => ({ ...prev, totalInvested: total }));
+            }
+        });
+    }, [session]);
+
+    // Subscribe to real-time changes
+    useRealtime(
+        { table: 'projects', event: '*', enabled: !!session },
+        refreshClientData
+    );
+
+    useRealtime(
+        { table: 'project_milestones', event: '*', enabled: !!session },
+        refreshClientData
+    );
+
+    useRealtime(
+        { table: 'payments', event: '*', enabled: !!session },
+        refreshClientData
+    );
 
     const getGreeting = () => {
         const hour = new Date().getHours();

@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Search, Phone, Mail, Clock, DollarSign, UserCheck, CheckCircle } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { useRealtime } from '@/hooks/useRealtime';
 
 interface Lead {
     id: string;
@@ -54,6 +55,16 @@ export default function LeadsPage() {
             setLoading(false);
         }
     };
+
+    // Real-time updates
+    const refreshLeads = useCallback(() => {
+        fetchLeads();
+    }, []);
+
+    useRealtime(
+        { table: 'leads', event: '*', enabled: true },
+        refreshLeads
+    );
 
     const handleClaim = async (leadId: string) => {
         try {

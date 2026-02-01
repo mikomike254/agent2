@@ -2,8 +2,9 @@
 'use client';
 
 import { useSession } from 'next-auth/react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Briefcase, Upload, Clock, CheckCircle, AlertTriangle, Wallet, Activity, ArrowUpRight } from 'lucide-react';
+import { useRealtime } from '@/hooks/useRealtime';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 
@@ -31,6 +32,36 @@ export default function DeveloperDashboard() {
             fetchData();
         }
     }, [session]);
+
+    // Real-time updates for developer dashboard
+    const refreshDeveloperData = useCallback(() => {
+        if (!session?.user) return;
+
+        fetch('/api/developer/dashboard')
+            .then(res => res.json())
+            .then(result => {
+                if (result.success) {
+                    setData(result.data);
+                }
+            })
+            .catch(error => console.error('Error refreshing developer data:', error));
+    }, [session?.user]);
+
+    // Subscribe to real-time changes
+    useRealtime(
+        { table: 'projects', event: '*', enabled: !!session?.user },
+        refreshDeveloperData
+    );
+
+    useRealtime(
+        { table: 'project_milestones', event: '*', enabled: !!session?.user },
+        refreshDeveloperData
+    );
+
+    useRealtime(
+        { table: 'payouts', event: '*', enabled: !!session?.user },
+        refreshDeveloperData
+    );
 
     if (loading) {
         return (
@@ -154,8 +185,8 @@ export default function DeveloperDashboard() {
                                                     {project.title}
                                                 </h3>
                                                 <span className={`px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border ${project.role === 'lead' ? 'bg-indigo-50 text-indigo-700 border-indigo-100' :
-                                                        project.role === 'qa' ? 'bg-amber-50 text-amber-700 border-amber-100' :
-                                                            'bg-purple-50 text-purple-700 border-purple-100'
+                                                    project.role === 'qa' ? 'bg-amber-50 text-amber-700 border-amber-100' :
+                                                        'bg-purple-50 text-purple-700 border-purple-100'
                                                     }`}>
                                                     Squad Position: {project.role}
                                                 </span>

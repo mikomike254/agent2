@@ -13,6 +13,8 @@ import {
     ArrowDownLeft
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
+import { useRealtime } from '@/hooks/useRealtime';
+import { useCallback } from 'react';
 
 export default function AdminPaymentsPage() {
     const { data: session } = useSession();
@@ -21,24 +23,34 @@ export default function AdminPaymentsPage() {
     const [filterStatus, setFilterStatus] = useState('all');
 
     useEffect(() => {
-        const fetchPayments = async () => {
-            try {
-                const response = await fetch('/api/payments');
-                const result = await response.json();
-                if (result.success) {
-                    setPayments(result.data);
-                }
-            } catch (error) {
-                console.error('Error fetching payments:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
         if (session) {
             fetchPayments();
         }
     }, [session]);
+
+    const fetchPayments = async () => {
+        try {
+            const response = await fetch('/api/payments');
+            const result = await response.json();
+            if (result.success) {
+                setPayments(result.data);
+            }
+        } catch (error) {
+            console.error('Error fetching payments:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Real-time integration
+    const refreshPayments = useCallback(() => {
+        fetchPayments();
+    }, []);
+
+    useRealtime(
+        { table: 'payments', event: '*', enabled: !!session },
+        refreshPayments
+    );
 
     const stats = {
         total: payments.reduce((acc, p) => acc + Number(p.amount), 0),
@@ -87,8 +99,8 @@ export default function AdminPaymentsPage() {
                                 key={s}
                                 onClick={() => setFilterStatus(s)}
                                 className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all ${filterStatus === s
-                                        ? 'bg-gray-900 text-white shadow-md'
-                                        : 'bg-gray-50 text-gray-500 hover:bg-gray-100'
+                                    ? 'bg-gray-900 text-white shadow-md'
+                                    : 'bg-gray-50 text-gray-500 hover:bg-gray-100'
                                     } uppercase tracking-wider`}
                             >
                                 {s}
@@ -141,12 +153,12 @@ export default function AdminPaymentsPage() {
                                             </td>
                                             <td className="px-6 py-4">
                                                 <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase ${payment.status === 'verified' ? 'bg-green-100 text-green-700' :
-                                                        payment.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
-                                                            'bg-gray-100 text-gray-700'
+                                                    payment.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
+                                                        'bg-gray-100 text-gray-700'
                                                     }`}>
                                                     <span className={`w-1.5 h-1.5 rounded-full ${payment.status === 'verified' ? 'bg-green-500' :
-                                                            payment.status === 'pending' ? 'bg-yellow-500' :
-                                                                'bg-gray-500'
+                                                        payment.status === 'pending' ? 'bg-yellow-500' :
+                                                            'bg-gray-500'
                                                         }`} />
                                                     {payment.status}
                                                 </span>

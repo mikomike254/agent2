@@ -14,6 +14,8 @@ import {
     MoreVertical
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
+import { useRealtime } from '@/hooks/useRealtime';
+import { useCallback } from 'react';
 
 export default function AdminUsersPage() {
     const { data: session } = useSession();
@@ -23,24 +25,34 @@ export default function AdminUsersPage() {
     const [filterRole, setFilterRole] = useState('all');
 
     useEffect(() => {
-        const fetchUsers = async () => {
-            try {
-                const response = await fetch('/api/admin/users');
-                const result = await response.json();
-                if (result.success) {
-                    setUsers(result.data);
-                }
-            } catch (error) {
-                console.error('Error fetching users:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
         if (session) {
             fetchUsers();
         }
     }, [session]);
+
+    const fetchUsers = async () => {
+        try {
+            const response = await fetch('/api/admin/users');
+            const result = await response.json();
+            if (result.success) {
+                setUsers(result.data);
+            }
+        } catch (error) {
+            console.error('Error fetching users:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Real-time integration
+    const refreshUsers = useCallback(() => {
+        fetchUsers();
+    }, []);
+
+    useRealtime(
+        { table: 'users', event: '*', enabled: !!session },
+        refreshUsers
+    );
 
     const filteredUsers = users.filter(user => {
         const matchesSearch =
@@ -125,9 +137,9 @@ export default function AdminUsersPage() {
                                         </td>
                                         <td className="px-6 py-4">
                                             <span className={`px-3 py-1 rounded-full text-xs font-medium ${user.role === 'admin' ? 'bg-purple-100 text-purple-700' :
-                                                    user.role === 'developer' ? 'bg-blue-100 text-blue-700' :
-                                                        user.role === 'commissioner' ? 'bg-orange-100 text-orange-700' :
-                                                            'bg-green-100 text-green-700'
+                                                user.role === 'developer' ? 'bg-blue-100 text-blue-700' :
+                                                    user.role === 'commissioner' ? 'bg-orange-100 text-orange-700' :
+                                                        'bg-green-100 text-green-700'
                                                 }`}>
                                                 {user.role}
                                             </span>

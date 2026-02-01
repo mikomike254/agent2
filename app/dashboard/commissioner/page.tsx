@@ -2,7 +2,7 @@
 'use client';
 
 import { useSession } from 'next-auth/react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
     Users,
     Link2,
@@ -23,6 +23,7 @@ import { LeadBarChart } from '@/components/ui/charts';
 import { NewLeadModal } from '@/components/dashboard/NewLeadModal';
 import { CreateInvoiceModal } from '@/components/dashboard/CreateInvoiceModal';
 import Link from 'next/link';
+import { useRealtime } from '@/hooks/useRealtime';
 
 export default function CommissionerDashboard() {
     const { data: session } = useSession();
@@ -96,6 +97,66 @@ export default function CommissionerDashboard() {
             fetchDashboardData();
         }
     }, [session]);
+
+    // Real-time updates - refresh data when tables change
+    const refreshDashboard = useCallback(() => {
+        if (!commissionerId || !session) return;
+
+        // Refetch leads
+        fetch('/api/leads').then(res => res.json()).then(data => {
+            if (data.success) {
+                const myLeads = data.data.filter((l: any) =>
+                    l.commissioner_id === commissionerId || l.claimed_by === commissionerId
+                );
+                const pendingLeads = myLeads.filter((l: any) =>
+                    l.status === 'created' || l.status === 'claimed'
+                ).length;
+                const recentLeads = myLeads.slice(0, 5);
+
+                setStats(prev => ({
+                    ...prev,
+                    pendingLeads,
+                    recentLeads
+                }));
+            }
+        });
+
+        // Refetch projects
+        fetch('/api/projects').then(res => res.json()).then(data => {
+            if (data.success) {
+                const activeProjects = data.data.filter((p: any) =>
+                    p.status === 'active' || p.status === 'in_progress'
+                ).length;
+                setStats(prev => ({ ...prev, activeProjects }));
+            }
+        });
+
+        // Refetch payments for revenue
+        fetch('/api/payments').then(res => res.json()).then(data => {
+            if (data.success) {
+                const totalRevenue = data.data.reduce((sum: number, p: any) =>
+                    sum + (Number(p.amount) || 0), 0
+                );
+                setStats(prev => ({ ...prev, totalRevenue }));
+            }
+        });
+    }, [commissionerId, session]);
+
+    // Subscribe to real-time changes
+    useRealtime(
+        { table: 'leads', event: '*', enabled: !!commissionerId },
+        refreshDashboard
+    );
+
+    useRealtime(
+        { table: 'projects', event: '*', enabled: !!commissionerId },
+        refreshDashboard
+    );
+
+    useRealtime(
+        { table: 'payments', event: '*', enabled: !!commissionerId },
+        refreshDashboard
+    );
 
     if (loading) {
         return (

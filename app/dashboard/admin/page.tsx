@@ -2,11 +2,11 @@
 'use client';
 
 import { useSession } from 'next-auth/react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { RevenueLineChart } from '@/components/ui/charts';
 import { CheckCircle, AlertCircle, Shield, DollarSign, Eye, TrendingUp, Briefcase, Mail, Loader2 } from 'lucide-react';
-
 import { Card } from '@/components/ui/card';
+import { useRealtime } from '@/hooks/useRealtime';
 
 export default function AdminDashboard() {
     const { data: session } = useSession();
@@ -43,6 +43,37 @@ export default function AdminDashboard() {
             fetchData();
         }
     }, [session]);
+
+    // Real-time updates for admin
+    const refreshAdminData = useCallback(() => {
+        if (!session?.user) return;
+
+        // Refresh pending users
+        fetch('/api/admin/users/pending').then(res => res.json()).then(data => {
+            if (data.success) setPendingUsers(data.data);
+        });
+
+        // Refresh proposals
+        fetch('/api/admin/proposals').then(res => res.json()).then(data => {
+            if (data.success) setProposals(data.data);
+        });
+    }, [session?.user]);
+
+    // Subscribe to real-time changes for admin monitoring
+    useRealtime(
+        { table: 'users', event: '*', enabled: !!session?.user },
+        refreshAdminData
+    );
+
+    useRealtime(
+        { table: 'leads', event: '*', enabled: !!session?.user },
+        refreshAdminData
+    );
+
+    useRealtime(
+        { table: 'payments', event: '*', enabled: !!session?.user },
+        refreshAdminData
+    );
 
     const handleVerifyPayment = async (paymentId: string) => {
         const response = await fetch(`/api/admin/payments/${paymentId}/verify`, {

@@ -4,6 +4,7 @@
 import { Search, Bell, ChevronDown, Menu } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { motion } from 'framer-motion';
+import { ConnectionStatus } from '@/components/ConnectionStatus';
 
 export function TopBar({ onMenuClick }: { onMenuClick: () => void }) {
     const { data: session } = useSession();
@@ -33,6 +34,9 @@ export function TopBar({ onMenuClick }: { onMenuClick: () => void }) {
 
             {/* Actions */}
             <div className="flex items-center gap-3 md:gap-8">
+                {/* Connection Status */}
+                <ConnectionStatus />
+
                 <button className="relative p-3 rounded-2xl bg-gray-50/50 hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-all active:scale-95">
                     <Bell className="w-5 h-5" />
                     <span className="absolute top-2.5 right-2.5 w-2.5 h-2.5 bg-indigo-500 rounded-full border-2 border-white shadow-sm animate-pulse"></span>
