@@ -24,6 +24,11 @@ export const authOptions: NextAuthOptions = {
                 }
 
                 try {
+                    if (!supabaseAdmin) {
+                        console.error('Supabase Admin client not initialized');
+                        return null;
+                    }
+
                     // Authenticate directly with Supabase Auth
                     const { data: authData, error: authError } = await supabaseAdmin.auth.signInWithPassword({
                         email: credentials.email,
@@ -64,7 +69,7 @@ export const authOptions: NextAuthOptions = {
     ],
     callbacks: {
         async signIn({ user, account }) {
-            if (account?.provider === 'google') {
+            if (account?.provider === 'google' && supabaseAdmin) {
                 const { data: existingUser } = await supabaseAdmin
                     .from('users')
                     .select('*')
@@ -90,7 +95,7 @@ export const authOptions: NextAuthOptions = {
             if (user) {
                 token.role = user.role;
                 token.id = user.id;
-            } else if (token.email) {
+            } else if (token.email && supabaseAdmin) {
                 const { data: dbUser } = await supabaseAdmin
                     .from('users')
                     .select('*')

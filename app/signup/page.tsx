@@ -34,17 +34,33 @@ export default function SignupPage() {
             const result = await response.json();
 
             if (result.success) {
-                if (formData.role === 'client') {
-                    // Auto-login clients
-                    await signIn('credentials', {
-                        email: formData.email,
-                        password: formData.password,
-                        callbackUrl: '/dashboard/client'
-                    });
+                // Determine redirect path
+                const roleRedirects: Record<string, string> = {
+                    client: '/dashboard/client',
+                    commissioner: '/dashboard/commissioner',
+                    developer: '/dashboard/developer',
+                    admin: '/dashboard/admin'
+                };
+                const callbackUrl = roleRedirects[formData.role] || '/dashboard';
+
+                // Automatically sign in the user
+                const signInResult = await signIn('credentials', {
+                    email: formData.email,
+                    password: formData.password,
+                    redirect: false,
+                    callbackUrl
+                });
+
+                if (signInResult?.error) {
+                    setMessage('Account created, but could not sign in automatically. Please log in manually.');
+                    setTimeout(() => router.push('/login'), 2000);
+                } else if (formData.role !== 'client') {
+                    // Show pending message but still allow login session 
+                    // (Dashboard middleware will handle approval checks)
+                    setMessage('Registration successful! Your account is pending admin approval.');
+                    setTimeout(() => router.push(callbackUrl), 2000);
                 } else {
-                    // Show pending message for commissioners/developers
-                    setMessage('Registration submitted! Your account is pending admin approval. You will receive an email once approved.');
-                    setTimeout(() => router.push('/login'), 3000);
+                    router.push(callbackUrl);
                 }
             } else {
                 setMessage(result.message || 'Signup failed. Please try again.');

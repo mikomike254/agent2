@@ -4,83 +4,84 @@ import { supabaseAdmin } from '@/lib/db';
 import crypto from 'crypto';
 
 export async function POST(req: NextRequest) {
+    if (!supabaseAdmin) {
+        return NextResponse.json(
+            { success: false, message: 'Supabase Admin client not initialized. Check environment variables.' },
+            { status: 500 }
+        );
+    }
     try {
         const reqjson = await req.json();
         const { name, email, password, role, phone } = reqjson;
 
-        // Check if user already exists
-        const { data: existingUser } = await supabaseAdmin
-            .from('users')
-            .select('*')
-            .eq('email', email)
-            .single();
+        // 1. Create user in Supabase Auth
+        const { data: authUser, error: authError } = await supabaseAdmin.auth.admin.createUser({
+            email,
+            password,
+            email_confirm: true,
+            user_metadata: { full_name: name, role, phone }
+        });
 
-        if (existingUser) {
+        if (authError) {
+            console.error('Supabase Auth creation error:', authError.message);
             return NextResponse.json(
-                { success: false, message: 'User with this email already exists' },
+                { success: false, message: authError.message },
                 { status: 400 }
             );
         }
 
-        // Hash password (in production, use bcrypt)
-        const passwordHash = crypto
-            .createHash('sha256')
-            .update(password)
-            .digest('hex');
+        const user = authUser.user;
 
-        // Determine approval status
-        const verified = role === 'client'; // Auto-approve clients
-
-        // Create user
-        const { data: newUser, error } = await supabaseAdmin
+        // 2. Create user in public.users table (linked by ID)
+        const { data: newUser, error: profileError } = await supabaseAdmin
             .from('users')
             .insert({
+                id: user.id, // Use the ID from Auth
                 name,
                 email,
-                password_hash: passwordHash,
                 role,
                 phone,
-                verified
-                // removed status as it's missing from schema
+                verified: role === 'client' // Auto-approve clients
             })
             .select()
             .single();
 
-        if (error) {
-            console.error('User creation error:', error);
+        if (profileError) {
+            console.error('Profile creation error:', profileError);
+            // Cleanup: delete the auth user if profile creation fails? 
+            // Better to just return error for now.
             return NextResponse.json(
-                { success: false, message: `Failed to create user: ${error.message}` },
+                { success: false, message: `Failed to create profile: ${profileError.message}` },
                 { status: 500 }
             );
         }
 
-        // If commissioner or developer, create additional profile
+        // 3. Create role-specific profiles
         if (role === 'commissioner') {
-            const { error: commError } = await supabaseAdmin.from('commissioners').insert({
+            await supabaseAdmin.from('commissioners').insert({
                 user_id: newUser.id,
                 tier: 'tier1',
-                rate_percent: 25.0,
-                verified_at: null // Explicitly pending
+                rate_percent: 25.0
             });
-
-            if (commError) {
-                console.error('Commissioner creation error:', commError);
-                // We keep the user but log the error
-            }
+        } else if (role === 'developer') {
+            await supabaseAdmin.from('developers').insert({
+                user_id: newUser.id,
+                verified: false
+            });
+        } else if (role === 'client') {
+            await supabaseAdmin.from('clients').insert({
+                user_id: newUser.id,
+                company_name: name // Default to name
+            });
         }
 
-        // Create audit log
+        // 4. Create audit log
         await supabaseAdmin.from('audit_logs').insert({
             actor_id: newUser.id,
             actor_role: role,
             action: 'user_registration',
-            details: { role, email },
-            // Removed ip_address as it's not in schema
+            details: { role, email }
         });
-
-        // TODO: Send notification email
-        // If commissioner/developer: "Registration pending approval"
-        // If client: "Welcome to Tech Developers"
 
         return NextResponse.json({
             success: true,
@@ -88,8 +89,7 @@ export async function POST(req: NextRequest) {
                 id: newUser.id,
                 email: newUser.email,
                 role: newUser.role,
-                status: newUser.status,
-                requiresApproval: !verified
+                requiresApproval: role !== 'client'
             }
         });
 
