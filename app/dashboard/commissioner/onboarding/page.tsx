@@ -72,7 +72,7 @@ export default function CommissionerOnboardingPage() {
     };
 
     const copyLink = (id: string) => {
-        const url = `${window.location.origin}/onboard/${id}`;
+        const url = `${window.location.origin}/onboard/session/${id}`;
         navigator.clipboard.writeText(url);
         alert('Onboarding link copied to clipboard!');
     };
@@ -232,7 +232,7 @@ export default function CommissionerOnboardingPage() {
                                                     asChild
                                                     className="h-8 px-3 rounded-lg border-gray-200 text-gray-600 hover:text-indigo-600 hover:border-indigo-100"
                                                 >
-                                                    <a href={`/onboard/${session.id}`} target="_blank" rel="noopener noreferrer">
+                                                    <a href={`/onboard/session/${session.id}`} target="_blank" rel="noopener noreferrer">
                                                         <ExternalLink className="w-3.5 h-3.5 mr-1" />
                                                         Preview
                                                     </a>

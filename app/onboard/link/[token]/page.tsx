@@ -53,8 +53,8 @@ export default function ClientOnboardingPage() {
     const fetchOnboardingData = async () => {
         try {
             const [sessionRes, stepsRes] = await Promise.all([
-                fetch(`/api/onboarding/${token}`),
-                fetch(`/api/onboarding/${token}/steps`)
+                fetch(`/api/onboarding/link/${token}`),
+                fetch(`/api/onboarding/link/${token}/steps`)
             ]);
 
             const sessionData = await sessionRes.json();
@@ -79,7 +79,7 @@ export default function ClientOnboardingPage() {
     const handleStepSubmit = async (stepNumber: number, data: any) => {
         setSaving(true);
         try {
-            const response = await fetch(`/api/onboarding/${token}/steps`, {
+            const response = await fetch(`/api/onboarding/link/${token}/steps`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -119,7 +119,7 @@ export default function ClientOnboardingPage() {
 
     const completeOnboarding = async () => {
         try {
-            const response = await fetch(`/api/onboarding/${token}`, {
+            const response = await fetch(`/api/onboarding/link/${token}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -215,10 +215,10 @@ export default function ClientOnboardingPage() {
                                     <div
                                         key={step.id}
                                         className={`flex items-start gap-3 cursor-pointer transition-all ${index + 1 === currentStep
-                                                ? 'opacity-100'
-                                                : step.status === 'completed'
-                                                    ? 'opacity-75 hover:opacity-100'
-                                                    : 'opacity-40'
+                                            ? 'opacity-100'
+                                            : step.status === 'completed'
+                                                ? 'opacity-75 hover:opacity-100'
+                                                : 'opacity-40'
                                             }`}
                                         onClick={() => {
                                             if (step.status === 'completed' || index + 1 === currentStep) {
@@ -530,8 +530,8 @@ function TechnicalRequirementsForm({ formData, setFormData }: any) {
                             type="button"
                             onClick={() => toggleSkill(skill)}
                             className={`px-4 py-2 rounded-lg border-2 font-medium transition-all ${selectedSkills.includes(skill)
-                                    ? 'border-indigo-600 bg-indigo-600 text-white'
-                                    : 'border-gray-300 hover:border-indigo-300'
+                                ? 'border-indigo-600 bg-indigo-600 text-white'
+                                : 'border-gray-300 hover:border-indigo-300'
                                 }`}
                         >
                             {skill}

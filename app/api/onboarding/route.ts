@@ -209,7 +209,7 @@ export async function POST(req: NextRequest) {
         // Generate unique token
         const token = crypto.randomBytes(32).toString('hex');
         const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
-        const onboardingLink = `${baseUrl}/onboard/${token}`;
+        const onboardingLink = `${baseUrl}/onboard/link/${token}`;
 
         // Create onboarding session
         const { data: onboarding, error: onboardingError } = await supabaseAdmin

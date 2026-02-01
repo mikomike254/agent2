@@ -57,7 +57,7 @@ export async function GET(req: NextRequest) {
                 )
             `);
 
-        if (role === 'commissioner') {
+        if (role === 'commissioner' && commissioner) {
             query = query.eq('assigned_commissioner_id', commissioner.id);
         }
 

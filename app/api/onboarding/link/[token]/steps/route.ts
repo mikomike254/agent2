@@ -5,14 +5,14 @@ import { supabaseAdmin } from '@/lib/db';
 // POST: Update onboarding step
 export async function POST(
     req: NextRequest,
-    { params }: { params: { token: string } }
+    { params }: { params: Promise<{ token: string }> }
 ) {
     if (!supabaseAdmin) {
         return NextResponse.json({ error: 'Database not initialized' }, { status: 500 });
     }
 
     try {
-        const { token } = params;
+        const { token } = await params;
         const body = await req.json();
         const { stepNumber, status, data } = body;
 
@@ -87,14 +87,14 @@ export async function POST(
 // GET: Get all steps for an onboarding session
 export async function GET(
     req: NextRequest,
-    { params }: { params: { token: string } }
+    { params }: { params: Promise<{ token: string }> }
 ) {
     if (!supabaseAdmin) {
         return NextResponse.json({ error: 'Database not initialized' }, { status: 500 });
     }
 
     try {
-        const { token } = params;
+        const { token } = await params;
 
         // Get onboarding session
         const { data: onboarding } = await supabaseAdmin

@@ -7,7 +7,7 @@ import { supabaseAdmin } from '@/lib/db';
 // PUT: Approve or reject approval request
 export async function PUT(
     req: NextRequest,
-    { params }: { params: { id: string } }
+    props: { params: Promise<{ id: string }> }
 ) {
     if (!supabaseAdmin) {
         return NextResponse.json({ error: 'Database not initialized' }, { status: 500 });
@@ -27,7 +27,8 @@ export async function PUT(
             return NextResponse.json({ error: 'Access denied' }, { status: 403 });
         }
 
-        const { id } = params;
+        const params = await props.params;
+        const id = params.id;
         const body = await req.json();
         const { status, adminNotes } = body;
 

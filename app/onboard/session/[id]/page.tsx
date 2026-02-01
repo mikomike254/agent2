@@ -35,7 +35,7 @@ export default function PublicClientOnboarding() {
 
     const fetchSession = async () => {
         try {
-            const res = await fetch(`/api/onboarding/${id}`);
+            const res = await fetch(`/api/onboarding/session/${id}`);
             const data = await res.json();
             if (data.success) {
                 setSessionData(data.data);
@@ -59,7 +59,7 @@ export default function PublicClientOnboarding() {
             // Calculate progress based on step
             const progress = Math.min(100, Math.round((step / 3) * 100));
 
-            await fetch(`/api/onboarding/${id}`, {
+            await fetch(`/api/onboarding/session/${id}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

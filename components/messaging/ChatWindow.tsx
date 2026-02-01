@@ -6,7 +6,7 @@ import { useSession } from 'next-auth/react';
 import { Send, Paperclip, MoreVertical, Loader2, ArrowLeft } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { formatDistanceToNow } from 'date-fns';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createClient } from '@/lib/supabase/client';
 
 interface Message {
     id: string;
@@ -31,7 +31,7 @@ export function ChatWindow({ conversationId, recipientName, recipientAvatar, onB
     const [sending, setSending] = useState(false);
     const [newMessage, setNewMessage] = useState('');
     const scrollRef = useRef<HTMLDivElement>(null);
-    const supabase = createClientComponentClient();
+    const supabase = createClient();
 
     const fetchMessages = async () => {
         try {

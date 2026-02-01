@@ -6,15 +6,18 @@ import { supabaseAdmin } from '@/lib/db';
 
 export async function GET(
     request: NextRequest,
-    { params }: { params: Promise<{ conversationId: string }> }
+    props: { params: Promise<{ conversationId: string }> }
 ) {
+    if (!supabaseAdmin) {
+        return NextResponse.json({ error: 'Database not initialized' }, { status: 500 });
+    }
+
     try {
+        const { conversationId } = await props.params;
         const session = await getServerSession(authOptions);
         if (!session?.user) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
-
-        const { conversationId } = await params;
         const userId = (session.user as any).id;
 
         // Verify user is a participant
@@ -91,15 +94,18 @@ export async function GET(
 
 export async function POST(
     request: NextRequest,
-    { params }: { params: Promise<{ conversationId: string }> }
+    props: { params: Promise<{ conversationId: string }> }
 ) {
+    if (!supabaseAdmin) {
+        return NextResponse.json({ error: 'Database not initialized' }, { status: 500 });
+    }
+
     try {
+        const { conversationId } = await props.params;
         const session = await getServerSession(authOptions);
         if (!session?.user) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
-
-        const { conversationId } = await params;
         const userId = (session.user as any).id;
         const body = await request.json();
         const { content, type = 'text', attachments = [] } = body;
