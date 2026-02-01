@@ -41,10 +41,11 @@ export default function ProjectChat({ projectId, currentUserId }: ProjectChatPro
     }, [messages]);
 
     useEffect(() => {
-        if (!projectId) return;
+        if (!projectId || !supabaseClient) return;
 
         const fetchMessages = async () => {
             try {
+                if (!supabaseClient) return;
                 const { data, error } = await supabaseClient
                     .from('messages')
                     .select(`
@@ -70,6 +71,7 @@ export default function ProjectChat({ projectId, currentUserId }: ProjectChatPro
         fetchMessages();
 
         // Realtime Subscription
+        if (!supabaseClient) return;
         const channel = supabaseClient
             .channel(`project_chat:${projectId}`)
             .on('postgres_changes', {
@@ -78,6 +80,7 @@ export default function ProjectChat({ projectId, currentUserId }: ProjectChatPro
                 table: 'messages',
                 filter: `project_id=eq.${projectId}`
             }, async (payload) => {
+                if (!supabaseClient) return;
                 // Fetch the new message with sender details
                 const { data: newMsg, error } = await supabaseClient
                     .from('messages')
@@ -99,7 +102,9 @@ export default function ProjectChat({ projectId, currentUserId }: ProjectChatPro
             .subscribe();
 
         return () => {
-            supabaseClient.removeChannel(channel);
+            if (supabaseClient) {
+                supabaseClient.removeChannel(channel);
+            }
         };
     }, [projectId]);
 
@@ -117,6 +122,7 @@ export default function ProjectChat({ projectId, currentUserId }: ProjectChatPro
         setNewMessage('');
 
         try {
+            if (!supabaseClient) throw new Error('Supabase client not initialized');
             const { error } = await supabaseClient
                 .from('messages')
                 .insert(tempData);

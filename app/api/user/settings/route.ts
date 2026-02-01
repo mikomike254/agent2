@@ -5,6 +5,9 @@ import { authOptions } from '@/lib/auth';
 import { supabaseAdmin } from '@/lib/db';
 
 export async function GET(req: NextRequest) {
+    if (!supabaseAdmin) {
+        return NextResponse.json({ error: 'Supabase Admin not initialized' }, { status: 500 });
+    }
     const session = await getServerSession(authOptions);
     if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
@@ -33,6 +36,9 @@ export async function GET(req: NextRequest) {
 }
 
 export async function PATCH(req: NextRequest) {
+    if (!supabaseAdmin) {
+        return NextResponse.json({ error: 'Supabase Admin not initialized' }, { status: 500 });
+    }
     const session = await getServerSession(authOptions);
     if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 

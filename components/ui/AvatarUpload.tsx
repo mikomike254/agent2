@@ -40,7 +40,7 @@ export function AvatarUpload({ currentAvatar, onUpload, userId }: AvatarUploadPr
             formData.append('userId', userId);
 
             // Upload to server
-            const response = await fetch('/api/upload/avatar', {
+            const response = await fetch('/api/profile/avatar', {
                 method: 'POST',
                 body: formData,
             });

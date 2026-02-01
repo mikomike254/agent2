@@ -5,6 +5,9 @@ import { supabaseAdmin, db } from '@/lib/db';
 import { emailService } from '@/lib/email';
 
 export async function POST(request: NextRequest) {
+    if (!supabaseAdmin) {
+        return NextResponse.json({ error: 'Supabase Admin not initialized' }, { status: 500 });
+    }
     try {
         const body = await request.text();
         const signature = request.headers.get('x-paystack-signature');

@@ -4,6 +4,9 @@ import { supabaseAdmin } from '@/lib/db';
 import { NextResponse } from 'next/server';
 
 export async function GET(req: Request) {
+    if (!supabaseAdmin) {
+        return NextResponse.json({ message: 'Supabase Admin not initialized' }, { status: 500 });
+    }
     try {
         const session = await getServerSession(authOptions);
         if (!session?.user || (session.user as any).role !== 'commissioner') {
@@ -36,6 +39,7 @@ export async function GET(req: Request) {
 
         // 3. Calculate actual revenue and overrides for EACH downline agent
         const teamData = await Promise.all((downline || []).map(async (agent: any) => {
+            if (!supabaseAdmin) throw new Error('Supabase Admin not initialized');
             // Get all projects for this agent
             const { data: projData } = await supabaseAdmin
                 .from('projects')

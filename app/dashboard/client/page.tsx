@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import Link from 'next/link';
+import { TopUpModal } from '@/components/projects/TopUpModal';
 
 export default function ClientDashboard() {
     const { data: session } = useSession();
@@ -31,6 +32,7 @@ export default function ClientDashboard() {
     });
     const [recentActivity, setRecentActivity] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [showTopUp, setShowTopUp] = useState(false);
 
     useEffect(() => {
         const fetchDashboardData = async () => {
@@ -146,7 +148,16 @@ export default function ClientDashboard() {
             {/* Quick Actions */}
             <Card className="p-8 bg-[var(--bg-card)] border-[var(--bg-input)]">
                 <h2 className="text-xl font-bold text-[var(--text-primary)] mb-6">Quick Actions</h2>
-                <div className="grid md:grid-cols-3 gap-4">
+                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <button
+                        onClick={() => setShowTopUp(true)}
+                        className="p-6 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl text-white hover:shadow-xl transition-all group text-left"
+                    >
+                        <DollarSign className="w-8 h-8 mb-4 group-hover:scale-110 transition-transform" />
+                        <h3 className="font-bold text-lg mb-2">Add Funds</h3>
+                        <p className="text-green-100 text-sm">Top up your wallet via M-Pesa or Card</p>
+                    </button>
+
                     <Link
                         href="/dashboard/client/new-project"
                         className="p-6 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl text-white hover:shadow-xl transition-all group"
@@ -264,6 +275,8 @@ export default function ClientDashboard() {
                     24/7 Support Active
                 </span>
             </div>
+
+            <TopUpModal open={showTopUp} onOpenChange={setShowTopUp} />
         </div>
     );
 }

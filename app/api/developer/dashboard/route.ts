@@ -4,6 +4,9 @@ import { authOptions } from '@/lib/auth';
 import { supabaseAdmin as supabase } from '@/lib/db';
 
 export async function GET(req: NextRequest) {
+    if (!supabase) {
+        return NextResponse.json({ error: 'Supabase Admin not initialized' }, { status: 500 });
+    }
     const session = await getServerSession(authOptions);
 
     if (!session || !session.user?.email) {
@@ -43,6 +46,7 @@ export async function GET(req: NextRequest) {
 }
 
 async function getData(developer: any) {
+    if (!supabase) throw new Error('Supabase Admin not initialized');
     // 2. Fetch Active Projects (via Squads)
     const { data: squads, error: squadError } = await supabase
         .from('project_squads')

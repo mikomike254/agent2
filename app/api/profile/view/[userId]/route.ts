@@ -6,6 +6,9 @@ export async function GET(
     req: NextRequest,
     { params }: { params: Promise<{ userId: string }> }
 ) {
+    if (!supabaseAdmin) {
+        return NextResponse.json({ success: false, message: 'Supabase Admin not initialized' }, { status: 500 });
+    }
     try {
         const { userId } = await params;
 

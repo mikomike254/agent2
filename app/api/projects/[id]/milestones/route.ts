@@ -6,6 +6,9 @@ export async function GET(
     request: NextRequest,
     { params }: { params: Promise<{ id: string }> }
 ) {
+    if (!supabaseAdmin) {
+        return NextResponse.json({ error: 'Supabase Admin not initialized' }, { status: 500 });
+    }
     const { id } = await params;
     try {
         const { data: milestones, error } = await supabaseAdmin
@@ -31,6 +34,9 @@ export async function POST(
     request: NextRequest,
     { params }: { params: Promise<{ id: string }> }
 ) {
+    if (!supabaseAdmin) {
+        return NextResponse.json({ error: 'Supabase Admin not initialized' }, { status: 500 });
+    }
     const { id } = await params;
     try {
         const body = await request.json();

@@ -6,6 +6,9 @@ import { supabaseAdmin } from '@/lib/db';
 
 export async function POST(request: NextRequest) {
     try {
+        if (!supabaseAdmin) {
+            return NextResponse.json({ error: 'Supabase Admin not initialized' }, { status: 500 });
+        }
         const session = await getServerSession(authOptions);
         if (!session?.user) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

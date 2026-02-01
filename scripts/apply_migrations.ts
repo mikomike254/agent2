@@ -12,6 +12,11 @@ const migrations = [
 async function applyMigrations() {
     console.log('🚀 Starting database migrations...\n');
 
+    if (!supabaseAdmin) {
+        console.error('❌ Supabase Admin not initialized. Check your environment variables.');
+        process.exit(1);
+    }
+
     for (const migration of migrations) {
         const migrationPath = path.join(__dirname, '../supabase/migrations', migration);
 

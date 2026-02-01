@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/db';
 
 export async function POST(req: Request) {
+    if (!supabaseAdmin) {
+        return NextResponse.json({ message: 'Supabase Admin not initialized' }, { status: 500 });
+    }
     try {
         const { projectId, amount, email } = await req.json();
 

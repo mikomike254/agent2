@@ -6,6 +6,9 @@ import { supabaseAdmin } from '@/lib/db';
 
 // GET: Fetch payout requests (admin or own requests)
 export async function GET(request: NextRequest) {
+    if (!supabaseAdmin) {
+        return NextResponse.json({ error: 'Supabase Admin not initialized' }, { status: 500 });
+    }
     try {
         const session = await getServerSession(authOptions);
         if (!session?.user) {
@@ -62,6 +65,9 @@ export async function GET(request: NextRequest) {
 
 // POST: Create payout request (commissioner)
 export async function POST(request: NextRequest) {
+    if (!supabaseAdmin) {
+        return NextResponse.json({ error: 'Supabase Admin not initialized' }, { status: 500 });
+    }
     try {
         const session = await getServerSession(authOptions);
         if (!session?.user) {
@@ -115,6 +121,9 @@ export async function POST(request: NextRequest) {
 
 // PATCH: Approve/Reject payout (admin only)
 export async function PATCH(request: NextRequest) {
+    if (!supabaseAdmin) {
+        return NextResponse.json({ error: 'Supabase Admin not initialized' }, { status: 500 });
+    }
     try {
         const session = await getServerSession(authOptions);
         if (!session?.user) {

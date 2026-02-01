@@ -8,6 +8,9 @@ export async function POST(
     { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        if (!supabaseAdmin) {
+            return NextResponse.json({ error: 'Supabase Admin not initialized' }, { status: 500 });
+        }
         const session = await getServerSession(authOptions);
         if (!session || (session.user as any).role !== 'admin') {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

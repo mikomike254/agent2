@@ -47,6 +47,7 @@ export default function AdminPayoutsPage() {
     useEffect(() => {
         const fetchPayouts = async () => {
             try {
+                if (!supabaseClient) throw new Error('Supabase client not initialized');
                 const { data, error } = await supabaseClient
                     .from('commissions')
                     .select(`
@@ -74,6 +75,7 @@ export default function AdminPayoutsPage() {
         if (!confirm(`Approve payout of KES ${amount} to ${commissionerName}?`)) return;
 
         try {
+            if (!supabaseClient) throw new Error('Supabase client not initialized');
             const { error } = await supabaseClient
                 .from('commissions')
                 .update({ status: 'paid', paid_at: new Date() })

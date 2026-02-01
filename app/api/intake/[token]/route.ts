@@ -7,6 +7,9 @@ export async function GET(
     { params }: { params: Promise<{ token: string }> }
 ) {
     try {
+        if (!supabaseAdmin) {
+            return NextResponse.json({ error: 'Supabase Admin not initialized' }, { status: 500 });
+        }
         const { token } = await params;
 
         // Get lead with commissioner info

@@ -13,6 +13,17 @@ export default async function AdminApprovalsPage() {
         redirect('/login');
     }
 
+    if (!supabaseAdmin) {
+        return (
+            <div className="p-6 max-w-7xl mx-auto">
+                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative" role="alert">
+                    <strong className="font-bold">Error: </strong>
+                    <span className="block sm:inline">Supabase Admin client not initialized. check your environment variables.</span>
+                </div>
+            </div>
+        );
+    }
+
     // Fetch pending commissioners
     const { data: pendingCommissioners } = await supabaseAdmin
         .from('commissioners')

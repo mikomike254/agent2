@@ -4,6 +4,9 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from "@/lib/auth";
 
 export async function POST(req: Request) {
+    if (!supabaseAdmin) {
+        return NextResponse.json({ error: 'Supabase Admin not initialized' }, { status: 500 });
+    }
     try {
         const session = await getServerSession(authOptions);
         if (!session || session.user.role !== 'admin') {

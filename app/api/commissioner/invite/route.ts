@@ -11,6 +11,9 @@ function isUUID(str: string) {
 }
 
 export async function POST(req: NextRequest) {
+    if (!supabaseAdmin) {
+        return NextResponse.json({ success: false, message: 'Supabase Admin not initialized' }, { status: 500 });
+    }
     try {
         const session = await getServerSession();
         // In a real app, verify session user is a commissioner.

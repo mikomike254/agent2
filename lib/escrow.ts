@@ -51,6 +51,7 @@ export async function createEscrowHold(
 ): Promise<any> {
     const newBalance = currentBalance + amount;
 
+    if (!supabaseAdmin) throw new Error('Supabase Admin not initialized');
     const { data: ledgerEntry, error: ledgerError } = await supabaseAdmin
         .from('escrow_ledger')
         .insert({
@@ -68,6 +69,7 @@ export async function createEscrowHold(
     if (ledgerError) throw ledgerError;
 
     // Update project escrow balance
+    if (!supabaseAdmin) throw new Error('Supabase Admin not initialized');
     const { error: projectError } = await supabaseAdmin
         .from('projects')
         .update({
@@ -99,6 +101,7 @@ export async function releaseEscrow(
     const newBalance = currentBalance - amount;
 
     // Create escrow release entry
+    if (!supabaseAdmin) throw new Error('Supabase Admin not initialized');
     const { data: ledgerEntry, error: ledgerError } = await supabaseAdmin
         .from('escrow_ledger')
         .insert({
@@ -115,6 +118,7 @@ export async function releaseEscrow(
     if (ledgerError) throw ledgerError;
 
     // Update project escrow balance
+    if (!supabaseAdmin) throw new Error('Supabase Admin not initialized');
     const { error: projectError } = await supabaseAdmin
         .from('projects')
         .update({ escrow_balance: newBalance })
@@ -150,6 +154,7 @@ export async function releaseEscrow(
         });
     }
 
+    if (!supabaseAdmin) throw new Error('Supabase Admin not initialized');
     const { data: payoutRecords, error: payoutError } = await supabaseAdmin
         .from('payouts')
         .insert(payouts)
@@ -158,6 +163,7 @@ export async function releaseEscrow(
     if (payoutError) throw payoutError;
 
     // Create commission record
+    if (!supabaseAdmin) throw new Error('Supabase Admin not initialized');
     const { data: commissionRecord, error: commissionError } = await supabaseAdmin
         .from('commissions')
         .insert({
@@ -194,6 +200,7 @@ export async function issueRefund(
     const newBalance = currentBalance - paidAmount;
 
     // Create escrow refund entry
+    if (!supabaseAdmin) throw new Error('Supabase Admin not initialized');
     const { data: ledgerEntry, error: ledgerError } = await supabaseAdmin
         .from('escrow_ledger')
         .insert({
@@ -211,6 +218,7 @@ export async function issueRefund(
     if (ledgerError) throw ledgerError;
 
     // Update project
+    if (!supabaseAdmin) throw new Error('Supabase Admin not initialized');
     const { error: projectError } = await supabaseAdmin
         .from('projects')
         .update({
@@ -223,6 +231,7 @@ export async function issueRefund(
     if (projectError) throw projectError;
 
     // Update payment status
+    if (!supabaseAdmin) throw new Error('Supabase Admin not initialized');
     const { error: paymentError } = await supabaseAdmin
         .from('payments')
         .update({ status: 'refunded' })

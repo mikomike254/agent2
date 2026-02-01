@@ -5,6 +5,9 @@ import { authOptions } from '@/lib/auth';
 import { supabaseAdmin } from '@/lib/db';
 
 export async function GET(request: NextRequest) {
+    if (!supabaseAdmin) {
+        return NextResponse.json({ error: 'Supabase Admin not initialized' }, { status: 500 });
+    }
     try {
         const session = await getServerSession(authOptions);
         if (!session?.user) {

@@ -6,6 +6,9 @@ import { supabaseAdmin, db } from '@/lib/db';
 import { PLATFORM_CONFIG } from '@/lib/escrow';
 
 export async function POST(request: NextRequest) {
+    if (!supabaseAdmin) {
+        return NextResponse.json({ error: 'Supabase Admin not initialized' }, { status: 500 });
+    }
     try {
         const body = await request.json();
         const { lead_id, method, client_email, client_phone } = body;

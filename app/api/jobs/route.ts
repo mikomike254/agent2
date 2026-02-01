@@ -4,6 +4,9 @@ import { supabaseAdmin } from '@/lib/db';
 import { getServerSession } from 'next-auth';
 
 export async function GET(req: NextRequest) {
+    if (!supabaseAdmin) {
+        return NextResponse.json({ success: false, message: 'Supabase Admin not initialized' }, { status: 500 });
+    }
     try {
         // Public endpoint - anyone can view jobs
         const { data: jobs, error } = await supabaseAdmin
@@ -27,6 +30,9 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+    if (!supabaseAdmin) {
+        return NextResponse.json({ success: false, message: 'Supabase Admin not initialized' }, { status: 500 });
+    }
     try {
         const session = await getServerSession();
 

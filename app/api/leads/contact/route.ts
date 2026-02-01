@@ -4,6 +4,9 @@ import { supabaseAdmin, db } from '@/lib/db';
 import { NextResponse } from 'next/server';
 
 export async function POST(req: Request) {
+    if (!supabaseAdmin) {
+        return NextResponse.json({ message: 'Supabase Admin not initialized' }, { status: 500 });
+    }
     try {
         const session = await getServerSession(authOptions);
         if (!session?.user || (session.user as any).role !== 'commissioner') {

@@ -91,6 +91,9 @@ export async function createCommissionRecords(
     commissionerId: string,
     projectValue: number
 ) {
+    if (!supabaseAdmin) {
+        return { success: false, error: 'Supabase Admin not initialized' };
+    }
     try {
         // Get commissioner details including tier and parent
         const { data: commissioner, error: commError } = await supabaseAdmin

@@ -4,6 +4,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin, db } from '@/lib/db';
 
 export async function POST(request: NextRequest) {
+    if (!supabaseAdmin) {
+        return NextResponse.json({ error: 'Supabase Admin not initialized' }, { status: 500 });
+    }
     try {
         const body = await request.json();
         let { commissioner_id, user_id, client_name, client_phone, client_email, project_summary, budget } = body;
@@ -75,6 +78,9 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
+    if (!supabaseAdmin) {
+        return NextResponse.json({ error: 'Supabase Admin not initialized' }, { status: 500 });
+    }
     try {
         // Public Pool Logic: Fetch ALL leads
         const { data: leads, error } = await supabaseAdmin

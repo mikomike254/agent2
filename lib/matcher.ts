@@ -8,6 +8,7 @@ interface DeveloperMatch {
 }
 
 export async function findBestDevelopersForProject(projectId: string): Promise<DeveloperMatch[]> {
+    if (!supabaseAdmin) throw new Error('Supabase Admin not initialized');
     // 1. Get Project Requirements
     const { data: project } = await supabaseAdmin
         .from('projects')
@@ -20,8 +21,8 @@ export async function findBestDevelopersForProject(projectId: string): Promise<D
     const requiredSkills: string[] = project.required_skills || project.description?.toLowerCase().split(' ') || []; // Fallback simple parsing if column missing
 
     // 2. Initial Filter: Developers with ANY matching skill (or all, depending on strictness)
-    // We'll fetch all active developers for now and filter in-memory for complex ranking if dataset is small, 
-    // or use strict SQL for larger sets. Given likely small refined pool:
+    // We'll fetch all active developers for now and filter in-memory for senior/junior/mid sorting.
+    if (!supabaseAdmin) throw new Error('Supabase Admin not initialized');
     const { data: developers } = await supabaseAdmin
         .from('developers')
         .select('*, user:users(name, email)') // Join with user to get names

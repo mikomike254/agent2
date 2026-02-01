@@ -162,7 +162,7 @@ export function Sidebar({
                                 <ThemeToggle />
                             </div>
                             <button
-                                onClick={() => signOut({ callbackUrl: '/' })}
+                                onClick={() => signOut({ callbackUrl: 'https://nighaa.netlify.app/' })}
                                 className="flex items-center gap-4 px-4 py-4 w-full rounded-2xl text-gray-500 hover:bg-red-50 hover:text-red-600 transition-all duration-300 group font-bold text-sm"
                             >
                                 <LogOut className="w-5 h-5 transition-transform group-hover:-translate-x-1" />

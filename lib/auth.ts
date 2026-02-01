@@ -70,23 +70,57 @@ export const authOptions: NextAuthOptions = {
     callbacks: {
         async signIn({ user, account }) {
             if (account?.provider === 'google' && supabaseAdmin) {
-                const { data: existingUser } = await supabaseAdmin
-                    .from('users')
-                    .select('*')
-                    .eq('email', user.email!)
-                    .single();
-
-                if (!existingUser) {
-                    await supabaseAdmin
+                try {
+                    // Check if user already exists
+                    const { data: existingUser } = await supabaseAdmin
                         .from('users')
-                        .insert({
-                            email: user.email,
-                            name: user.name,
-                            avatar_url: user.image,
-                            role: 'client',
-                            verified: true,
-                            status: 'active'
-                        });
+                        .select('*')
+                        .eq('email', user.email!)
+                        .single();
+
+                    if (!existingUser) {
+                        // Create new user with default role 'client'
+                        const { data: newUser, error: userError } = await supabaseAdmin
+                            .from('users')
+                            .insert({
+                                email: user.email,
+                                name: user.name,
+                                avatar_url: user.image,
+                                role: 'client',
+                                verified: true,
+                                status: 'active'
+                            })
+                            .select()
+                            .single();
+
+                        if (userError) {
+                            console.error('Error creating user:', userError);
+                            return false;
+                        }
+
+                        // Create client profile for new Google users
+                        const { error: clientError } = await supabaseAdmin
+                            .from('clients')
+                            .insert({
+                                user_id: newUser.id,
+                                contact_person: newUser.name || 'Unknown'
+                            });
+
+                        if (clientError) {
+                            console.error('Error creating client profile:', clientError);
+                        }
+                    } else {
+                        // Update existing user's avatar if needed
+                        if (user.image && existingUser.avatar_url !== user.image) {
+                            await supabaseAdmin
+                                .from('users')
+                                .update({ avatar_url: user.image })
+                                .eq('id', existingUser.id);
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error in Google signIn callback:', error);
+                    return false;
                 }
             }
             return true;

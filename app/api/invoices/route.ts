@@ -5,6 +5,9 @@ import { supabaseAdmin } from '@/lib/db';
 
 // GET: List invoices (Admin or Commissioner)
 export async function GET(req: NextRequest) {
+    if (!supabaseAdmin) {
+        return NextResponse.json({ success: false, error: 'Supabase Admin not initialized' }, { status: 500 });
+    }
     try {
         const session = await getServerSession(authOptions);
         if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -39,6 +42,9 @@ export async function GET(req: NextRequest) {
 
 // POST: Create a new Invoice Request (Pending Approval)
 export async function POST(request: NextRequest) {
+    if (!supabaseAdmin) {
+        return NextResponse.json({ success: false, error: 'Supabase Admin not initialized' }, { status: 500 });
+    }
     try {
         const session = await getServerSession(authOptions);
         if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

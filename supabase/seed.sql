@@ -63,3 +63,41 @@ INSERT INTO referrals (referrer_id, referee_id, override_percent) VALUES
 
 INSERT INTO audit_logs (actor_id, actor_role, action, details) VALUES
 ('00000000-0000-0000-0000-000000000001', 'admin', 'system_initialized', '{"message": "Test data seeded"}'::jsonb);
+
+-- =======================
+-- PROJECTS
+-- =======================
+INSERT INTO projects (id, client_id, commissioner_id, lead_id, title, description, budget, status, project_type, created_at) VALUES
+('20000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000007', '00000000-0000-0000-0000-000000000002', NULL, 'School Management System', 'A comprehensive system for managing students, fees, and grades.', 150000, 'active', 'web_app', NOW() - INTERVAL '10 days'),
+('20000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000008', NULL, NULL, 'E-commerce Mobile App', 'Android and iOS app for online retail store.', 250000, 'pending', 'mobile_app', NOW() - INTERVAL '2 days');
+
+-- =======================
+-- CONVERSATIONS
+-- =======================
+INSERT INTO conversations (id, title, conversation_type, project_id, created_by) VALUES
+-- Direct chat between Commissioner Esther and Client Green School
+('30000000-0000-0000-0000-000000000001', NULL, 'direct', NULL, '00000000-0000-0000-0000-000000000002'),
+-- Project Group Chat
+('30000000-0000-0000-0000-000000000002', 'School System Dev Team', 'group', '20000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000002');
+
+-- =======================
+-- CONVERSATION PARTICIPANTS
+-- =======================
+INSERT INTO conversation_participants (conversation_id, user_id) VALUES
+-- Direct Chat Participants
+('30000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000002'), -- Esther
+('30000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000007'), -- Green School
+
+-- Project Group Chat Participants
+('30000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000002'), -- Esther
+('30000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000007'), -- Green School
+('30000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000005'); -- Aisha Developer
+
+-- =======================
+-- MESSAGES
+-- =======================
+INSERT INTO messages (conversation_id, sender_id, content, created_at) VALUES
+('30000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000002', 'Hello John, how are you properly?', NOW() - INTERVAL '5 hours'),
+('30000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000007', 'I am good Esther. Ready to start the project.', NOW() - INTERVAL '4 hours'),
+('30000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000002', 'Welcome everyone to the project group.', NOW() - INTERVAL '1 day');
+

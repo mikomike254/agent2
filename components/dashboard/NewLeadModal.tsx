@@ -8,9 +8,10 @@ import { useSession } from 'next-auth/react';
 interface NewLeadModalProps {
     isOpen: boolean;
     onClose: () => void;
+    commissionerId?: string | null;
 }
 
-export function NewLeadModal({ isOpen, onClose }: NewLeadModalProps) {
+export function NewLeadModal({ isOpen, onClose, commissionerId }: NewLeadModalProps) {
     const { data: session } = useSession();
     const [loading, setLoading] = useState(false);
 
@@ -73,9 +74,8 @@ export function NewLeadModal({ isOpen, onClose }: NewLeadModalProps) {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    commissioner_id: (session?.user as any)?.id, // Passing User ID, backend needs to handle this or I need to fix backend.
-                    // Actually, let's update the backend to support finding commissioner by user_id if commissioner_id is missing?
-                    // OR better: The parent component should pass the correct ID.
+                    commissioner_id: commissionerId, // Ideally passed from parent
+                    user_id: (session?.user as any)?.id, // Fallback for backend lookup
                     ...formData
                 })
             });

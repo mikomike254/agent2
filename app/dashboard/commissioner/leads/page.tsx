@@ -1,47 +1,49 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
-import {
-    Users,
-    Share2,
-    CheckCircle,
-    Clock,
-    UserPlus,
-    Search,
-    ChevronRight,
-    Target,
-    Plus,
-    X,
-    MessageSquare,
-    Briefcase
-} from 'lucide-react';
 import { Card } from '@/components/ui/card';
-import { LeadBarChart } from '@/components/ui/charts';
-import { useRouter } from 'next/navigation';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Search, Phone, Mail, Clock, DollarSign, UserCheck, CheckCircle } from 'lucide-react';
+import { formatDistanceToNow } from 'date-fns';
 
-export default function CommissionerLeadsPage() {
+interface Lead {
+    id: string;
+    client_name: string;
+    client_email: string;
+    client_phone: string;
+    project_summary: string;
+    budget: string;
+    status: 'created' | 'active' | 'contacted' | 'converted' | 'closed' | 'claimed';
+    created_at: string;
+    commissioner_id: string | null;
+    claimed_by: string | null;
+    commissioner?: {
+        user?: {
+            name: string;
+            avatar_url: string;
+            email: string;
+        };
+    };
+}
+
+export default function LeadsPage() {
     const { data: session } = useSession();
-    const router = useRouter();
-    const [leads, setLeads] = useState<any[]>([]);
+    const [leads, setLeads] = useState<Lead[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
-    const [activeTab, setActiveTab] = useState<'public' | 'mine'>('public');
+    const [filter, setFilter] = useState<'all' | 'mine' | 'pool'>('all');
 
-    // Modal State
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [formData, setFormData] = useState({
-        client_name: '',
-        client_email: '',
-        client_phone: '',
-        project_summary: '',
-        budget: ''
-    });
-    const [submitting, setSubmitting] = useState(false);
+    useEffect(() => {
+        fetchLeads();
+    }, []);
 
     const fetchLeads = async () => {
         try {
-            const response = await fetch('/api/leads'); // Fetches ALL leads (Public Pool)
+            const response = await fetch('/api/leads');
             const result = await response.json();
             if (result.success) {
                 setLeads(result.data);
@@ -53,377 +55,184 @@ export default function CommissionerLeadsPage() {
         }
     };
 
-    useEffect(() => {
-        if (session) {
-            fetchLeads();
-        }
-    }, [session]);
-
-    const handleCreateLead = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setSubmitting(true);
+    const handleClaim = async (leadId: string) => {
         try {
-            const response = await fetch('/api/leads', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    ...formData,
-                    commissioner_id: (session?.user as any)?.commissioner_id, // Ensure this exists or fallback handled in API
-                    user_id: (session?.user as any)?.id
-                }),
-            });
-
-            if (response.ok) {
-                // Reset and Refresh
-                setIsModalOpen(false);
-                setFormData({
-                    client_name: '',
-                    client_email: '',
-                    client_phone: '',
-                    project_summary: '',
-                    budget: ''
-                });
-                fetchLeads();
-                alert('Lead added to Public Pool!');
-            } else {
-                alert('Failed to create lead.');
-            }
-        } catch (error) {
-            console.error(error);
-            alert('Error creating lead.');
-        } finally {
-            setSubmitting(false);
-        }
-    };
-
-    const handleLogContact = async (leadId: string) => {
-        try {
-            const res = await fetch('/api/leads/contact', {
+            const response = await fetch('/api/leads/claim', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ leadId })
             });
-            if (res.ok) {
-                alert('Contact Logged! This lead is now secured.');
-                fetchLeads();
+
+            const result = await response.json();
+            if (result.success) {
+                alert('Lead claimed successfully!');
+                fetchLeads(); // Refresh
             } else {
-                alert('Failed to log contact');
+                alert(result.message || 'Failed to claim lead');
             }
         } catch (error) {
-            console.error(error);
+            console.error('Error claiming lead:', error);
+            alert('An error occurred');
         }
     };
 
-    const handleClaimLead = async (leadId: string) => {
-        if (!confirm('Are you sure you want to claim this lead? You have a limited capacity of 3 active leads.')) return;
-
-        try {
-            const res = await fetch('/api/leads/claim', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ leadId })
-            });
-            const json = await res.json();
-
-            if (res.ok) {
-                alert(json.message || 'Lead claimed successfully!');
-                fetchLeads();
-                setActiveTab('mine'); // Switch to My Leads tab
-            } else {
-                alert(json.message || 'Failed to claim lead');
-            }
-        } catch (error) {
-            console.error(error);
-            alert('An error occurred while claiming the lead');
-        }
-    };
-
-    const myCommId = (session?.user as any)?.commissioner_id;
+    // Filter logic
+    const userEmail = session?.user?.email;
 
     const filteredLeads = leads.filter(lead => {
-        const matchesSearch = lead.client_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            lead.client_email?.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesSearch =
+            lead.client_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            lead.project_summary?.toLowerCase().includes(searchTerm.toLowerCase());
 
         if (!matchesSearch) return false;
 
-        if (activeTab === 'public') {
-            // Public pool: Unclaimed leads
-            return !lead.claimed_by;
-        } else {
-            // My Leads: Claimed by me
-            return lead.claimed_by === myCommId;
+        const ownerEmail = lead.commissioner?.user?.email;
+        const isClaimed = !!lead.claimed_by || !!lead.commissioner_id;
+
+        if (filter === 'pool') return !isClaimed;
+        if (filter === 'mine') {
+            // Include if explicitly claimed by me (if we had ID) OR matches email OR is assigned to me
+            return isClaimed && (ownerEmail === userEmail || !ownerEmail);
         }
+
+        return true;
     });
 
+    const getStatusBadge = (status: string) => {
+        switch (status) {
+            case 'created': return <Badge variant="secondary" className="bg-blue-100 text-blue-700">New</Badge>;
+            case 'active': return <Badge variant="secondary" className="bg-green-100 text-green-700">Active</Badge>;
+            case 'contacted': return <Badge variant="secondary" className="bg-yellow-100 text-yellow-700">Contacted</Badge>;
+            case 'converted': return <Badge variant="secondary" className="bg-purple-100 text-purple-700">Converted</Badge>;
+            case 'closed': return <Badge variant="secondary" className="bg-gray-100 text-gray-700">Closed</Badge>;
+            case 'claimed': return <Badge variant="secondary" className="bg-indigo-100 text-indigo-700">Claimed</Badge>;
+            default: return <Badge variant="outline">{status}</Badge>;
+        }
+    };
+
     return (
-        <div className="space-y-8 relative">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
+        <div className="space-y-8">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[var(--primary)] to-[var(--accent)] tracking-tight">
-                        {activeTab === 'public' ? 'Public Lead Pool' : 'My Active Leads'}
-                    </h1>
-                    <p className="text-[var(--text-secondary)] mt-2">
-                        {activeTab === 'public'
-                            ? 'View available leads and add new ones to the pool.'
-                            : 'Manage your claimed leads and secure them by logging contact.'}
-                    </p>
+                    <h1 className="text-3xl font-bold text-[var(--text-primary)]">Lead Management</h1>
+                    <p className="text-[var(--text-secondary)]">Track and convert potential clients.</p>
                 </div>
-                <div className="flex gap-4 w-full md:w-auto items-center">
-                    <div className="flex bg-[var(--bg-card)] p-1 rounded-2xl border border-[var(--bg-input)]">
+                {/* Search & Filter */}
+                <div className="flex gap-2 w-full md:w-auto">
+                    <div className="relative flex-1 md:w-64">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-secondary)]" />
+                        <Input
+                            placeholder="Search leads..."
+                            className="pl-9"
+                            value={searchTerm}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
+                        />
+                    </div>
+                    <div className="flex bg-[var(--bg-secondary)] rounded-lg p-1 border border-[var(--bg-input)]">
                         <button
-                            onClick={() => setActiveTab('public')}
-                            className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${activeTab === 'public' ? 'bg-[var(--primary)] text-white shadow-lg' : 'text-[var(--text-secondary)] hover:bg-[var(--bg-input)]'}`}
+                            onClick={() => setFilter('all')}
+                            className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all ${filter === 'all' ? 'bg-white shadow-sm text-[var(--text-primary)]' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'}`}
                         >
-                            Public Pool
+                            All
                         </button>
                         <button
-                            onClick={() => setActiveTab('mine')}
-                            className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${activeTab === 'mine' ? 'bg-[var(--primary)] text-white shadow-lg' : 'text-[var(--text-secondary)] hover:bg-[var(--bg-input)]'}`}
+                            onClick={() => setFilter('mine')}
+                            className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all ${filter === 'mine' ? 'bg-white shadow-sm text-[var(--text-primary)]' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'}`}
                         >
                             My Leads
                         </button>
+                        <button
+                            onClick={() => setFilter('pool')}
+                            className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all ${filter === 'pool' ? 'bg-white shadow-sm text-[var(--text-primary)]' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'}`}
+                        >
+                            Pool
+                        </button>
                     </div>
-
-                    <div className="relative flex-1 md:w-64">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                        <input
-                            type="text"
-                            placeholder="Search..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pl-10 pr-4 py-3 border border-[var(--bg-input)] rounded-2xl focus:ring-2 focus:ring-[var(--primary)] outline-none bg-[var(--bg-card)] shadow-sm text-[var(--text-primary)]"
-                        />
-                    </div>
-                    <button
-                        onClick={() => setIsModalOpen(true)}
-                        className="btn-primary flex items-center gap-2 px-6 py-3 rounded-2xl shadow-lg shadow-indigo-500/20"
-                    >
-                        <Plus className="w-5 h-5" />
-                        <span className="hidden md:inline">Add Lead</span>
-                    </button>
                 </div>
             </div>
 
-            {/* Performance Chart Area - Only show on Public Tab for now */}
-            {activeTab === 'public' && (
-                <div className="grid md:grid-cols-3 gap-8">
-                    <Card className="md:col-span-2 p-8 border-none bg-[var(--bg-card)] shadow-xl shadow-green-900/5 overflow-hidden relative group">
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-[var(--primary)]/10 rounded-full -mr-16 -mt-16 opacity-50 blur-3xl group-hover:scale-110 transition-transform"></div>
-                        <h3 className="text-lg font-black text-[var(--text-primary)] uppercase tracking-widest mb-2">Pool Velocity</h3>
-                        <p className="text-xs text-[var(--text-secondary)] font-medium mb-6">New leads added to the pool (7 days)</p>
-                        <LeadBarChart />
-                    </Card>
-
-                    <Card className="p-8 bg-gradient-to-br from-[var(--primary)] to-[var(--secondary)] text-white border-none shadow-xl shadow-indigo-500/20 flex flex-col justify-between">
-                        <div>
-                            <h3 className="text-lg font-bold">Total Pool Value</h3>
-                            <p className="text-white/80 text-sm opacity-80 mt-1">Estimated Budget</p>
-                        </div>
-                        <div className="py-8">
-                            <h2 className="text-4xl font-black">
-                                KES {leads.filter(l => !l.claimed_by).reduce((sum, l) => sum + (Number(l.budget) || 0), 0).toLocaleString()}
-                            </h2>
-                            <p className="text-white/60 text-xs font-bold mt-2 uppercase tracking-widest italic">Across {leads.filter(l => !l.claimed_by).length} Available Leads</p>
-                        </div>
-                        <button className="w-full py-3 bg-white/10 hover:bg-white/20 transition-colors rounded-xl font-bold text-xs uppercase tracking-widest border border-white/20">
-                            View Analytics
-                        </button>
-                    </Card>
+            {loading ? (
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 animate-pulse">
+                    {[1, 2, 3].map(i => (
+                        <div key={i} className="h-48 bg-[var(--bg-secondary)] rounded-xl"></div>
+                    ))}
                 </div>
-            )}
-
-            {/* Leads Table Card */}
-            <Card className="overflow-hidden border-[var(--bg-input)] shadow-xl shadow-gray-900/5 bg-[var(--bg-card)]">
-                <div className="overflow-x-auto">
-                    <table className="w-full text-left">
-                        <thead className="bg-[var(--bg-app)] border-b border-[var(--bg-input)]">
-                            <tr>
-                                <th className="px-8 py-5 text-[11px] font-black text-[var(--text-secondary)] uppercase tracking-[0.2em]">Contact</th>
-                                <th className="px-8 py-5 text-[11px] font-black text-[var(--text-secondary)] uppercase tracking-[0.2em]">Status</th>
-                                <th className="px-8 py-5 text-[11px] font-black text-[var(--text-secondary)] uppercase tracking-[0.2em]">Budget</th>
-                                <th className="px-8 py-5 text-[11px] font-black text-[var(--text-secondary)] uppercase tracking-[0.2em]">Phone</th>
-                                <th className="px-8 py-5 text-[11px] font-black text-[var(--text-secondary)] uppercase tracking-[0.2em]">Added By</th>
-                                <th className="px-8 py-5 text-[11px] font-black text-[var(--text-secondary)] uppercase tracking-[0.2em] text-right">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-[var(--bg-input)] bg-[var(--bg-card)]">
-                            {loading ? (
-                                Array(5).fill(0).map((_, i) => (
-                                    <tr key={i} className="animate-pulse">
-                                        <td colSpan={6} className="px-8 py-6"><div className="h-5 bg-[var(--bg-input)] rounded w-full"></div></td>
-                                    </tr>
-                                ))
-                            ) : filteredLeads.length === 0 ? (
-                                <tr>
-                                    <td colSpan={6} className="px-8 py-20 text-center">
-                                        <div className="w-16 h-16 bg-[var(--bg-input)] rounded-full flex items-center justify-center mx-auto mb-4">
-                                            <Target className="w-8 h-8 text-[var(--text-secondary)]" />
-                                        </div>
-                                        <p className="text-[var(--text-secondary)] font-medium italic">
-                                            {activeTab === 'public'
-                                                ? 'No leads in the pool yet. Be the first to add one!'
-                                                : 'You haven\'t claimed any leads yet. Check the Public Pool!'}
-                                        </p>
-                                    </td>
-                                </tr>
-                            ) : (
-                                filteredLeads.map((lead) => {
-                                    const isMyLead = lead.claimed_by && (session?.user as any)?.commissioner_id === lead.claimed_by;
-                                    const isClaimable = !lead.claimed_by && activeTab === 'public';
-
-                                    return (
-                                        <tr key={lead.id} className="group hover:bg-[var(--bg-app)] transition-all duration-300">
-                                            <td className="px-8 py-6">
-                                                <div className="flex items-center gap-4">
-                                                    <div className="w-12 h-12 rounded-2xl bg-[var(--primary)]/10 flex items-center justify-center font-bold text-[var(--primary)] transition-transform group-hover:scale-110">
-                                                        {lead.client_name?.[0]?.toUpperCase()}
-                                                    </div>
-                                                    <div>
-                                                        <p className="font-bold text-[var(--text-primary)] group-hover:text-[var(--primary)] transition-colors">
-                                                            {isMyLead ? lead.client_name : (lead.client_name.split(' ')[0] + '...')}
-                                                        </p>
-                                                        <p className="text-xs text-[var(--text-secondary)] max-w-xs truncate">{lead.project_summary || 'No summary'}</p>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td className="px-8 py-6">
-                                                <p className="font-bold text-[var(--text-primary)]">
-                                                    {lead.budget ? `KES ${Number(lead.budget).toLocaleString()}` : 'N/A'}
-                                                </p>
-                                            </td>
-                                            <td className="px-8 py-6">
-                                                <p className="text-sm text-[var(--text-secondary)]">
-                                                    {isMyLead ? (lead.client_phone || 'Not provided') : 'Locked'}
-                                                </p>
-                                            </td>
-                                            <td className="px-8 py-6">
-                                                <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-tight ${lead.status === 'converted' ? 'bg-green-500/10 text-green-500' :
-                                                    lead.status === 'contacted' ? 'bg-blue-500/10 text-blue-500' :
-                                                        lead.claimed_by ? 'bg-purple-500/10 text-purple-500' :
-                                                            'bg-green-500/10 text-green-600'
-                                                    }`}>
-                                                    <div className={`w-1.5 h-1.5 rounded-full ${lead.status === 'converted' ? 'bg-green-500' :
-                                                        lead.claimed_by ? 'bg-purple-500' : 'bg-green-500'
-                                                        }`} />
-                                                    {lead.claimed_by ? (isMyLead ? (lead.status === 'claimed' ? 'Claimed - Contact Pending' : 'Contacted') : 'Claimed') : 'Open'}
-                                                </span>
-                                            </td>
-                                            <td className="px-8 py-6 text-sm text-[var(--text-secondary)]">
-                                                {lead.commissioner?.user?.name || 'Pool'}
-                                            </td>
-                                            <td className="px-8 py-6 text-right">
-                                                {isClaimable ? (
-                                                    <button
-                                                        onClick={() => handleClaimLead(lead.id)}
-                                                        className="px-4 py-2 bg-indigo-600 text-white rounded-xl text-xs font-bold hover:bg-indigo-700 transition"
-                                                    >
-                                                        Claim Lead
-                                                    </button>
-                                                ) : isMyLead && lead.status === 'claimed' ? (
-                                                    <button
-                                                        onClick={() => handleLogContact(lead.id)}
-                                                        className="px-4 py-2 border border-blue-200 bg-blue-50 text-blue-600 rounded-xl text-xs font-bold hover:bg-blue-100 transition"
-                                                    >
-                                                        Log Contact
-                                                    </button>
-                                                ) : isMyLead ? (
-                                                    <button className="px-4 py-2 border border-gray-200 text-gray-400 rounded-xl text-xs font-bold cursor-default">
-                                                        Secured
-                                                    </button>
-                                                ) : (
-                                                    <span className="text-xs text-gray-400 italic">Unavailable</span>
-                                                )}
-                                            </td>
-                                        </tr>
-                                    );
-                                })
-                            )}
-                        </tbody>
-                    </table>
-                </div>
-            </Card>
-
-            {/* Create Lead Modal */}
-            {isModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-                    <div className="bg-[var(--bg-card)] w-full max-w-lg rounded-3xl shadow-2xl border border-[var(--bg-input)] animate-in fade-in zoom-in duration-200">
-                        <div className="p-6 border-b border-[var(--bg-input)] flex justify-between items-center">
-                            <h2 className="text-xl font-bold text-[var(--text-primary)]">Add Lead to Pool</h2>
-                            <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-[var(--bg-input)] rounded-full text-[var(--text-secondary)]">
-                                <X className="w-5 h-5" />
-                            </button>
-                        </div>
-
-                        <form onSubmit={handleCreateLead} className="p-6 space-y-4">
-                            <div>
-                                <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1">Client Name</label>
-                                <input
-                                    required
-                                    type="text"
-                                    className="w-full px-4 py-3 rounded-xl border border-[var(--bg-input)] bg-[var(--bg-app)] text-[var(--text-primary)] focus:ring-2 focus:ring-[var(--primary)] outline-none transition-all"
-                                    placeholder="e.g. John Doe"
-                                    value={formData.client_name}
-                                    onChange={(e) => setFormData({ ...formData, client_name: e.target.value })}
-                                />
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1">Budget (KES)</label>
-                                    <input
-                                        type="number"
-                                        className="w-full px-4 py-3 rounded-xl border border-[var(--bg-input)] bg-[var(--bg-app)] text-[var(--text-primary)] focus:ring-2 focus:ring-[var(--primary)] outline-none transition-all"
-                                        placeholder="0.00"
-                                        value={formData.budget}
-                                        onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1">Phone</label>
-                                    <input
-                                        type="tel"
-                                        className="w-full px-4 py-3 rounded-xl border border-[var(--bg-input)] bg-[var(--bg-app)] text-[var(--text-primary)] focus:ring-2 focus:ring-[var(--primary)] outline-none transition-all"
-                                        placeholder="07..."
-                                        value={formData.client_phone}
-                                        onChange={(e) => setFormData({ ...formData, client_phone: e.target.value })}
-                                    />
-                                </div>
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1">Project Summary</label>
-                                <textarea
-                                    rows={3}
-                                    className="w-full px-4 py-3 rounded-xl border border-[var(--bg-input)] bg-[var(--bg-app)] text-[var(--text-primary)] focus:ring-2 focus:ring-[var(--primary)] outline-none transition-all"
-                                    placeholder="Brief description of the project..."
-                                    value={formData.project_summary}
-                                    onChange={(e) => setFormData({ ...formData, project_summary: e.target.value })}
-                                />
-                            </div>
-
-                            <div className="pt-4 flex gap-3">
-                                <button
-                                    type="button"
-                                    onClick={() => setIsModalOpen(false)}
-                                    className="flex-1 px-4 py-3 rounded-xl font-bold text-[var(--text-secondary)] hover:bg-[var(--bg-input)] transition-colors"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    type="submit"
-                                    disabled={submitting}
-                                    className="flex-1 px-4 py-3 rounded-xl font-bold bg-[var(--primary)] text-white hover:brightness-110 transition-all shadow-lg shadow-indigo-500/20 disabled:opacity-50"
-                                >
-                                    {submitting ? 'Adding...' : 'Add to Pool'}
-                                </button>
-                            </div>
-                        </form>
+            ) : filteredLeads.length === 0 ? (
+                <div className="text-center py-12 bg-[var(--bg-card)] rounded-xl border border-[var(--bg-input)]">
+                    <div className="w-16 h-16 bg-[var(--bg-secondary)] rounded-full flex items-center justify-center mx-auto mb-4">
+                        <UserCheck className="w-8 h-8 text-[var(--text-secondary)]" />
                     </div>
+                    <h3 className="text-lg font-bold text-[var(--text-primary)]">No leads found</h3>
+                    <p className="text-[var(--text-secondary)]">Try adjusting your search or filters.</p>
+                </div>
+            ) : (
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {filteredLeads.map((lead) => {
+                        const isClaimed = !!lead.claimed_by || !!lead.commissioner_id;
+                        return (
+                            <Card key={lead.id} className="group hover:shadow-lg transition-all border-[var(--bg-input)] bg-[var(--bg-card)] overflow-hidden">
+                                <div className="p-6 space-y-4">
+                                    <div className="flex justify-between items-start">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold">
+                                                {lead.client_name.charAt(0)}
+                                            </div>
+                                            <div>
+                                                <h3 className="font-bold text-[var(--text-primary)] line-clamp-1">{lead.client_name}</h3>
+                                                <p className="text-xs text-[var(--text-secondary)] flex items-center gap-1">
+                                                    <Clock className="w-3 h-3" />
+                                                    {formatDistanceToNow(new Date(lead.created_at), { addSuffix: true })}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        {getStatusBadge(lead.status)}
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <p className="text-sm text-[var(--text-primary)] line-clamp-2 min-h-[40px]">
+                                            {lead.project_summary}
+                                        </p>
+                                        <div className="flex items-center gap-2 text-xs text-[var(--text-secondary)]">
+                                            <DollarSign className="w-3 h-3" />
+                                            Budget: <span className="font-medium text-[var(--text-primary)]">KES {Number(lead.budget).toLocaleString() || 'Negotiable'}</span>
+                                        </div>
+                                    </div>
+
+                                    <div className="pt-4 border-t border-[var(--bg-input)] flex justify-between items-center">
+                                        <div className="flex gap-2">
+                                            {lead.client_email && (
+                                                <a href={`mailto:${lead.client_email}`} className="p-2 hover:bg-[var(--bg-secondary)] rounded-full text-[var(--text-secondary)] transition-colors">
+                                                    <Mail className="w-4 h-4" />
+                                                </a>
+                                            )}
+                                            {lead.client_phone && (
+                                                <a href={`tel:${lead.client_phone}`} className="p-2 hover:bg-[var(--bg-secondary)] rounded-full text-[var(--text-secondary)] transition-colors">
+                                                    <Phone className="w-4 h-4" />
+                                                </a>
+                                            )}
+                                        </div>
+
+                                        {!isClaimed ? (
+                                            <Button
+                                                size="sm"
+                                                onClick={() => handleClaim(lead.id)}
+                                                className="bg-[var(--primary)] text-white hover:opacity-90"
+                                            >
+                                                Claim Lead
+                                            </Button>
+                                        ) : (
+                                            <div className="flex items-center gap-2 text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded-full">
+                                                <CheckCircle className="w-3 h-3" />
+                                                {lead.status === 'claimed' ? 'Claimed' : 'Assigned'}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </Card>
+                        );
+                    })}
                 </div>
             )}
         </div>
     );
 }
-

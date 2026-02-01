@@ -25,6 +25,7 @@ export const supabaseClient = supabaseUrl && supabaseAnonKey
 export const db = {
     // Users
     async getUserById(id: string) {
+        if (!supabaseAdmin) throw new Error('Supabase Admin not initialized');
         const { data, error } = await supabaseAdmin
             .from('users')
             .select('*')
@@ -35,6 +36,7 @@ export const db = {
     },
 
     async getUserByEmail(email: string) {
+        if (!supabaseAdmin) throw new Error('Supabase Admin not initialized');
         const { data, error } = await supabaseAdmin
             .from('users')
             .select('*')
@@ -46,6 +48,7 @@ export const db = {
 
     // Projects
     async getProjectById(id: string) {
+        if (!supabaseAdmin) throw new Error('Supabase Admin not initialized');
         const { data, error } = await supabaseAdmin
             .from('projects')
             .select(`
@@ -62,6 +65,7 @@ export const db = {
     },
 
     async getProjectsByClient(clientId: string) {
+        if (!supabaseAdmin) throw new Error('Supabase Admin not initialized');
         const { data, error } = await supabaseAdmin
             .from('projects')
             .select('*, milestones:project_milestones(*)')
@@ -72,6 +76,7 @@ export const db = {
     },
 
     async getProjectsByCommissioner(commissionerId: string) {
+        if (!supabaseAdmin) throw new Error('Supabase Admin not initialized');
         const { data, error } = await supabaseAdmin
             .from('projects')
             .select('*, client:clients(*,user:users(*)), milestones:project_milestones(*)')
@@ -82,6 +87,7 @@ export const db = {
     },
 
     async getProjectsByDeveloper(developerId: string) {
+        if (!supabaseAdmin) throw new Error('Supabase Admin not initialized');
         const { data, error } = await supabaseAdmin
             .from('projects')
             .select('*, client:clients(*,user:users(*)), milestones:project_milestones(*)')
@@ -93,6 +99,7 @@ export const db = {
 
     // Leads
     async getLeadByToken(token: string) {
+        if (!supabaseAdmin) throw new Error('Supabase Admin not initialized');
         const { data, error } = await supabaseAdmin
             .from('leads')
             .select('*, commissioner:commissioners(*,user:users(*))')
@@ -103,6 +110,7 @@ export const db = {
     },
 
     async getLeadsByCommissioner(commissionerId: string) {
+        if (!supabaseAdmin) throw new Error('Supabase Admin not initialized');
         const { data, error } = await supabaseAdmin
             .from('leads')
             .select('*')
@@ -114,6 +122,7 @@ export const db = {
 
     // Payments
     async getPaymentsPendingVerification() {
+        if (!supabaseAdmin) throw new Error('Supabase Admin not initialized');
         const { data, error } = await supabaseAdmin
             .from('payments')
             .select('*, project:projects(*)')
@@ -124,6 +133,7 @@ export const db = {
     },
 
     async getPaymentById(id: string) {
+        if (!supabaseAdmin) throw new Error('Supabase Admin not initialized');
         const { data, error } = await supabaseAdmin
             .from('payments')
             .select('*')
@@ -135,6 +145,7 @@ export const db = {
 
     // Escrow Ledger
     async getEscrowLedgerByProject(projectId: string) {
+        if (!supabaseAdmin) throw new Error('Supabase Admin not initialized');
         const { data, error } = await supabaseAdmin
             .from('escrow_ledger')
             .select('*')
@@ -146,6 +157,7 @@ export const db = {
 
     // Commissions
     async getCommissionsByCommissioner(commissionerId: string) {
+        if (!supabaseAdmin) throw new Error('Supabase Admin not initialized');
         const { data, error } = await supabaseAdmin
             .from('commissions')
             .select('*, project:projects(*)')
@@ -157,6 +169,7 @@ export const db = {
 
     // Audit Logs
     async createAuditLog(actorId: string, actorRole: string, action: string, details: any) {
+        if (!supabaseAdmin) throw new Error('Supabase Admin not initialized');
         const { data, error } = await supabaseAdmin
             .from('audit_logs')
             .insert({
@@ -173,6 +186,7 @@ export const db = {
 
     // Notifications
     async createNotification(userId: string, channel: string, title: string, body: string, metadata?: any) {
+        if (!supabaseAdmin) throw new Error('Supabase Admin not initialized');
         const { data, error } = await supabaseAdmin
             .from('notifications')
             .insert({

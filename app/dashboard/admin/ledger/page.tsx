@@ -15,6 +15,7 @@ export default function AdminLedgerPage() {
         const fetchLedger = async () => {
             try {
                 // Fetch all ledger entries
+                if (!supabaseClient) throw new Error('Supabase client not initialized');
                 const { data, error } = await supabaseClient
                     .from('escrow_ledger')
                     .select(`

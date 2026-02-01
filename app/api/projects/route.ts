@@ -5,6 +5,9 @@ import { authOptions } from '@/lib/auth';
 import { db, supabaseAdmin } from '@/lib/db';
 
 export async function GET(req: NextRequest) {
+    if (!supabaseAdmin) {
+        return NextResponse.json({ error: 'Supabase Admin not initialized' }, { status: 500 });
+    }
     try {
         const session = await getServerSession(authOptions);
         if (!session?.user) {
@@ -65,6 +68,9 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+    if (!supabaseAdmin) {
+        return NextResponse.json({ error: 'Supabase Admin not initialized' }, { status: 500 });
+    }
     try {
         const session = await getServerSession(authOptions);
         if (!session?.user) {
@@ -83,16 +89,40 @@ export async function POST(request: NextRequest) {
         } = body;
 
         const userId = (session.user as any).id;
+        const userRole = (session.user as any).role;
 
-        //  Get client_id from user
-        const { data: client } = await supabaseAdmin
+        // Get or create client record
+        let { data: client } = await supabaseAdmin
             .from('clients')
             .select('id')
             .eq('user_id', userId)
             .single();
 
+        // If client doesn't exist and user is a client, create one
+        if (!client && userRole === 'client') {
+            const { data: newClient, error: clientError } = await supabaseAdmin
+                .from('clients')
+                .insert({
+                    user_id: userId,
+                    contact_person: (session.user as any).name || 'Unknown'
+                })
+                .select()
+                .single();
+
+            if (clientError) {
+                console.error('Error creating client record:', clientError);
+                return NextResponse.json({ error: 'Failed to create client profile' }, { status: 500 });
+            }
+            client = newClient;
+        }
+
         if (!client) {
-            return NextResponse.json({ error: 'Client profile not found' }, { status: 400 });
+            return NextResponse.json({ error: 'Client profile not found. Please contact support.' }, { status: 400 });
+        }
+
+        // Validate required fields
+        if (!title || !description) {
+            return NextResponse.json({ error: 'Project title and description are required' }, { status: 400 });
         }
 
         // Create project
@@ -104,33 +134,39 @@ export async function POST(request: NextRequest) {
                 lead_id: body.leadId || null,
                 title,
                 description,
+                total_value: budget || 0,
                 budget,
                 timeline,
                 skills: skills || [],
-                status: projectType === 'direct' ? 'active' : 'pending',
-                project_type: projectType,
+                status: projectType === 'direct' ? 'active' : 'lead',
+                project_type: projectType || 'open',
+                currency: 'KES'
             })
             .select()
             .single();
 
-        if (error) throw error;
+        if (error) {
+            console.error('Database error creating project:', error);
+            throw error;
+        }
 
         // If it was from a lead, mark the lead as converted
         if (body.leadId) {
             await supabaseAdmin
                 .from('leads')
-                .update({ status: 'converted', updated_at: new Date() })
+                .update({ status: 'converted', updated_at: new Date().toISOString() })
                 .eq('id', body.leadId);
         }
 
         return NextResponse.json({
             success: true,
             data: project,
+            message: 'Project created successfully'
         });
     } catch (error: any) {
         console.error('Error creating project:', error);
         return NextResponse.json(
-            { error: error.message || 'Failed to create project' },
+            { error: error.message || 'Failed to create project', details: error.hint || '' },
             { status: 500 }
         );
     }
