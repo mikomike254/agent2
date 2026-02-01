@@ -44,19 +44,8 @@ git push -u origin main
    - **Publish directory:** `.next`
    - **Functions directory:** (leave empty)
 
-6. Add environment variables in Netlify dashboard under "Site settings" → "Environment variables":
-```
-NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-SUPABASE_SERVICE_ROLE_KEY=your-service-key
-NEXTAUTH_SECRET=your-secret
-NEXTAUTH_URL=https://your-site.netlify.app
-PAYSTACK_SECRET_KEY=your-paystack-key
-PAYSTACK_PUBLIC_KEY=your-paystack-public-key
-RESEND_API_KEY=your-resend-key
-GOOGLE_CLIENT_ID=your-google-client-id
-GOOGLE_CLIENT_SECRET=your-google-client-secret
-```
+6. Add environment variables in Netlify dashboard under "Site settings" → "Environment variables".
+   Refer to `.env.example` for the list of required variables.
 
 7. Click "Deploy site"
 
