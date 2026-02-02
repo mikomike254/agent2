@@ -189,22 +189,23 @@ export default function PostJobPage() {
                     </div>
 
                     {/* Commissioner Selection */}
-                    <div>
-                        <label className="block text-sm font-semibold text-gray-900 mb-2">
-                            Select Project Commissioner *
+                    <div className="p-6 bg-[var(--bg-input)] rounded-3xl border border-[var(--border-color)]">
+                        <label className="block text-sm font-black text-gray-900 mb-2 uppercase tracking-widest">
+                            Project Commissioner
                         </label>
                         <select
                             value={formData.commissioner_id}
                             onChange={(e) => setFormData({ ...formData, commissioner_id: e.target.value })}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-600 focus:border-transparent outline-none"
-                            required
+                            className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent outline-none font-bold text-sm"
                         >
-                            <option value="">Select a commissioner...</option>
+                            <option value="">Post to Public Pool (Recommended)</option>
                             {commissioners.map(c => (
-                                <option key={c.id} value={c.id}>{c.name} — {c.specialties?.[0]}</option>
+                                <option key={c.id} value={c.id}>{c.name} — Verified Commissioner</option>
                             ))}
                         </select>
-                        <p className="text-[10px] text-gray-400 mt-2 uppercase font-black">Selecting a verified commissioner ensures premium delivery quality.</p>
+                        <p className="text-[10px] text-gray-400 mt-2 uppercase font-black tracking-tighter">
+                            If you don't choose a commissioner, your project will be available for our verified partner network to claim.
+                        </p>
                     </div>
 
                     {/* Submit */}

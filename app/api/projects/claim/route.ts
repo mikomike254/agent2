@@ -62,6 +62,7 @@ export async function POST(req: NextRequest) {
             .update({
                 developer_id: developer.id,
                 status: 'active',
+                project_type: 'active', // Mark as no longer in pool
                 updated_at: new Date().toISOString()
             })
             .eq('id', projectId)
@@ -70,7 +71,14 @@ export async function POST(req: NextRequest) {
 
         if (claimError) throw claimError;
 
-        // 4. Audit Log
+        // 4. Add to Project Members
+        await supabaseAdmin.from('project_members').insert({
+            project_id: projectId,
+            user_id: userId,
+            role: 'developer'
+        });
+
+        // 5. Audit Log
         await db.createAuditLog(
             userId,
             'developer',

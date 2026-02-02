@@ -1,45 +1,46 @@
 @import "tailwindcss";
 
 :root {
-  /* creative.ke - Clean Theme (Shopeers Style) */
-  --primary: #2563eb;
-  /* Royal Blue */
-  --primary-light: #60a5fa;
-  /* Soft Blue */
-  --secondary: #0f172a;
-  /* Slate 900 */
-  --accent: #f59e0b;
-  /* Amber (Action highlights) */
+  /* CREATIVE.KE - Crextio Aesthetic (Warm & Premium) */
+  --primary: #1a1a1a;
+  /* Dark Onyx */
+  --primary-light: #404040;
+  /* Charcoal Gray */
+  --secondary: #eae6d8;
+  /* Warm Beige (App Background) */
+  --accent: #fbbf24;
+  /* Gold (State/Action Highlights) */
 
   /* Functional Colors */
-  --success: #10b981;
-  --warning: #f59e0b;
-  --danger: #ef4444;
+  --success: #059669;
+  --warning: #d97706;
+  --danger: #dc2626;
 
-  /* Backgrounds - Clean Light */
-  --bg-app: #f8f9fc;
-  /* Very light cool gray */
+  /* Backgrounds */
+  --bg-app: #eae6d8;
+  /* Warm Beige Base */
   --bg-card: #ffffff;
-  /* Pure white */
-  --bg-sidebar: #ffffff;
-  /* White sidebar */
-  --bg-input: #f1f5f9;
-  /* Slate 100 */
+  /* Pure White for offset */
+  --bg-sidebar: #eae6d8;
+  /* Sidebar matches app bg for "Integrated" look */
+  --bg-input: #f5f4ef;
+  /* Slightly darker beige */
 
-  /* Text - Sharp & Accessible */
-  --text-primary: #0f172a;
-  /* Most content */
-  --text-secondary: #64748b;
-  /* Subtitles */
-  --text-muted: #94a3b8;
-  /* Placeholders */
-  --border-color: #e2e8f0;
-  /* Slate 200 */
+  /* Text */
+  --text-primary: #1a1a1a;
+  /* Sharp Dark */
+  --text-secondary: #737373;
+  /* Neutral Muted */
+  --text-muted: #a3a3a3;
+  /* Subtle Placeholders */
+  --border-color: rgba(26, 26, 26, 0.05);
 
-  /* Modern Shadows */
+  /* Modern Shadows & Smooth Radii */
+  --radius-xl: 3rem;
+  /* Crextio Signature Radii */
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-soft: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
-  --shadow-hover: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --shadow-soft: 0 4px 20px -2px rgba(0, 0, 0, 0.03), 0 2px 10px -2px rgba(0, 0, 0, 0.02);
+  --shadow-hover: 0 25px 50px -12px rgba(26, 26, 26, 0.08);
 }
 
 .font-serif {
@@ -90,14 +91,14 @@ body {
 /* Custom Utilities */
 .card-soft {
   background: var(--bg-card);
-  border-radius: 24px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-soft);
+  border: 1px solid var(--border-color);
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 :root[class~="dark"] .card-soft {
-  background: rgba(17, 24, 39, 0.7);
+  background: rgba(26, 26, 26, 0.7);
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.15);
   border: 1px solid rgba(255, 255, 255, 0.03);
 }
@@ -157,25 +158,23 @@ body {
 }
 
 .sidebar-item {
-  border-radius: 12px;
+  border-radius: 100px;
+  /* Pill Shape */
   color: var(--text-secondary);
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-bottom: 2px;
 }
 
 .sidebar-item.active {
-  background: rgba(99, 102, 241, 0.15);
-  color: var(--primary-light);
-  font-weight: 600;
-  border: 1px solid rgba(99, 102, 241, 0.2);
+  background: var(--primary);
+  color: #ffffff;
+  font-weight: 700;
+  box-shadow: var(--shadow-soft);
 }
 
 .sidebar-item:hover:not(.active) {
-  background: rgba(0, 0, 0, 0.05);
+  background: rgba(26, 26, 26, 0.05);
   color: var(--text-primary);
-}
-
-:root[class~="dark"] .sidebar-item:hover:not(.active) {
-  background: rgba(255, 255, 255, 0.05);
 }
 
 /* Scrollbar Customization */

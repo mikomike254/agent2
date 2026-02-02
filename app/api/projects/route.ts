@@ -180,8 +180,8 @@ export async function POST(request: NextRequest) {
                 total_value: budget || 0,
                 timeline,
                 skills: skills || [],
-                status: projectType === 'direct' ? 'active' : 'lead',
-                project_type: projectType || 'open',
+                status: finalCommissionerId ? 'active' : 'lead',
+                project_type: finalCommissionerId ? 'direct' : 'pool',
                 category: body.category || 'general',
                 currency: 'KES'
             })
@@ -192,6 +192,31 @@ export async function POST(request: NextRequest) {
             console.error('Database error creating project:', error);
             throw error;
         }
+
+        // Add Stakeholders to project_members for Team Communication
+        const membersToInsert = [
+            { project_id: project.id, user_id: userId, role: 'client' }
+        ];
+
+        if (finalCommissionerId) {
+            // Resolve commissioner's user_id
+            const { data: commData } = await supabaseAdmin
+                .from('commissioners')
+                .select('user_id')
+                .eq('id', finalCommissionerId)
+                .single();
+
+            if (commData) {
+                membersToInsert.push({
+                    project_id: project.id,
+                    user_id: commData.user_id,
+                    role: 'commissioner'
+                });
+            }
+        }
+
+        // Insert team members
+        await supabaseAdmin.from('project_members').insert(membersToInsert);
 
         // If it was from a lead, mark the lead as converted
         if (body.leadId) {

@@ -146,7 +146,7 @@ export function Sidebar({
                         </div>
 
                         {/* Navigation */}
-                        <nav className="flex-1 px-5 py-6 space-y-1.5 overflow-y-auto custom-scrollbar">
+                        <nav className="flex-1 px-4 space-y-1 mt-4 overflow-y-auto custom-scrollbar">
                             <p className="px-4 text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">
                                 Main Navigation
                             </p>
@@ -162,13 +162,14 @@ export function Sidebar({
                                         onClick={() => {
                                             if (window.innerWidth < 1024) onClose();
                                         }}
-                                        className={`flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all duration-300 group ${isActive
-                                            ? 'bg-indigo-600 text-white font-bold shadow-lg shadow-indigo-200'
-                                            : 'text-gray-500 hover:bg-indigo-50 hover:text-indigo-600'
+                                        className={`sidebar-item flex items-center gap-3 px-4 py-3 text-sm font-semibold transition-all group ${isActive
+                                            ? 'active'
+                                            : 'hover:bg-black/5 text-gray-500'
                                             }`}
                                     >
-                                        <Icon className={`w-5 h-5 transition-transform duration-300 ${isActive ? 'scale-110' : 'group-hover:scale-110'}`} />
-                                        <span className="text-sm tracking-tight">{item.name}</span>
+                                        <Icon className={`w-5 h-5 transition-colors ${isActive ? 'text-white' : 'text-gray-400 group-hover:text-black'
+                                            }`} />
+                                        <span className="tracking-tight">{item.name}</span>
                                         {isActive && (
                                             <motion.div
                                                 layoutId="active-pill"

@@ -179,16 +179,16 @@ export default function CommissionerDashboard() {
     return (
         <div className="space-y-8">
             {/* Header */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 px-2">
                 <div>
-                    <h2 className="text-3xl font-black text-gray-900 tracking-tight flex items-center gap-2">
+                    <h2 className="text-4xl font-black text-black tracking-tighter flex items-center gap-2">
                         Welcome, {session?.user?.name?.split(' ')[0] || 'Partner'}! 👋
                     </h2>
                     <p className="text-gray-500 mt-2 text-lg">Manage your digital agency pipeline and client relationships.</p>
                 </div>
                 <button
                     onClick={() => setIsInvoiceOpen(true)}
-                    className="bg-indigo-900 text-white px-6 py-3 rounded-xl font-bold text-sm shadow-lg hover:bg-black transition-all flex items-center gap-2"
+                    className="bg-black text-white px-8 py-4 rounded-[2rem] font-bold text-sm shadow-xl hover:scale-105 transition-all flex items-center gap-2"
                 >
                     <Mail className="w-4 h-4" />
                     New Invoice
@@ -197,64 +197,57 @@ export default function CommissionerDashboard() {
 
             {/* Quick Stats */}
             <div className="grid md:grid-cols-3 gap-6">
-                <Card className="p-6 border-none shadow-xl shadow-indigo-100/50 bg-white relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-50 rounded-full -mr-8 -mt-8 opacity-50 blur-xl group-hover:scale-110 transition-transform"></div>
+                <Card className="card-soft p-10 group bg-white border-none shadow-none">
                     <div className="relative">
-                        <p className="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">Active Projects</p>
-                        <h3 className="text-4xl font-black text-gray-900">{stats.activeProjects}</h3>
-                        <div className="mt-4 flex items-center gap-2 text-xs font-bold text-green-600 bg-green-50 w-fit px-2 py-1 rounded-md">
+                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Active Projects</p>
+                        <h3 className="text-5xl font-black text-black tracking-tighter">{stats.activeProjects}</h3>
+                        <div className="mt-4 flex items-center gap-2 text-[10px] font-black text-green-600 bg-green-50 w-fit px-3 py-1 rounded-full uppercase">
                             <TrendingUp className="w-3 h-3" />
                             <span>Current Workload</span>
                         </div>
                     </div>
                 </Card>
 
-                <Card className="p-6 border-2 border-yellow-100 shadow-none bg-yellow-50/30 relative">
+                <Card className="card-soft p-10 bg-white border-2 border-[var(--bg-input)] shadow-none relative">
                     {stats.pendingLeads > 0 && (
-                        <div className="absolute top-3 right-3 animate-pulse">
-                            <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                        <div className="absolute top-6 right-6 animate-pulse">
+                            <div className="w-3 h-3 bg-amber-500 rounded-full"></div>
                         </div>
                     )}
-                    <p className="text-xs font-black text-yellow-600 uppercase tracking-widest mb-1">Pending Leads</p>
-                    <h3 className="text-4xl font-black text-gray-900">{stats.pendingLeads}</h3>
-                    <div className="mt-4 flex items-center gap-2 text-xs font-bold text-yellow-700 bg-yellow-100 w-fit px-2 py-1 rounded-md">
+                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Pending Leads</p>
+                    <h3 className="text-5xl font-black text-black tracking-tighter">{stats.pendingLeads}</h3>
+                    <div className="mt-4 flex items-center gap-2 text-[10px] font-black text-amber-600 bg-amber-50 w-fit px-3 py-1 rounded-full uppercase">
                         <Clock className="w-3 h-3" />
                         <span>Action Required</span>
                     </div>
                 </Card>
 
-                <Card className="p-6 border-none shadow-lg bg-indigo-600 text-white relative overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-br from-indigo-500 to-indigo-700"></div>
+                <Card className="card-soft p-10 bg-black text-white relative overflow-hidden shadow-none">
                     <div className="relative z-10">
-                        <p className="text-xs font-black text-indigo-200 uppercase tracking-widest mb-1">Total Revenue</p>
-                        <h3 className="text-4xl font-black text-white">KES {stats.totalRevenue.toLocaleString()}</h3>
-                        <p className="text-xs text-indigo-200 mt-4">Lifetime Earnings</p>
+                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Total Revenue</p>
+                        <h3 className="text-5xl font-black text-white tracking-tighter">KES {stats.totalRevenue.toLocaleString()}</h3>
+                        <p className="text-[10px] text-gray-500 mt-4 uppercase font-black tracking-widest">Lifetime Earnings</p>
                     </div>
                 </Card>
             </div>
 
             <div className="grid lg:grid-cols-3 gap-8">
                 {/* Fast Leads Action */}
-                <Card className="lg:col-span-1 p-8 border-gray-100 shadow-xl shadow-indigo-100/20 max-h-fit">
-                    <div className="flex items-center gap-3 mb-6">
-                        <div className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600">
-                            <UserPlus className="w-5 h-5" />
+                <Card className="lg:col-span-1 p-10 card-soft bg-white border-none shadow-none">
+                    <div className="flex items-center gap-3 mb-8">
+                        <div className="w-12 h-12 bg-black text-white rounded-2xl flex items-center justify-center">
+                            <UserPlus className="w-6 h-6" />
                         </div>
                         <div>
-                            <h3 className="font-bold text-gray-900 leading-tight">New Client Lead</h3>
-                            <p className="text-xs text-gray-400 font-medium">Add a prospect manually</p>
+                            <h3 className="text-xl font-black text-black tracking-tight">Add Lead</h3>
+                            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Manual Intake</p>
                         </div>
                     </div>
 
-                    <div className="space-y-4">
-                        <p className="text-sm text-gray-600 leading-relaxed">
-                            Manually add a new client lead to your pipeline.
-                            Or share your referral link to let them sign up themselves.
-                        </p>
-
+                    <div className="space-y-6">
                         <button
                             onClick={() => setIsNewLeadOpen(true)}
-                            className="w-full py-4 bg-gray-900 text-white rounded-xl font-bold text-sm uppercase tracking-widest hover:bg-black transition-all flex items-center justify-center gap-2 shadow-lg shadow-gray-200"
+                            className="w-full py-5 bg-black text-white rounded-[2rem] font-bold text-sm uppercase tracking-widest hover:scale-[1.02] transition-all flex items-center justify-center gap-2"
                         >
                             <Mail className="w-4 h-4" />
                             Create New Lead
@@ -262,10 +255,10 @@ export default function CommissionerDashboard() {
 
                         <Link href="/dashboard/commissioner/onboard">
                             <button
-                                className="w-full py-4 bg-white border-2 border-gray-100 text-gray-900 rounded-xl font-bold text-sm uppercase tracking-widest hover:border-indigo-600 hover:bg-indigo-50 transition-all flex items-center justify-center gap-2 mt-3"
+                                className="w-full py-5 bg-[var(--bg-input)] text-black rounded-[2rem] font-bold text-sm uppercase tracking-widest hover:bg-gray-200 transition-all flex items-center justify-center gap-2"
                             >
                                 <UserPlus className="w-4 h-4" />
-                                Onboard New Client
+                                Onboard Client
                             </button>
                         </Link>
 
