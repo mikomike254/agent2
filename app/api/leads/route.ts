@@ -32,15 +32,18 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // If no commissioner_id, it goes to the Open Pool
+        // If no commissioner_id, it goes to Admin Approval Queue
         const isPublicPool = !commissioner_id;
-        const status = isPublicPool ? 'created' : 'active';
+        const status = isPublicPool ? 'pending_approval' : 'active';
+
+        // Fix: Ensure empty string becomes null for UUID column
+        const finalCommissionerId = commissioner_id || null;
 
         // Create lead - simple message-based inquiry
         const { data: lead, error } = await supabaseAdmin
             .from('leads')
             .insert({
-                commissioner_id,
+                commissioner_id: finalCommissionerId,
                 client_name,
                 client_phone,
                 client_email,
@@ -82,8 +85,11 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ error: 'Supabase Admin not initialized' }, { status: 500 });
     }
     try {
-        // Public Pool Logic: Fetch ALL leads
-        const { data: leads, error } = await supabaseAdmin
+        // Get session to check role
+        const { searchParams } = new URL(request.url);
+        const role = searchParams.get('role'); // Optional role param for filtering
+
+        let query = supabaseAdmin
             .from('leads')
             .select(`
                 *,
@@ -95,8 +101,15 @@ export async function GET(request: NextRequest) {
                         avatar_url
                     )
                 )
-            `)
-            .order('created_at', { ascending: false });
+            `);
+
+        // Commissioners should only see qualified or active leads (not pending approval)
+        // Admins see all leads via their dedicated endpoint
+        if (role !== 'admin') {
+            query = query.in('status', ['qualified', 'active', 'contacted', 'converted', 'claimed']);
+        }
+
+        const { data: leads, error } = await query.order('created_at', { ascending: false });
 
         if (error) throw error;
 

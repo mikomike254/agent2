@@ -4,14 +4,14 @@ import { supabaseAdmin } from '@/lib/db';
 
 export async function GET(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     if (!supabaseAdmin) {
         return NextResponse.json({ error: 'Supabase Admin not initialized' }, { status: 500 });
     }
 
     try {
-        const { id } = params;
+        const { id } = await params;
 
         // Fetch basic user data
         const { data: user, error: userError } = await supabaseAdmin

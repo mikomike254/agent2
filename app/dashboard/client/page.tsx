@@ -19,6 +19,7 @@ import Link from 'next/link';
 import { useRealtime } from '@/hooks/useRealtime';
 import { TopUpModal } from '@/components/projects/TopUpModal';
 import MeetingCalendar from '@/components/dashboard/MeetingCalendar';
+import SupportWidget from '@/components/support/SupportWidget';
 
 // Mock Data for "Recommended Talent" (until API is fully linked)
 const RECOMMENDED_TALENT = [
@@ -32,6 +33,7 @@ export default function ClientDashboard() {
     const [stats, setStats] = useState({
         activeProjects: 0,
         pendingProposals: 0,
+        proposedProjects: [] as any[],
         totalInvested: 0,
         teamMembers: 0,
     });
@@ -54,8 +56,9 @@ export default function ClientDashboard() {
                     const projects = projectsData.data || [];
                     setStats(prev => ({
                         ...prev,
-                        activeProjects: projects.filter((p: any) => p.status === 'active').length,
-                        pendingProposals: projects.filter((p: any) => p.status === 'pending').length,
+                        activeProjects: projects.filter((p: any) => p.status === 'active' || p.status === 'in_progress' || p.status === 'deposit_pending').length,
+                        pendingProposals: projects.filter((p: any) => p.status === 'proposed').length,
+                        proposedProjects: projects.filter((p: any) => p.status === 'proposed'),
                         teamMembers: projects.reduce((acc: number, p: any) =>
                             acc + (p.team_members?.length || 0), 0
                         ),
@@ -96,8 +99,9 @@ export default function ClientDashboard() {
                     const projects = projectsData.data || [];
                     setStats(prev => ({
                         ...prev,
-                        activeProjects: projects.filter((p: any) => p.status === 'active').length,
-                        pendingProposals: projects.filter((p: any) => p.status === 'pending').length,
+                        activeProjects: projects.filter((p: any) => p.status === 'active' || p.status === 'in_progress' || p.status === 'deposit_pending').length,
+                        pendingProposals: projects.filter((p: any) => p.status === 'proposed').length,
+                        proposedProjects: projects.filter((p: any) => p.status === 'proposed'),
                         teamMembers: projects.reduce((acc: number, p: any) =>
                             acc + (p.team_members?.length || 0), 0
                         ),
@@ -125,10 +129,10 @@ export default function ClientDashboard() {
             {/* 1. Shopeers Header */}
             <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold text-[var(--text-primary)] tracking-tight">
-                        Good morning, {userName}
+                    <h1 className="text-4xl font-black text-[var(--text-primary)] tracking-tight leading-none">
+                        Welcome back, {userName}! 👋
                     </h1>
-                    <p className="text-[var(--text-secondary)]">Here's what's happening with your projects today.</p>
+                    <p className="text-[var(--text-secondary)] mt-2 text-lg">You have {stats.pendingProposals} project proposals waiting for your review.</p>
                 </div>
                 <div className="flex items-center gap-3">
                     <button className="p-2.5 bg-white border border-[var(--border-color)] rounded-xl hover:bg-[var(--bg-input)] transition-colors text-[var(--text-secondary)]">
@@ -138,13 +142,6 @@ export default function ClientDashboard() {
                         <Bell className="w-5 h-5" />
                         <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
                     </button>
-                    <Link
-                        href="/dashboard/client/new-project"
-                        className="btn-primary flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold shadow-soft hover:shadow-hover"
-                    >
-                        <Plus className="w-5 h-5" />
-                        <span>New Project</span>
-                    </Link>
                 </div>
             </header>
 
@@ -248,37 +245,61 @@ export default function ClientDashboard() {
                             )}
                         </div>
                     </div>
+
+                    {/* New Section: Project Proposals */}
+                    <div className="bg-white rounded-3xl border border-indigo-100 shadow-xl shadow-indigo-50/50 overflow-hidden">
+                        <div className="p-6 border-b border-indigo-50 bg-indigo-50/30 flex justify-between items-center">
+                            <h2 className="text-lg font-black text-indigo-900 flex items-center gap-2">
+                                <Plus className="w-5 h-5" />
+                                Project Proposals
+                            </h2>
+                            <span className="bg-indigo-600 text-white text-[10px] font-black px-2 py-1 rounded-full uppercase">Action Needed</span>
+                        </div>
+                        <div className="p-4">
+                            {/* Filter projects with status 'proposed' */}
+                            {loading ? (
+                                <div className="p-8 text-center text-gray-400">Loading proposals...</div>
+                            ) : (
+                                <div className="space-y-4">
+                                    {(stats as any).proposedProjects?.length === 0 ? (
+                                        <div className="p-8 text-center text-gray-400 italic">No new proposals.</div>
+                                    ) : (
+                                        (stats as any).proposedProjects?.map((proj: any) => (
+                                            <div key={proj.id} className="p-5 border-2 border-dashed border-indigo-100 rounded-[2rem] hover:border-indigo-300 transition-all group">
+                                                <div className="flex justify-between items-start mb-4">
+                                                    <div>
+                                                        <h3 className="font-black text-gray-900 text-lg group-hover:text-indigo-600 transition-colors">{proj.title}</h3>
+                                                        <p className="text-sm text-gray-400 font-medium">Proposed Service: {proj.proposed_service || 'Development'}</p>
+                                                    </div>
+                                                    <div className="text-right">
+                                                        <span className="text-xl font-black text-gray-900 leading-none">KES {(proj.total_value || 0).toLocaleString()}</span>
+                                                        <p className="text-[10px] text-gray-400 uppercase font-black tracking-widest mt-1">Estim. Budget</p>
+                                                    </div>
+                                                </div>
+                                                <p className="text-sm text-gray-500 mb-6 line-clamp-2">{proj.description}</p>
+                                                <div className="flex gap-3">
+                                                    <Link
+                                                        href={`/dashboard/client/projects/${proj.id}`}
+                                                        className="flex-1 py-3 bg-indigo-600 text-white rounded-xl text-center font-bold text-sm hover:bg-black transition-all shadow-lg shadow-indigo-200"
+                                                    >
+                                                        Review & Accept
+                                                    </Link>
+                                                    <button className="px-5 py-3 border border-gray-100 text-gray-400 rounded-xl font-bold text-sm hover:bg-gray-50 transition-all">
+                                                        Decline
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ))
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    </div>
                 </div>
 
                 {/* Right Column (1/3) */}
                 <div className="space-y-8">
                     {/* Discovery Teaser Widget */}
-                    <div className="bg-black text-white rounded-3xl p-6 shadow-xl relative overflow-hidden">
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500 rounded-full blur-[60px] opacity-40"></div>
-                        <h2 className="text-xl font-bold mb-2 relative z-10">Find Talent</h2>
-                        <p className="text-gray-400 text-sm mb-6 relative z-10">
-                            Verified commissioners ready to lead your next project.
-                        </p>
-
-                        <div className="space-y-4 relative z-10">
-                            {RECOMMENDED_TALENT.map((talent) => (
-                                <div key={talent.id} className="flex items-center gap-3 bg-white/10 p-3 rounded-2xl hover:bg-white/20 transition-colors cursor-pointer backdrop-blur-sm">
-                                    <img src={talent.avatar} alt={talent.name} className="w-10 h-10 rounded-full object-cover" />
-                                    <div className="flex-1">
-                                        <h4 className="font-bold text-sm text-white">{talent.name}</h4>
-                                        <p className="text-xs text-indigo-300">{talent.role}</p>
-                                    </div>
-                                    <Link href={`/dashboard/client/discovery?commissionerId=${talent.id}`} className="p-2 bg-white text-black rounded-lg hover:bg-indigo-50">
-                                        <Plus className="w-4 h-4" />
-                                    </Link>
-                                </div>
-                            ))}
-                        </div>
-
-                        <Link href="/dashboard/client/discovery" className="block mt-6 text-center text-sm font-bold text-white/80 hover:text-white py-3 border border-white/20 rounded-xl hover:bg-white/10 transition-colors">
-                            View All Talent
-                        </Link>
-                    </div>
 
                     {/* Meeting Scheduler Widget */}
                     <MeetingCalendar />
@@ -312,6 +333,7 @@ export default function ClientDashboard() {
             </div>
 
             <TopUpModal open={showTopUp} onOpenChange={setShowTopUp} />
+            <SupportWidget />
         </div>
     );
 }

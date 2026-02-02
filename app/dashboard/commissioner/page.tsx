@@ -24,6 +24,7 @@ import { NewLeadModal } from '@/components/dashboard/NewLeadModal';
 import { CreateInvoiceModal } from '@/components/dashboard/CreateInvoiceModal';
 import Link from 'next/link';
 import { useRealtime } from '@/hooks/useRealtime';
+import SupportWidget from '@/components/support/SupportWidget';
 
 export default function CommissionerDashboard() {
     const { data: session } = useSession();
@@ -171,7 +172,9 @@ export default function CommissionerDashboard() {
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
                 <div>
-                    <h2 className="text-3xl font-black text-gray-900 tracking-tight">Commissioner Overview</h2>
+                    <h2 className="text-3xl font-black text-gray-900 tracking-tight flex items-center gap-2">
+                        Welcome, {session?.user?.name?.split(' ')[0] || 'Partner'}! 👋
+                    </h2>
                     <p className="text-gray-500 mt-2 text-lg">Manage your digital agency pipeline and client relationships.</p>
                 </div>
                 <button
@@ -247,6 +250,15 @@ export default function CommissionerDashboard() {
                             <Mail className="w-4 h-4" />
                             Create New Lead
                         </button>
+
+                        <Link href="/dashboard/commissioner/onboard">
+                            <button
+                                className="w-full py-4 bg-white border-2 border-gray-100 text-gray-900 rounded-xl font-bold text-sm uppercase tracking-widest hover:border-indigo-600 hover:bg-indigo-50 transition-all flex items-center justify-center gap-2 mt-3"
+                            >
+                                <UserPlus className="w-4 h-4" />
+                                Onboard New Client
+                            </button>
+                        </Link>
 
                         {/* Referral Link */}
                         <div className="pt-4 border-t border-gray-100 mt-4">
@@ -341,6 +353,8 @@ export default function CommissionerDashboard() {
 
             {/* Invoice Modal */}
             <CreateInvoiceModal isOpen={isInvoiceOpen} onClose={() => setIsInvoiceOpen(false)} />
+
+            <SupportWidget />
         </div>
     );
 }

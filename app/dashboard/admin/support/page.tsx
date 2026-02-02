@@ -98,6 +98,22 @@ export default function AdminSupportPage() {
                 </div>
             </div>
 
+            {/* Assignment Overhaul Banner */}
+            <div className="bg-gradient-to-r from-violet-600 to-indigo-600 rounded-2xl p-6 shadow-xl shadow-indigo-200 text-white flex items-center justify-between">
+                <div>
+                    <h3 className="text-lg font-black uppercase tracking-tight flex items-center gap-2">
+                        <Zap className="w-5 h-5" />
+                        Assignment Protocol v2.0
+                    </h3>
+                    <p className="text-indigo-100 font-medium mt-1">
+                        Automated ticket routing and intelligent agent matching overhaul is coming soon to this portal.
+                    </p>
+                </div>
+                <div className="bg-white/10 px-4 py-2 rounded-xl backdrop-blur-sm border border-white/20 text-xs font-bold uppercase tracking-widest">
+                    Coming Soon
+                </div>
+            </div>
+
             <div className="grid lg:grid-cols-3 gap-8">
                 {/* Left: Support Tickets */}
                 <div className="lg:col-span-2 space-y-8">

@@ -9,6 +9,7 @@ import Link from 'next/link';
 import ProjectFileManager from '@/components/projects/ProjectFileManager';
 import ProjectChat from '@/components/dashboard/ProjectChat';
 import MilestoneChecklist from '@/components/developer/MilestoneChecklist';
+import DisputeWidget from '@/components/disputes/DisputeWidget';
 
 export default function DeveloperProjectDetailPage() {
     const params = useParams();
@@ -75,6 +76,7 @@ export default function DeveloperProjectDetailPage() {
                         <Rocket className="w-4 h-4" />
                         Status: {project.status.toUpperCase()}
                     </span>
+                    <DisputeWidget projectId={project.id} projectTitle={project.title} />
                 </div>
             </div>
 

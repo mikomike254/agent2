@@ -21,7 +21,7 @@ import {
     FileText,
     X
 } from 'lucide-react';
-import { signOut } from 'next-auth/react';
+import { signOut, useSession } from 'next-auth/react';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -39,22 +39,21 @@ const menuItems = {
     ],
     client: [
         { name: 'Dashboard', icon: LayoutDashboard, href: '/dashboard/client' },
-        { name: 'Messages', icon: MessageSquare, href: '/dashboard/client/messages' },
-        { name: 'Find Talent', icon: Search, href: '/dashboard/client/discovery' },
-        { name: 'My Projects', icon: Briefcase, href: '/dashboard/client/projects' },
-        { name: 'Knowledge Base', icon: BookOpen, href: '/dashboard/kb' },
         { name: 'Payments', icon: CreditCard, href: '/dashboard/client/payments' },
+        { name: 'My Projects', icon: Briefcase, href: '/dashboard/client/projects' },
+        { name: 'Messages', icon: MessageSquare, href: '/dashboard/client/messages' },
+        { name: 'Knowledge Base', icon: BookOpen, href: '/dashboard/kb' },
         { name: 'Profile', icon: User, href: '/dashboard/profile' },
     ],
     commissioner: [
         { name: 'Dashboard', href: '/dashboard/commissioner', icon: LayoutDashboard },
+        { name: 'Onboard Client', icon: User, href: '/dashboard/commissioner/onboard' },
         { name: 'Leads', href: '/dashboard/commissioner/leads', icon: Target },
-        { name: 'Marketing', href: '/dashboard/commissioner/marketing', icon: Megaphone },
-        { name: 'Knowledge Base', href: '/dashboard/kb', icon: BookOpen },
-        { name: 'Team', href: '/dashboard/commissioner/team', icon: Users },
-        { name: 'Profile', href: '/dashboard/profile', icon: User },
-        { name: 'Messages', href: '/dashboard/commissioner/messages', icon: MessageSquare },
         { name: 'Invoices', href: '/dashboard/commissioner/invoices', icon: CreditCard },
+        { name: 'Marketing', href: '/dashboard/commissioner/marketing', icon: Megaphone },
+        { name: 'Team', href: '/dashboard/commissioner/team', icon: Users },
+        { name: 'Messages', href: '/dashboard/commissioner/messages', icon: MessageSquare },
+        { name: 'Profile', href: '/dashboard/profile', icon: User },
     ],
     developer: [
         { name: 'Work Queue', icon: LayoutDashboard, href: '/dashboard/developer' },
@@ -76,6 +75,7 @@ export function Sidebar({
     onClose: () => void;
 }) {
     const pathname = usePathname();
+    const { data: session } = useSession();
     const items = menuItems[role] || [];
 
     const sidebarVariants = {
@@ -118,6 +118,27 @@ export function Sidebar({
                             >
                                 <X className="w-6 h-6 text-gray-400" />
                             </button>
+                        </div>
+
+                        {/* User Profile Snippet */}
+                        <div className="px-8 pb-6">
+                            <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-2xl border border-gray-100">
+                                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold shadow-md ring-2 ring-white">
+                                    {session?.user?.image ? (
+                                        <img src={session.user.image} alt="Profile" className="w-full h-full rounded-full object-cover" />
+                                    ) : (
+                                        session?.user?.name?.[0] || 'U'
+                                    )}
+                                </div>
+                                <div className="overflow-hidden">
+                                    <h3 className="text-sm font-bold text-gray-900 truncate">
+                                        {session?.user?.name || 'Guest User'}
+                                    </h3>
+                                    <p className="text-[10px] text-gray-400 uppercase tracking-wider font-bold truncate">
+                                        {role}
+                                    </p>
+                                </div>
+                            </div>
                         </div>
 
                         {/* Navigation */}

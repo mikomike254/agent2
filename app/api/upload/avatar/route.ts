@@ -2,12 +2,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { createClient } from '@supabase/supabase-js';
+import { supabaseAdmin } from '@/lib/db';
 
-const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+// Fallback for static build optimization
+const supabase = supabaseAdmin;
 
 export async function POST(request: NextRequest) {
     try {
@@ -32,6 +30,10 @@ export async function POST(request: NextRequest) {
         // Convert file to buffer
         const arrayBuffer = await file.arrayBuffer();
         const buffer = Buffer.from(arrayBuffer);
+
+        if (!supabase) {
+            return NextResponse.json({ error: 'Storage service unavailable during build' }, { status: 503 });
+        }
 
         // Upload to Supabase Storage
         const bucketName = 'avatars';

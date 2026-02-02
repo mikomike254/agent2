@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
-import { Outfit } from "next/font/google"; // Premium, clean sans-serif
+// import { Outfit } from "next/font/google"; // Premium, clean sans-serif
 import "./globals.css";
 import { Providers } from "./providers";
 
-const outfit = Outfit({
-  subsets: ["latin"],
-  variable: "--font-outfit",
-  display: "swap",
-});
+// const outfit = Outfit({
+//   subsets: ["latin"],
+//   variable: "--font-outfit",
+//   display: "swap",
+// });
 
 export const metadata: Metadata = {
   title: "creative.ke | Premier Tech Talent Marketplace",
@@ -21,7 +21,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${outfit.variable} font-sans antialiased bg-[var(--bg-app)] text-[var(--text-primary)]`}>
+      <body className={`font-sans antialiased bg-[var(--bg-app)] text-[var(--text-primary)]`}>
         <Providers>
           {children}
         </Providers>

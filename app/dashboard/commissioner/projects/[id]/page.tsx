@@ -10,6 +10,7 @@ import { useCallback } from 'react';
 import Link from 'next/link';
 import ProjectFileManager from '@/components/projects/ProjectFileManager';
 import ProjectChat from '@/components/dashboard/ProjectChat';
+import DisputeWidget from '@/components/disputes/DisputeWidget';
 
 interface Project {
     id: string;
@@ -122,8 +123,11 @@ export default function CommissionerProjectDetailPage() {
                         </p>
                     </div>
                 </div>
-                <div className={`px-4 py-2 rounded-full border-2 font-semibold text-sm ${statusColors[project.status] || statusColors.pending}`}>
-                    {project.status.toUpperCase()}
+                <div className="flex items-center gap-3">
+                    <div className={`px-4 py-2 rounded-full border-2 font-semibold text-sm ${statusColors[project.status] || statusColors.pending}`}>
+                        {project.status.toUpperCase()}
+                    </div>
+                    <DisputeWidget projectId={project.id} projectTitle={project.title} />
                 </div>
             </div>
 
@@ -236,6 +240,6 @@ export default function CommissionerProjectDetailPage() {
                     </Card>
                 </div>
             </div>
-        </div>
+        </div >
     );
 }

@@ -1,10 +1,8 @@
-import { createClient } from '@supabase/supabase-js';
+import { supabaseAdmin } from '@/lib/db';
 import { NextResponse } from 'next/server';
 
-const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+// Fallback for static build optimization
+const supabase = supabaseAdmin;
 
 // Sample commissioners for demo purposes
 const SAMPLE_COMMISSIONERS = [
@@ -44,29 +42,35 @@ export async function GET(req: Request) {
     const search = searchParams.get('search');
 
     try {
-        let query = supabase
-            .from('commissioners')
-            .select(`
-                *,
-                user:users(id, name, avatar_url)
-            `);
+        let dbCommissioners: any[] = [];
 
-        if (category) {
-            query = query.contains('specialties', [category]);
-        }
+        if (supabase) {
+            let query = supabase
+                .from('commissioners')
+                .select(`
+                    *,
+                    user:users(id, name, avatar_url)
+                `);
 
-        if (search) {
-            query = query.ilike('bio', `%${search}%`);
-        }
+            if (category) {
+                query = query.contains('specialties', [category]);
+            }
 
-        const { data, error } = await query;
+            if (search) {
+                query = query.ilike('bio', `%${search}%`);
+            }
 
-        if (error) {
-            console.error('Database query error:', error);
+            const { data, error } = await query;
+
+            if (error) {
+                console.error('Database query error:', error);
+            } else {
+                dbCommissioners = data || [];
+            }
         }
 
         // Transform database data for the frontend
-        let commissioners = (data || []).map(comm => ({
+        let commissioners = dbCommissioners.map(comm => ({
             id: comm.id,
             user_id: comm.user_id,
             name: comm.user?.name || 'Commissioner',

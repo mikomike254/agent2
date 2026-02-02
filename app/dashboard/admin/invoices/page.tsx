@@ -1,17 +1,65 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { FileText, CheckCircle, XCircle, Mail, DollarSign, Clock } from 'lucide-react';
+import { FileText, CheckCircle, XCircle, Mail, DollarSign, Clock, Plus, Loader2 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 
 export default function AdminInvoicesPage() {
     const [invoices, setInvoices] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState('pending_approval');
+    const [showCreateModal, setShowCreateModal] = useState(false);
+    const [projects, setProjects] = useState<any[]>([]);
+    const [isCreating, setIsCreating] = useState(false);
+    const [newInvoice, setNewInvoice] = useState({
+        projectId: '',
+        amount: '',
+        description: '',
+        invoice_number: ''
+    });
 
     useEffect(() => {
         fetchInvoices();
     }, [filter]);
+
+    useEffect(() => {
+        if (showCreateModal) {
+            fetch('/api/projects')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) setProjects(data.data);
+                });
+        }
+    }, [showCreateModal]);
+
+    const handleCreateInvoice = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsCreating(true);
+        try {
+            // Find client_id from selected project
+            const project = projects.find(p => p.id === newInvoice.projectId);
+            const res = await fetch('/api/invoices', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    project_id: newInvoice.projectId,
+                    client_id: project?.client_id,
+                    amount: parseFloat(newInvoice.amount),
+                    description: newInvoice.description,
+                    invoice_number: newInvoice.invoice_number || `INV-ADM-${Date.now()}`
+                })
+            });
+            if (res.ok) {
+                alert('Invoice issued successfully!');
+                setShowCreateModal(false);
+                fetchInvoices();
+            }
+        } catch (error) {
+            console.error('Create invoice error:', error);
+        } finally {
+            setIsCreating(false);
+        }
+    };
 
     const fetchInvoices = async () => {
         setLoading(true);
@@ -70,14 +118,97 @@ export default function AdminInvoicesPage() {
     };
 
     return (
-        <div className="space-y-8">
+        <div className="space-y-8 relative">
             {/* Header */}
-            <div>
-                <h1 className="text-3xl font-bold text-[var(--text-primary)]">Invoice Management</h1>
-                <p className="text-[var(--text-secondary)] mt-2">
-                    Review and approve client invoice requests
-                </p>
+            <div className="flex justify-between items-center">
+                <div>
+                    <h1 className="text-3xl font-bold text-[var(--text-primary)]">Invoice Management</h1>
+                    <p className="text-[var(--text-secondary)] mt-2">
+                        Review and approve client invoice requests
+                    </p>
+                </div>
+                <button
+                    onClick={() => setShowCreateModal(true)}
+                    className="flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-black transition-all shadow-xl shadow-indigo-200"
+                >
+                    <Plus className="w-4 h-4" /> Issue Invoice
+                </button>
             </div>
+
+            {/* Create Invoice Modal */}
+            {showCreateModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+                    <Card className="w-full max-w-lg p-8 space-y-6 bg-white rounded-[2.5rem] shadow-2xl relative">
+                        <button
+                            onClick={() => setShowCreateModal(false)}
+                            className="absolute top-6 right-6 text-gray-400 hover:text-gray-900"
+                        >
+                            <XCircle className="w-6 h-6" />
+                        </button>
+                        <div>
+                            <h2 className="text-2xl font-black text-gray-900 tracking-tight">Issue New Invoice</h2>
+                            <p className="text-sm text-gray-500 font-medium">Create and send an invoice request directly to a client.</p>
+                        </div>
+                        <form onSubmit={handleCreateInvoice} className="space-y-4">
+                            <div className="space-y-1">
+                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Select Project</label>
+                                <select
+                                    required
+                                    value={newInvoice.projectId}
+                                    onChange={e => setNewInvoice({ ...newInvoice, projectId: e.target.value })}
+                                    className="w-full px-5 py-3 bg-gray-50 border border-gray-100 rounded-xl outline-none font-bold"
+                                >
+                                    <option value="">Select a project...</option>
+                                    {projects.map(p => (
+                                        <option key={p.id} value={p.id}>{p.title}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-1">
+                                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">KSh Amount</label>
+                                    <input
+                                        required
+                                        type="number"
+                                        value={newInvoice.amount}
+                                        onChange={e => setNewInvoice({ ...newInvoice, amount: e.target.value })}
+                                        className="w-full px-5 py-3 bg-gray-50 border border-gray-100 rounded-xl outline-none font-bold text-indigo-600"
+                                        placeholder="50,000"
+                                    />
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Invoice # (Auto)</label>
+                                    <input
+                                        type="text"
+                                        value={newInvoice.invoice_number}
+                                        onChange={e => setNewInvoice({ ...newInvoice, invoice_number: e.target.value })}
+                                        className="w-full px-5 py-3 bg-gray-50 border border-gray-100 rounded-xl outline-none text-gray-500 font-medium"
+                                        placeholder="INV-ADM-..."
+                                    />
+                                </div>
+                            </div>
+                            <div className="space-y-1">
+                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Narrative/Items</label>
+                                <textarea
+                                    required
+                                    rows={3}
+                                    value={newInvoice.description}
+                                    onChange={e => setNewInvoice({ ...newInvoice, description: e.target.value })}
+                                    className="w-full px-5 py-3 bg-gray-50 border border-gray-100 rounded-xl outline-none text-sm"
+                                    placeholder="Describe the payment request scope..."
+                                />
+                            </div>
+                            <button
+                                disabled={isCreating}
+                                type="submit"
+                                className="w-full py-4 bg-indigo-600 text-white rounded-2xl font-black uppercase tracking-widest text-sm hover:bg-black transition-all flex items-center justify-center gap-2"
+                            >
+                                {isCreating ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Dispatch Invoice'}
+                            </button>
+                        </form>
+                    </Card>
+                </div>
+            )}
 
             {/* Filter Tabs */}
             <div className="flex gap-2">

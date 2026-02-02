@@ -74,9 +74,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
             .insert({
                 title: proposal.project_title,
                 description: proposal.project_description,
-                budget: proposal.budget,
+                total_value: proposal.budget || 0,
                 client_id: client.id,
-                commissioner_id: proposal.commissioner_id,
+                commissioner_id: (proposal.commissioner_id && proposal.commissioner_id !== '') ? proposal.commissioner_id : null,
                 status: 'deposit_pending',
                 escrow_status: 'no_deposit'
             })

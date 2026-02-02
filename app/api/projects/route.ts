@@ -145,13 +145,17 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Project title and description are required' }, { status: 400 });
         }
 
+        // Sanitize UUIDs
+        const finalCommissionerId = (projectType === 'direct' && commissionerId && commissionerId.trim() !== '') ? commissionerId : null;
+        const finalLeadId = (body.leadId && body.leadId.trim() !== '') ? body.leadId : null;
+
         // Create project
         const { data: project, error } = await supabaseAdmin
             .from('projects')
             .insert({
                 client_id: client.id,
-                commissioner_id: projectType === 'direct' ? commissionerId : null,
-                lead_id: body.leadId || null,
+                commissioner_id: finalCommissionerId,
+                lead_id: finalLeadId,
                 title,
                 description,
                 total_value: budget || 0,
