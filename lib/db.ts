@@ -6,15 +6,20 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 // Service role client for server-side operations
-// This will return null if called on the client side or if the key is missing
-export const supabaseAdmin = supabaseUrl && supabaseServiceKey
-    ? createClient(supabaseUrl, supabaseServiceKey, {
-        auth: {
-            autoRefreshToken: false,
-            persistSession: false
-        }
-    })
-    : null;
+export const supabaseAdmin = (() => {
+    try {
+        if (!supabaseUrl || !supabaseServiceKey) return null;
+        return createClient(supabaseUrl, supabaseServiceKey, {
+            auth: {
+                autoRefreshToken: false,
+                persistSession: false
+            }
+        });
+    } catch (e) {
+        console.error('Failed to initialize Supabase Admin:', e);
+        return null;
+    }
+})();
 
 // Client for browser (with anon key)
 export const supabaseClient = supabaseUrl && supabaseAnonKey

@@ -8,9 +8,10 @@ interface ApprovalActionButtonsProps {
     id: string;
     type: 'commissioner' | 'developer';
     name: string;
+    onSuccess?: () => void;
 }
 
-export default function ApprovalActionButtons({ id, type, name }: ApprovalActionButtonsProps) {
+export default function ApprovalActionButtons({ id, type, name, onSuccess }: ApprovalActionButtonsProps) {
     const [loading, setLoading] = useState(false);
     const router = useRouter();
 
@@ -26,6 +27,7 @@ export default function ApprovalActionButtons({ id, type, name }: ApprovalAction
             });
 
             if (res.ok) {
+                if (onSuccess) onSuccess();
                 router.refresh();
             } else {
                 alert('Action failed. Please try again.');

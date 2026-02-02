@@ -14,10 +14,18 @@ export async function GET(req: NextRequest) {
     }
 
     try {
-        const { data: users, error } = await supabaseAdmin
+        const { searchParams } = new URL(req.url);
+        const role = searchParams.get('role');
+        const verified = searchParams.get('verified');
+
+        let query = supabaseAdmin
             .from('users')
-            .select('*')
-            .order('created_at', { ascending: false });
+            .select('*');
+
+        if (role) query = query.eq('role', role);
+        if (verified) query = query.eq('verified', verified === 'true');
+
+        const { data: users, error } = await query.order('created_at', { ascending: false });
 
         if (error) throw error;
 

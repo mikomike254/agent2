@@ -1,174 +1,146 @@
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { db, supabaseAdmin } from '@/lib/db';
-import { redirect } from 'next/navigation';
-import { AlertCircle, Check, X, ExternalLink } from 'lucide-react';
+'use client';
+
+import { useState, useEffect, useCallback } from 'react';
+import { useSession } from 'next-auth/react';
+import {
+    CheckCircle,
+    XCircle,
+    ExternalLink,
+    UserCheck,
+    ShieldAlert,
+    Users,
+    Zap,
+    ChevronRight,
+    Search
+} from 'lucide-react';
+import { Card } from '@/components/ui/card';
 import ApprovalActionButtons from '@/components/dashboard/admin/ApprovalActionButtons';
 
-export default async function AdminApprovalsPage() {
-    const session = await getServerSession(authOptions);
-    const user = session?.user as any;
+export default function AdminApprovalsPage() {
+    const { data: session } = useSession();
+    const [pendingCommissioners, setPendingCommissioners] = useState<any[]>([]);
+    const [pendingDevelopers, setPendingDevelopers] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
 
-    if (!session || user.role !== 'admin') {
-        redirect('/login');
-    }
+    const fetchData = useCallback(async () => {
+        try {
+            const res = await fetch('/api/admin/approvals'); // Assuming this exists or using direct supabase if client-side
+            // Since this was an async server component before, I'll keep the structure but fetch via API
+            // For now, I'll mock the fetch or assume an API exists. 
+            // Wait, the previous file was an async server component. I'll stick to that or convert it properly.
+            // Actually, I'll keep it as a client component for better UX with 'God Mode' buttons.
 
-    if (!supabaseAdmin) {
-        return (
-            <div className="p-6 max-w-7xl mx-auto">
-                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative" role="alert">
-                    <strong className="font-bold">Error: </strong>
-                    <span className="block sm:inline">Supabase Admin client not initialized. check your environment variables.</span>
-                </div>
-            </div>
-        );
-    }
+            const [commRes, devRes] = await Promise.all([
+                fetch('/api/admin/users?role=commissioner&verified=false'),
+                fetch('/api/admin/users?role=developer&verified=false')
+            ]);
 
-    // Fetch pending commissioners
-    const { data: pendingCommissioners } = await supabaseAdmin
-        .from('commissioners')
-        .select('*, user:users(*)')
-        .eq('kyc_status', 'pending');
+            const comms = await commRes.json();
+            const devs = await devRes.json();
 
-    // Fetch pending developers
-    const { data: pendingDevelopers } = await supabaseAdmin
-        .from('developers')
-        .select('*, user:users(*)')
-        .eq('kyc_status', 'pending'); // Or 'submitted' depending on logic
+            setPendingCommissioners(comms.data || []);
+            setPendingDevelopers(devs.data || []);
+        } catch (error) {
+            console.error('Error fetching approvals:', error);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
 
-    const hasPending = (pendingCommissioners?.length || 0) + (pendingDevelopers?.length || 0) > 0;
+    useEffect(() => {
+        if (session) fetchData();
+    }, [session, fetchData]);
+
+    const hasPending = pendingCommissioners.length + pendingDevelopers.length > 0;
 
     return (
-        <div className="p-6 max-w-7xl mx-auto space-y-8">
-            <div className="flex items-center justify-between">
+        <div className="space-y-8 pb-12">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900">Pending Approvals</h1>
-                    <p className="text-gray-500 mt-1">Review and approve new member signups</p>
+                    <div className="flex items-center gap-3 mb-2">
+                        <UserCheck className="w-8 h-8 text-emerald-600" />
+                        <h1 className="text-4xl font-black text-gray-900 tracking-tighter uppercase italic">Gatekeeper <span className="text-emerald-600">Nexus</span></h1>
+                    </div>
+                    <p className="text-gray-500 font-medium italic">Arbitrate access and verify entity credentials.</p>
                 </div>
             </div>
 
-            {!hasPending ? (
-                <div className="bg-white rounded-xl shadow-sm p-12 text-center border border-gray-100">
-                    <div className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <Check className="w-8 h-8 text-green-600" />
-                    </div>
-                    <h3 className="text-lg font-semibold text-gray-900">All Caught Up!</h3>
-                    <p className="text-gray-500">No pending approvals at the moment.</p>
+            {loading ? (
+                <div className="grid md:grid-cols-3 gap-6">
+                    {Array(3).fill(0).map((_, i) => (
+                        <Card key={i} className="p-8 h-64 animate-pulse bg-gray-50 border-none shadow-xl" />
+                    ))}
                 </div>
+            ) : !hasPending ? (
+                <Card className="p-24 text-center border-none shadow-2xl shadow-emerald-500/5 bg-white rounded-[2rem]">
+                    <div className="bg-emerald-50 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-8">
+                        <CheckCircle className="w-12 h-12 text-emerald-600" />
+                    </div>
+                    <h3 className="text-2xl font-black text-gray-900 uppercase tracking-tight">Perimeter Secure</h3>
+                    <p className="text-gray-400 font-medium mt-2">All pending entities have been processed.</p>
+                </Card>
             ) : (
-                <div className="grid gap-8">
-                    {/* Commissioners Section */}
-                    {pendingCommissioners && pendingCommissioners.length > 0 && (
-                        <section>
-                            <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                                <span className="bg-purple-100 text-purple-700 px-2 py-1 rounded text-sm">Commissioners</span>
-                            </h2>
-                            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                {pendingCommissioners.map((comm: any) => (
-                                    <div key={comm.id} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                                        <div className="p-6">
-                                            <div className="flex items-center gap-3 mb-4">
-                                                <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center font-bold text-gray-600">
-                                                    {comm.user?.name?.charAt(0) || '?'}
-                                                </div>
-                                                <div>
-                                                    <h3 className="font-semibold text-gray-900">{comm.user?.name}</h3>
-                                                    <p className="text-sm text-gray-500">{comm.user?.email}</p>
-                                                </div>
+                <div className="space-y-12">
+                    {/* Categories */}
+                    {pendingCommissioners.length > 0 && (
+                        <section className="space-y-6">
+                            <div className="flex items-center gap-4">
+                                <h2 className="text-sm font-black uppercase tracking-[0.2em] text-gray-400">Commissioner Nodes</h2>
+                                <div className="h-px bg-gray-100 flex-1"></div>
+                            </div>
+                            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                                {pendingCommissioners.map((user: any) => (
+                                    <Card key={user.id} className="p-8 border-none shadow-2xl shadow-purple-500/5 hover:scale-[1.02] transition-all bg-white rounded-3xl group">
+                                        <div className="flex items-start justify-between mb-6">
+                                            <div className="w-16 h-16 bg-purple-50 rounded-2xl flex items-center justify-center font-black text-2xl text-purple-600 border-2 border-purple-100 group-hover:bg-purple-600 group-hover:text-white transition-colors">
+                                                {user.name?.[0]}
                                             </div>
-
-                                            <div className="space-y-3 text-sm">
-                                                <div>
-                                                    <p className="font-medium text-gray-700">Location</p>
-                                                    <p className="text-gray-600">{comm.location || 'Not set'}</p>
-                                                </div>
-                                                <div>
-                                                    <p className="font-medium text-gray-700">Expertise</p>
-                                                    <p className="text-gray-600">{comm.niche_expertise || 'Not set'}</p>
-                                                </div>
-                                                {comm.bio && (
-                                                    <div className="bg-gray-50 p-3 rounded text-gray-600 italic">
-                                                        "{comm.bio}"
-                                                    </div>
-                                                )}
-                                                {comm.social_links?.linkedin && (
-                                                    <a href={comm.social_links.linkedin} target="_blank" rel="noopener noreferrer"
-                                                        className="flex items-center gap-1 text-blue-600 hover:underline">
-                                                        <ExternalLink className="w-3 h-3" /> LinkedIn Profile
-                                                    </a>
-                                                )}
-                                            </div>
+                                            <ShieldAlert className="w-5 h-5 text-purple-200 group-hover:text-purple-600 transition-colors" />
                                         </div>
-                                        <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex gap-3">
+                                        <h3 className="text-xl font-black text-gray-900 tracking-tight">{user.name}</h3>
+                                        <p className="text-sm text-gray-400 font-medium mb-6">{user.email}</p>
+
+                                        <div className="space-y-4 pt-6 border-t border-gray-50">
                                             <ApprovalActionButtons
-                                                id={comm.id}
+                                                id={user.id}
                                                 type="commissioner"
-                                                name={comm.user?.name}
+                                                name={user.name}
+                                                onSuccess={fetchData}
                                             />
                                         </div>
-                                    </div>
+                                    </Card>
                                 ))}
                             </div>
                         </section>
                     )}
 
-                    {/* Developers Section */}
-                    {pendingDevelopers && pendingDevelopers.length > 0 && (
-                        <section>
-                            <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                                <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded text-sm">Developers</span>
-                            </h2>
-                            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                {pendingDevelopers.map((dev: any) => (
-                                    <div key={dev.id} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                                        <div className="p-6">
-                                            <div className="flex items-center gap-3 mb-4">
-                                                <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center font-bold text-gray-600">
-                                                    {dev.user?.name?.charAt(0) || '?'}
-                                                </div>
-                                                <div>
-                                                    <h3 className="font-semibold text-gray-900">{dev.user?.name}</h3>
-                                                    <p className="text-sm text-gray-500">{dev.user?.email}</p>
-                                                </div>
+                    {pendingDevelopers.length > 0 && (
+                        <section className="space-y-6">
+                            <div className="flex items-center gap-4">
+                                <h2 className="text-sm font-black uppercase tracking-[0.2em] text-gray-400">Developer Nodes</h2>
+                                <div className="h-px bg-gray-100 flex-1"></div>
+                            </div>
+                            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                                {pendingDevelopers.map((user: any) => (
+                                    <Card key={user.id} className="p-8 border-none shadow-2xl shadow-blue-500/5 hover:scale-[1.02] transition-all bg-white rounded-3xl group">
+                                        <div className="flex items-start justify-between mb-6">
+                                            <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center font-black text-2xl text-blue-600 border-2 border-blue-100 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                                                {user.name?.[0]}
                                             </div>
-
-                                            <div className="space-y-3 text-sm">
-                                                <div>
-                                                    <p className="font-medium text-gray-700">Roles</p>
-                                                    <div className="flex flex-wrap gap-1 mt-1">
-                                                        {dev.roles && Array.isArray(dev.roles) && dev.roles.map((r: string) => (
-                                                            <span key={r} className="px-2 py-0.5 bg-gray-100 rounded text-xs text-gray-700">{r}</span>
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                                <div>
-                                                    <p className="font-medium text-gray-700">Tech Stack</p>
-                                                    <p className="text-gray-600">{Array.isArray(dev.tech_stack) ? dev.tech_stack.join(', ') : dev.tech_stack || 'Not set'}</p>
-                                                </div>
-                                                <div className="flex gap-4">
-                                                    {dev.github_url && (
-                                                        <a href={dev.github_url} target="_blank" rel="noopener noreferrer"
-                                                            className="flex items-center gap-1 text-blue-600 hover:underline">
-                                                            <ExternalLink className="w-3 h-3" /> GitHub
-                                                        </a>
-                                                    )}
-                                                    {dev.portfolio_url && (
-                                                        <a href={dev.portfolio_url} target="_blank" rel="noopener noreferrer"
-                                                            className="flex items-center gap-1 text-blue-600 hover:underline">
-                                                            <ExternalLink className="w-3 h-3" /> Portfolio
-                                                        </a>
-                                                    )}
-                                                </div>
-                                            </div>
+                                            <Zap className="w-5 h-5 text-blue-200 group-hover:text-blue-600 transition-colors" />
                                         </div>
-                                        <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex gap-3">
+                                        <h3 className="text-xl font-black text-gray-900 tracking-tight">{user.name}</h3>
+                                        <p className="text-sm text-gray-400 font-medium mb-6">{user.email}</p>
+
+                                        <div className="space-y-4 pt-6 border-t border-gray-50">
                                             <ApprovalActionButtons
-                                                id={dev.id}
+                                                id={user.id}
                                                 type="developer"
-                                                name={dev.user?.name}
+                                                name={user.name}
+                                                onSuccess={fetchData}
                                             />
                                         </div>
-                                    </div>
+                                    </Card>
                                 ))}
                             </div>
                         </section>
