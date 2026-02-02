@@ -102,7 +102,7 @@ export default function PublicProfile() {
                                         const res = await fetch('/api/messages', {
                                             method: 'POST',
                                             headers: { 'Content-Type': 'application/json' },
-                                            body: JSON.stringify({ recipientId: profile.user_id })
+                                            body: JSON.stringify({ participantIds: [profile.user_id] })
                                         });
                                         const data = await res.json();
                                         if (data.success) {

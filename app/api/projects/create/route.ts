@@ -89,7 +89,8 @@ export async function POST(req: NextRequest) {
                 client_id: clientId,
                 commissioner_id: commissionerId,
                 developer_id: developerId,
-                status: creator_role === 'client' ? 'lead' : 'proposed'
+                status: creator_role === 'client' ? 'lead' : 'proposed',
+                project_type: creator_role === 'client' ? 'open' : (commissionerId ? 'direct' : 'open')
             })
             .select()
             .single();

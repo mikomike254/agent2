@@ -59,7 +59,7 @@ export default function ClientDashboard() {
                 setProjects(fetchedProjects);
                 setStats(prev => ({
                     ...prev,
-                    activeProjects: fetchedProjects.filter((p: any) => p.status === 'active' || p.status === 'in_progress' || p.status === 'deposit_pending' || p.status === 'deposit_verified').length,
+                    activeProjects: fetchedProjects.filter((p: any) => p.status === 'active' || p.status === 'in_progress' || p.status === 'deposit_pending' || p.status === 'deposit_verified' || p.status === 'lead').length,
                     pendingProposals: fetchedProjects.filter((p: any) => p.status === 'proposed').length,
                     proposedProjects: fetchedProjects.filter((p: any) => p.status === 'proposed'),
                     teamMembers: fetchedProjects.reduce((acc: number, p: any) =>
@@ -105,31 +105,29 @@ export default function ClientDashboard() {
 
     return (
         <div className="max-w-7xl mx-auto space-y-8 pb-20 fade-in">
-            {/* 1. Glass Header */}
-            <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
+            {/* 1. Header with Global Action */}
+            <header className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div className="flex items-center gap-6">
-                    <div className="w-16 h-16 rounded-[2rem] overflow-hidden shadow-2xl shadow-indigo-500/20 border-4 border-white/10 shrink-0 relative group">
-                        <div className="absolute inset-0 bg-indigo-500/20 group-hover:bg-transparent transition-colors z-10"></div>
+                    <div className="w-20 h-20 rounded-[2.5rem] overflow-hidden shadow-2xl shadow-indigo-100 border-4 border-white shrink-0 relative group">
                         <UserAvatar user={session?.user as any} size="xl" />
                     </div>
                     <div>
-                        <h1 className="text-4xl font-black text-gray-900 dark:text-white tracking-tighter leading-none">
+                        <h1 className="text-4xl lg:text-5xl font-black text-gray-900 tracking-tighter leading-none">
                             Welcome, {userName}.
                         </h1>
-                        <p className="text-gray-400 mt-2 text-lg font-medium flex items-center gap-2">
-                            Dashboard Hub <span className="w-1 h-1 bg-gray-600 rounded-full"></span> {stats.pendingProposals} Actions Pending
+                        <p className="text-gray-500 mt-2 text-lg font-medium flex items-center gap-2">
+                            Client HQ <span className="w-1.5 h-1.5 bg-indigo-600 rounded-full"></span> {stats.activeProjects + stats.pendingProposals} Operational Nodes
                         </p>
                     </div>
                 </div>
-                <div className="flex items-center gap-3">
-                    <div className="relative group">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-indigo-400" />
-                        <input
-                            type="text"
-                            placeholder="Search..."
-                            className="bg-white/5 border border-white/10 rounded-xl pl-9 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500/50 focus:bg-white/10 transition-all w-full md:w-64"
-                        />
-                    </div>
+
+                <div className="flex items-center gap-4">
+                    <button
+                        onClick={() => setIsProjectModalOpen(true)}
+                        className="px-8 py-4 bg-indigo-600 text-white rounded-[2rem] font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-indigo-100 hover:scale-105 active:scale-95 transition-all flex items-center gap-3"
+                    >
+                        <Plus className="w-4 h-4" /> Start New Project
+                    </button>
                     <NotificationMenu />
                 </div>
             </header>
@@ -140,44 +138,44 @@ export default function ClientDashboard() {
                 <div className="lg:col-span-2 space-y-8">
                     {/* Stats Row */}
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        <div className="bg-[#0F0F12] p-6 rounded-[2rem] border border-white/5 shadow-xl shadow-black/20 hover:border-indigo-500/30 transition-all group relative overflow-hidden">
-                            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                                <Briefcase className="w-12 h-12 text-white" />
+                        <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-xl shadow-indigo-50 hover:border-indigo-100 transition-all group relative overflow-hidden">
+                            <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity">
+                                <Briefcase className="w-16 h-16 text-indigo-600" />
                             </div>
                             <div className="relative z-10">
-                                <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">Active Projects</span>
-                                <h3 className="text-4xl font-black text-white mt-2">{stats.activeProjects}</h3>
-                                <div className="mt-4 flex items-center gap-1 text-[10px] font-bold text-green-400 bg-green-400/10 w-fit px-2 py-1 rounded-lg">
-                                    <ArrowUpRight className="w-3 h-3" /> Production Active
+                                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Active Deployments</span>
+                                <h3 className="text-5xl font-black text-gray-900 mt-2">{stats.activeProjects}</h3>
+                                <div className="mt-4 flex items-center gap-1 text-[10px] font-bold text-indigo-600 bg-indigo-50 w-fit px-3 py-1 rounded-full">
+                                    <ArrowUpRight className="w-3 h-3" /> Live Production
                                 </div>
                             </div>
                         </div>
 
-                        <div className="bg-[#0F0F12] p-6 rounded-[2rem] border border-white/5 shadow-xl shadow-black/20 hover:border-orange-500/30 transition-all group relative overflow-hidden">
-                            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                                <Clock className="w-12 h-12 text-orange-500" />
+                        <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-xl shadow-orange-50 hover:border-orange-100 transition-all group relative overflow-hidden">
+                            <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity">
+                                <Clock className="w-16 h-16 text-orange-600" />
                             </div>
                             <div className="relative z-10">
-                                <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">Pending Review</span>
-                                <h3 className="text-4xl font-black text-white mt-2">{stats.pendingProposals}</h3>
-                                <p className="mt-4 text-[10px] text-gray-400 font-medium">
-                                    Requires your attention
+                                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Pending Review</span>
+                                <h3 className="text-5xl font-black text-gray-900 mt-2">{stats.pendingProposals}</h3>
+                                <p className="mt-4 text-[10px] text-orange-600 font-black uppercase tracking-widest bg-orange-50 px-3 py-1 rounded-full w-fit">
+                                    Attention Required
                                 </p>
                             </div>
                         </div>
 
-                        <div className="bg-gradient-to-br from-indigo-600 to-indigo-900 p-6 rounded-[2rem] border border-white/10 shadow-xl shadow-indigo-500/20 hover:shadow-indigo-500/30 transition-all group relative overflow-hidden">
-                            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                                <CreditCard className="w-12 h-12 text-white" />
+                        <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-xl shadow-indigo-100/20 hover:shadow-indigo-100/30 transition-all group relative overflow-hidden">
+                            <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity">
+                                <CreditCard className="w-16 h-16 text-indigo-600" />
                             </div>
                             <div className="relative z-10">
-                                <span className="text-xs font-bold text-indigo-200 uppercase tracking-widest">Total Investment</span>
-                                <h3 className="text-3xl font-black text-white mt-2">
+                                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Total Investment</span>
+                                <h3 className="text-4xl font-black text-gray-900 mt-2">
                                     KES {(stats.totalInvested / 1000).toFixed(1)}k
                                 </h3>
                                 <button
                                     onClick={() => setShowTopUp(true)}
-                                    className="mt-4 w-full py-2 bg-white/10 hover:bg-white/20 rounded-xl text-xs font-bold text-white uppercase tracking-widest border border-white/10 transition-colors"
+                                    className="mt-6 w-full py-3 bg-indigo-600 hover:bg-indigo-700 rounded-2xl text-[10px] font-black text-white uppercase tracking-widest transition-all shadow-lg shadow-indigo-100"
                                 >
                                     + Top Up Balance
                                 </button>
@@ -186,17 +184,17 @@ export default function ClientDashboard() {
                     </div>
 
                     {/* Active Projects List */}
-                    <div className="bg-[#0F0F12]/50 backdrop-blur-md rounded-[2.5rem] border border-white/5 overflow-hidden">
-                        <div className="p-8 border-b border-white/5 flex justify-between items-center bg-white/[0.02]">
+                    <div className="bg-white rounded-[3rem] border border-gray-100 shadow-2xl shadow-indigo-100/30 overflow-hidden">
+                        <div className="p-10 border-b border-gray-50 flex justify-between items-center bg-gray-50/30">
                             <div>
-                                <h2 className="text-xl font-bold text-white tracking-tight">Active Deployments</h2>
-                                <p className="text-sm text-gray-500">Live project status tracking</p>
+                                <h2 className="text-2xl font-black text-gray-900 tracking-tight uppercase">Operational Nodes</h2>
+                                <p className="text-sm text-gray-500 font-medium">Real-time status of your active productions</p>
                             </div>
-                            <Link href="/dashboard/client/projects" className="text-xs font-bold text-indigo-400 hover:text-white uppercase tracking-widest transition-colors">
-                                View Portfolio <ChevronRight className="w-3 h-3 inline ml-1" />
+                            <Link href="/dashboard/client/projects" className="text-[10px] font-black text-indigo-600 hover:text-indigo-800 uppercase tracking-widest transition-colors flex items-center gap-2">
+                                Central Portfolio <ChevronRight className="w-4 h-4" />
                             </Link>
                         </div>
-                        <div className="p-4">
+                        <div className="p-8">
                             {stats.activeProjects === 0 ? (
                                 <div className="text-center py-16">
                                     <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -213,7 +211,7 @@ export default function ClientDashboard() {
                             ) : (
                                 <div className="space-y-4">
                                     {projects
-                                        .filter(p => p.status === 'active' || p.status === 'in_progress' || p.status === 'deposit_pending' || p.status === 'deposit_verified')
+                                        .filter(p => p.status === 'active' || p.status === 'in_progress' || p.status === 'deposit_pending' || p.status === 'deposit_verified' || p.status === 'lead')
                                         .slice(0, 3)
                                         .map((proj) => {
                                             // Calculate progress based on milestones
@@ -225,27 +223,38 @@ export default function ClientDashboard() {
                                                 <Link
                                                     key={proj.id}
                                                     href={`/dashboard/client/projects/${proj.id}`}
-                                                    className="flex items-center gap-6 p-6 bg-white/[0.02] border border-white/5 rounded-3xl hover:bg-white/[0.05] hover:border-indigo-500/30 transition-all group"
+                                                    className="flex items-center gap-8 p-8 bg-white border border-gray-50 rounded-[2.5rem] hover:bg-gray-50 hover:border-indigo-200 transition-all group"
                                                 >
-                                                    <div className="w-12 h-12 bg-indigo-500/10 rounded-2xl flex items-center justify-center border border-indigo-500/20 shrink-0">
-                                                        <Briefcase className="w-6 h-6 text-indigo-400" />
+                                                    <div className="w-16 h-16 bg-indigo-50 rounded-3xl flex items-center justify-center border border-indigo-100 shrink-0 group-hover:scale-105 transition-transform">
+                                                        <Briefcase className="w-8 h-8 text-indigo-600" />
                                                     </div>
                                                     <div className="flex-1 min-w-0">
-                                                        <div className="flex justify-between items-start">
+                                                        <div className="flex justify-between items-start mb-2">
                                                             <div>
-                                                                <h3 className="text-white font-bold truncate group-hover:text-indigo-400 transition-colors uppercase tracking-tight">{proj.title}</h3>
-                                                                <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-1">Status: {proj.status.replace('_', ' ')}</p>
+                                                                <h3 className="text-lg font-black text-gray-900 truncate group-hover:text-indigo-600 transition-colors uppercase tracking-tight">{proj.title}</h3>
+                                                                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1 italic">{proj.status.replace('_', ' ')}</p>
                                                             </div>
                                                             <div className="text-right">
-                                                                <span className="text-white font-black text-sm">{Math.round(progress)}%</span>
+                                                                <span className="text-gray-900 font-black text-xl tracking-tighter">{Math.round(progress)}%</span>
                                                             </div>
                                                         </div>
-                                                        <div className="mt-3 w-full bg-white/5 rounded-full h-1.5 overflow-hidden">
+                                                        <div className="w-full bg-gray-100 rounded-full h-3 overflow-hidden p-0.5 mt-2">
                                                             <div
-                                                                className="bg-indigo-500 h-full rounded-full transition-all duration-1000"
-                                                                style={{ width: `${progress}%` }}
+                                                                className="bg-indigo-600 h-full rounded-full transition-all duration-1000 shadow-[0_0_10px_rgba(79,70,229,0.3)]"
+                                                                style={{ width: `${proj.status === 'lead' ? 5 : progress}%` }}
                                                             ></div>
                                                         </div>
+                                                        {proj.status === 'lead' && (
+                                                            <div className="mt-4 flex gap-4">
+                                                                <Link
+                                                                    href="/find-commissioner"
+                                                                    className="px-4 py-2 bg-indigo-50 border border-indigo-100 text-indigo-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-indigo-600 hover:text-white transition-all flex items-center gap-2"
+                                                                >
+                                                                    <Search className="w-3 h-3" /> Find Talent
+                                                                </Link>
+                                                                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest self-center">Broadcasted to Network</p>
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 </Link>
                                             );
@@ -305,33 +314,31 @@ export default function ClientDashboard() {
 
                 {/* Right Column (1/3) */}
                 <div className="space-y-8">
-                    <div className="bg-[#0F0F12] rounded-[2.5rem] border border-white/5 overflow-hidden">
-                        <MeetingCalendar />
-                    </div>
+                    <MeetingCalendar />
 
                     {/* MARKET PULSE - TOP TALENT */}
-                    <div className="bg-[#0F0F12] rounded-[2.5rem] border border-white/5 p-8 shadow-xl">
+                    <div className="bg-white rounded-[3rem] border border-gray-100 p-10 shadow-xl shadow-indigo-50/50">
                         <MarketPulse />
                     </div>
 
                     {/* REAL ACTIVTY FEED */}
-                    <div className="bg-[#0F0F12] rounded-[2.5rem] border border-white/5 p-8 shadow-xl">
-                        <div className="flex justify-between items-center mb-6">
-                            <h2 className="font-bold text-white text-lg">Live Activity</h2>
-                            <button className="text-gray-500 hover:text-white transition-colors">
-                                <MoreHorizontal className="w-5 h-5" />
+                    <div className="bg-white rounded-[3rem] border border-gray-100 p-10 shadow-xl shadow-indigo-50/50">
+                        <div className="flex justify-between items-center mb-8">
+                            <h2 className="font-black text-gray-900 text-xl tracking-tight uppercase">Live Activity</h2>
+                            <button className="text-gray-400 hover:text-indigo-600 transition-colors">
+                                <MoreHorizontal className="w-6 h-6" />
                             </button>
                         </div>
-                        <div className="space-y-6">
+                        <div className="space-y-8">
                             {recentNotifications.length === 0 ? (
-                                <div className="text-center text-gray-500 text-sm py-4">No recent activity.</div>
+                                <div className="text-center text-gray-400 text-sm py-8 italic font-medium">Clear operational signals.</div>
                             ) : (
                                 recentNotifications.map((n) => (
-                                    <div key={n.id} className="flex gap-4 group">
-                                        <div className={`mt-1.5 w-2 h-2 rounded-full flex-shrink-0 shadow-[0_0_8px_rgba(255,255,255,0.2)] ${!n.read_at ? 'bg-indigo-500 shadow-indigo-500/50' : 'bg-gray-600'}`}></div>
-                                        <div>
-                                            <p className="text-sm text-gray-200 font-medium leading-snug group-hover:text-indigo-300 transition-colors">{n.title}</p>
-                                            <p className="text-xs text-gray-500 mt-1">{formatDistanceToNow(new Date(n.created_at), { addSuffix: true })}</p>
+                                    <div key={n.id} className="flex gap-5 group">
+                                        <div className={`mt-2 w-2.5 h-2.5 rounded-full flex-shrink-0 shadow-lg ${!n.read_at ? 'bg-indigo-600 shadow-indigo-200 animate-pulse' : 'bg-gray-200'}`}></div>
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-sm text-gray-700 font-bold leading-tight group-hover:text-indigo-600 transition-colors">{n.title}</p>
+                                            <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest mt-1.5">{formatDistanceToNow(new Date(n.created_at), { addSuffix: true })}</p>
                                         </div>
                                     </div>
                                 ))

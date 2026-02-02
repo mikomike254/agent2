@@ -44,10 +44,10 @@ export default function MarketPulse() {
         <div className="space-y-6">
             <div className="flex items-center justify-between px-2">
                 <div className="flex items-center gap-2">
-                    <Sparkles className="w-5 h-5 text-indigo-400" />
-                    <h2 className="text-xl font-bold text-white tracking-tight">Market Pulse</h2>
+                    <Sparkles className="w-5 h-5 text-indigo-600" />
+                    <h2 className="text-xl font-black text-gray-900 tracking-tight uppercase">Market Pulse</h2>
                 </div>
-                <div className="flex items-center gap-2 text-[10px] font-black text-green-400 bg-green-400/10 px-2 py-1 rounded-full uppercase tracking-widest">
+                <div className="flex items-center gap-2 text-[10px] font-black text-green-600 bg-green-50 px-3 py-1 rounded-full uppercase tracking-widest">
                     <TrendingUp className="w-3 h-3" />
                     Live Talent
                 </div>
@@ -64,10 +64,10 @@ export default function MarketPulse() {
                             <UserAvatar user={dev.user} size="md" />
                         </div>
                         <div className="flex-1 min-w-0">
-                            <h3 className="text-sm font-bold text-white truncate group-hover:text-indigo-400 transition-colors uppercase tracking-tight">
+                            <h3 className="text-sm font-black text-gray-900 truncate group-hover:text-indigo-600 transition-colors uppercase tracking-tight">
                                 {dev.user?.name}
                             </h3>
-                            <p className="text-[10px] text-gray-500 font-medium truncate uppercase tracking-widest mt-0.5">
+                            <p className="text-[10px] text-gray-400 font-bold truncate uppercase tracking-widest mt-0.5">
                                 {dev.specialization || 'Full Stack Node'}
                             </p>
                             <div className="flex items-center gap-3 mt-2">
@@ -81,8 +81,8 @@ export default function MarketPulse() {
                                 </div>
                             </div>
                         </div>
-                        <div className="p-2 bg-white/5 rounded-xl border border-white/5 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <ArrowUpRight className="w-4 h-4 text-white" />
+                        <div className="p-2 bg-indigo-50 border border-indigo-100 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity">
+                            <ArrowUpRight className="w-4 h-4 text-indigo-600" />
                         </div>
                     </Link>
                 ))}
