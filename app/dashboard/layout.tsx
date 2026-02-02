@@ -72,9 +72,16 @@ export default function DashboardLayout({
 
                     {/* Mobile Tab Bar Overlay (Vibrant Accents) */}
                     <div className="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 bg-white/80 backdrop-blur-xl border border-gray-100 px-6 py-3 rounded-3xl shadow-2xl flex items-center gap-8 z-30">
-                        <button className="text-indigo-600"><span className="text-[10px] font-black uppercase tracking-tighter">Live Support</span></button>
+                        <a
+                            href="https://wa.me/254793832286?text=hey%20i%20would%20like%20a%20website"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-indigo-600"
+                        >
+                            <span className="text-[10px] font-black uppercase tracking-tighter">Live Support</span>
+                        </a>
                         <div className="w-px h-4 bg-gray-100"></div>
-                        <button className="text-gray-400 font-bold text-xs">Knowledge Hub</button>
+                        <a href="/dashboard/kb" className="text-gray-400 font-bold text-xs underline decoration-indigo-200 underline-offset-4">Knowledge Hub</a>
                     </div>
                 </div>
             </div>
