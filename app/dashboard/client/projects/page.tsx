@@ -1,20 +1,56 @@
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { db } from '@/lib/db';
+'use client';
+
+import { useSession } from 'next-auth/react';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import PayDepositButton from '@/components/PayDepositButton';
-import { ShieldCheck, Clock, CheckCircle, AlertCircle, FileText, ExternalLink } from 'lucide-react';
-import { redirect } from 'next/navigation';
+import { ShieldCheck, Clock, CheckCircle, AlertCircle, FileText, ExternalLink, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 
-export default async function ClientProjectsPage() {
-    const session = await getServerSession(authOptions);
+export default function ClientProjectsPage() {
+    const { data: session, status } = useSession();
+    const router = useRouter();
+    const [projects, setProjects] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
 
-    if (!session) {
-        redirect('/login');
+    useEffect(() => {
+        if (status === 'unauthenticated') {
+            router.push('/login');
+        }
+    }, [status, router]);
+
+    useEffect(() => {
+        const fetchProjects = async () => {
+            if (!session?.user) return;
+            try {
+                const res = await fetch('/api/projects');
+                const data = await res.json();
+                if (data.success) {
+                    setProjects(data.data || []);
+                }
+            } catch (error) {
+                console.error('Failed to fetch projects:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        if (session?.user) {
+            fetchProjects();
+        }
+    }, [session]);
+
+    if (status === 'loading' || loading) {
+        return (
+            <div className="flex items-center justify-center min-h-screen">
+                <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
+            </div>
+        );
     }
 
+    if (!session?.user) return null;
+
     const user = session.user as any;
-    const projects = await db.getProjectsByClient(user.id);
 
     return (
         <div className="p-6 max-w-7xl mx-auto space-y-8">
