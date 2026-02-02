@@ -12,7 +12,25 @@ export async function POST(req: NextRequest) {
     }
     try {
         const reqjson = await req.json();
-        const { name, email, password, role, phone } = reqjson;
+        const { name, email, password, role, phone, referralCode } = reqjson;
+
+        let referrerId = null;
+        if (referralCode) {
+            // Check if referralCode is a user ID or a custom code
+            // First try matching custom code in commissioners table
+            const { data: refComm } = await supabaseAdmin
+                .from('commissioners')
+                .select('user_id')
+                .eq('referral_code', referralCode)
+                .single();
+
+            if (refComm) {
+                referrerId = refComm.user_id;
+            } else {
+                // Try matching as a raw UUID
+                referrerId = referralCode;
+            }
+        }
 
         // 1. Create user in Supabase Auth
         const { data: authUser, error: authError } = await supabaseAdmin.auth.admin.createUser({
@@ -41,6 +59,7 @@ export async function POST(req: NextRequest) {
                 email,
                 role,
                 phone,
+                referrer_id: referrerId,
                 verified: role === 'client' // Auto-approve clients
             })
             .select()
@@ -58,10 +77,22 @@ export async function POST(req: NextRequest) {
 
         // 3. Create role-specific profiles
         if (role === 'commissioner') {
+            const customRefCode = `COMM-${crypto.randomBytes(3).toString('hex').toUpperCase()}`;
+            let parentCommId = null;
+            if (referrerId) {
+                const { data: p } = await supabaseAdmin
+                    .from('commissioners')
+                    .select('id')
+                    .eq('user_id', referrerId)
+                    .single();
+                parentCommId = p?.id || null;
+            }
             await supabaseAdmin.from('commissioners').insert({
                 user_id: newUser.id,
                 tier: 'tier1',
-                rate_percent: 25.0
+                rate_percent: 25.0,
+                referral_code: customRefCode,
+                parent_commissioner_id: parentCommId
             });
         } else if (role === 'developer') {
             await supabaseAdmin.from('developers').insert({

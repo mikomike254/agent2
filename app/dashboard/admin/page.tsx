@@ -156,7 +156,7 @@ export default function AdminDashboard() {
             {/* Header with Search */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
-                    <h2 className="text-4xl font-black text-gray-900 tracking-tighter">Nexus <span className="text-[#5347CE]">Command</span></h2>
+                    <h2 className="text-4xl font-black text-gray-900 tracking-tighter">CREATIVE<span className="text-[#5347CE]">.KE</span> Admin</h2>
                     <div className="flex items-center gap-2 text-gray-400 mt-1">
                         <Activity className="w-4 h-4 text-green-500 animate-pulse" />
                         <span className="text-xs font-bold uppercase tracking-widest">Platform Status: Optimal</span>
@@ -180,7 +180,7 @@ export default function AdminDashboard() {
                     {searchQuery.length >= 2 && (
                         <Card className="absolute top-full left-0 right-0 mt-2 z-50 p-2 max-h-[400px] overflow-y-auto animate-in fade-in slide-in-from-top-2 duration-200">
                             {searchResults.length === 0 && !searching ? (
-                                <div className="p-8 text-center text-gray-400 italic">No records found in the Nexus.</div>
+                                <div className="p-8 text-center text-gray-400 italic">No records found in the CREATIVE.KE Hub.</div>
                             ) : (
                                 <div className="divide-y divide-gray-50">
                                     {searchResults.map((item, idx) => (
@@ -396,7 +396,7 @@ export default function AdminDashboard() {
                         ) : pendingUsers.length === 0 ? (
                             <div className="p-12 text-center">
                                 <CheckCircle className="w-12 h-12 text-gray-100 mx-auto mb-4" />
-                                <p className="text-gray-400 font-medium italic">Nexus is currently stable. No pending entrants.</p>
+                                <p className="text-gray-400 font-medium italic">CREATIVE.KE is currently stable. No pending entrants.</p>
                             </div>
                         ) : (
                             pendingUsers.map((user) => (

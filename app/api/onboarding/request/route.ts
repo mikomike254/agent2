@@ -17,7 +17,16 @@ export async function POST(req: NextRequest) {
 
         const commissionerUserId = (session.user as any).id;
         const body = await req.json();
-        const { clientName, clientEmail, projectTitle, projectDescription, budget, service, milestones } = body;
+        const {
+            clientName,
+            clientEmail,
+            projectTitle,
+            projectDescription,
+            budget,
+            service,
+            milestones,
+            projectType = 'direct'
+        } = body;
 
         if (!clientEmail || !projectTitle) {
             return NextResponse.json({ error: 'Client email and project title are required' }, { status: 400 });
@@ -95,7 +104,7 @@ export async function POST(req: NextRequest) {
                 description: projectDescription,
                 total_value: budget || 0,
                 status: 'proposed',
-                project_type: 'direct',
+                project_type: projectType,
                 category: 'general',
                 onboarding_email: clientEmail,
                 onboarding_name: clientName,

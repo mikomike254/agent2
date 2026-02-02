@@ -71,9 +71,7 @@ export default function ActivityFeedPage() {
             {/* Header Section */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white/[0.03] border border-white/[0.05] p-6 rounded-2xl backdrop-blur-md">
                 <div>
-                    <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-white/60">
-                        Nexus Activity Feed
-                    </h1>
+                    CREATIVE.KE Activity Feed
                     <p className="text-slate-400 text-sm mt-1 flex items-center gap-2">
                         <Activity className="w-4 h-4 text-emerald-500" />
                         Live platform-wide event monitoring
@@ -117,11 +115,11 @@ export default function ActivityFeedPage() {
                     {loading ? (
                         <div className="p-12 text-center text-slate-500 flex flex-col items-center gap-3">
                             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500"></div>
-                            Synchronizing with Nexus...
+                            Synchronizing with CREATIVE.KE...
                         </div>
                     ) : activities.length === 0 ? (
                         <div className="p-12 text-center text-slate-500">
-                            No matching activities found in the Nexus logs.
+                            No matching activities found in the CREATIVE.KE logs.
                         </div>
                     ) : (
                         activities.map((log) => (

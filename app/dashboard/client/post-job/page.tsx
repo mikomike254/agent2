@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Briefcase, FileText, DollarSign, Calendar } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 
@@ -11,10 +11,18 @@ export default function PostJobPage() {
         budget: '',
         timeline: '',
         requirements: '',
-        category: 'web_development'
+        category: 'web_development',
+        commissioner_id: ''
     });
+    const [commissioners, setCommissioners] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
+
+    useEffect(() => {
+        fetch('/api/commissioners').then(res => res.json()).then(data => {
+            if (data.success) setCommissioners(data.data);
+        });
+    }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -40,7 +48,8 @@ export default function PostJobPage() {
                     budget: '',
                     timeline: '',
                     requirements: '',
-                    category: 'web_development'
+                    category: 'web_development',
+                    commissioner_id: ''
                 });
 
                 setTimeout(() => {
@@ -177,6 +186,25 @@ export default function PostJobPage() {
                             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-600 focus:border-transparent outline-none min-h-[80px]"
                             placeholder="List any specific requirements..."
                         />
+                    </div>
+
+                    {/* Commissioner Selection */}
+                    <div>
+                        <label className="block text-sm font-semibold text-gray-900 mb-2">
+                            Select Project Commissioner *
+                        </label>
+                        <select
+                            value={formData.commissioner_id}
+                            onChange={(e) => setFormData({ ...formData, commissioner_id: e.target.value })}
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-600 focus:border-transparent outline-none"
+                            required
+                        >
+                            <option value="">Select a commissioner...</option>
+                            {commissioners.map(c => (
+                                <option key={c.id} value={c.id}>{c.name} — {c.specialties?.[0]}</option>
+                            ))}
+                        </select>
+                        <p className="text-[10px] text-gray-400 mt-2 uppercase font-black">Selecting a verified commissioner ensures premium delivery quality.</p>
                     </div>
 
                     {/* Submit */}

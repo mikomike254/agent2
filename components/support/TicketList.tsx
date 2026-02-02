@@ -11,6 +11,7 @@ import {
     Search
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
+import TicketAssignmentModal from './TicketAssignmentModal';
 
 interface Ticket {
     id: string;
@@ -18,6 +19,7 @@ interface Ticket {
     category: string;
     priority: string;
     status: string;
+    assigned_to?: string;
     created_at: string;
     sender: { name: string; role: string };
 }
@@ -26,14 +28,20 @@ export default function TicketList({ role }: { role: string }) {
     const [tickets, setTickets] = useState<Ticket[]>([]);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState('all');
+    const [assigningTicket, setAssigningTicket] = useState<Ticket | null>(null);
 
-    useEffect(() => {
+    const fetchTickets = () => {
+        setLoading(true);
         fetch('/api/support/tickets')
             .then(res => res.json())
             .then(data => {
                 if (data.success) setTickets(data.data);
                 setLoading(false);
             });
+    };
+
+    useEffect(() => {
+        fetchTickets();
     }, []);
 
     const getStatusColor = (status: string) => {
@@ -101,9 +109,19 @@ export default function TicketList({ role }: { role: string }) {
                                         </td>
                                         <td className="px-6 py-4 text-gray-500">{new Date(ticket.created_at).toLocaleDateString()}</td>
                                         <td className="px-6 py-4">
-                                            <Link href={`/dashboard/${role.toLowerCase()}/support/${ticket.id}`} className="text-indigo-600 hover:text-indigo-800 font-medium">
-                                                View
-                                            </Link>
+                                            <div className="flex items-center gap-3">
+                                                <Link href={`/dashboard/${role.toLowerCase()}/support/${ticket.id}`} className="text-indigo-600 hover:text-indigo-800 font-bold uppercase text-[10px] tracking-widest">
+                                                    View
+                                                </Link>
+                                                {role === 'admin' && (
+                                                    <button
+                                                        onClick={() => setAssigningTicket(ticket)}
+                                                        className="text-rose-600 hover:text-rose-800 font-bold uppercase text-[10px] tracking-widest"
+                                                    >
+                                                        Assign
+                                                    </button>
+                                                )}
+                                            </div>
                                         </td>
                                     </tr>
                                 ))
@@ -112,6 +130,16 @@ export default function TicketList({ role }: { role: string }) {
                     </table>
                 </div>
             </Card>
+
+            {assigningTicket && (
+                <TicketAssignmentModal
+                    isOpen={!!assigningTicket}
+                    onClose={() => setAssigningTicket(null)}
+                    ticketId={assigningTicket.id}
+                    currentAssigneeId={assigningTicket.assigned_to}
+                    onSuccess={fetchTickets}
+                />
+            )}
         </div>
     );
 }

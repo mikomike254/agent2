@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import Link from 'next/link';
+import AssignmentModal from '@/components/dashboard/AssignmentModal';
 
 export default function AdminProjectsPage() {
     const { data: session } = useSession();
@@ -29,6 +30,7 @@ export default function AdminProjectsPage() {
     const [searchTerm, setSearchTerm] = useState('');
     const [filterStatus, setFilterStatus] = useState('all');
     const [isUpdating, setIsUpdating] = useState<string | null>(null);
+    const [assignmentProject, setAssignmentProject] = useState<any | null>(null);
 
     const fetchProjects = useCallback(async () => {
         try {
@@ -84,7 +86,7 @@ export default function AdminProjectsPage() {
             case 'completed': return 'bg-green-100 text-green-700 border-green-200';
             case 'active': return 'bg-blue-100 text-blue-700 border-blue-200';
             case 'pending': return 'bg-yellow-100 text-yellow-700 border-yellow-200';
-            case 'review': return 'bg-purple-100 text-purple-700 border-purple-200';
+            case 'in_review': return 'bg-purple-100 text-purple-700 border-purple-200';
             case 'lead': return 'bg-orange-100 text-orange-700 border-orange-200';
             default: return 'bg-gray-100 text-gray-700 border-gray-200';
         }
@@ -98,7 +100,7 @@ export default function AdminProjectsPage() {
                         <Briefcase className="w-8 h-8 text-blue-600" />
                         <h1 className="text-4xl font-black text-gray-900 tracking-tighter uppercase italic">Project <span className="text-blue-600">Overlord</span></h1>
                     </div>
-                    <p className="text-gray-500 font-medium italic">Universal control over every work node in the Nexus.</p>
+                    <p className="text-gray-500 font-medium italic">Universal control over every work node in CREATIVE.KE.</p>
                 </div>
                 <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
                     <div className="relative group">
@@ -122,7 +124,7 @@ export default function AdminProjectsPage() {
                             <option value="lead">LEADS</option>
                             <option value="pending">PENDING</option>
                             <option value="active">ACTIVE</option>
-                            <option value="review">REVIEW</option>
+                            <option value="in_review">REVIEW</option>
                             <option value="completed">COMPLETED</option>
                         </select>
                         <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
@@ -171,7 +173,7 @@ export default function AdminProjectsPage() {
                                     <Zap className={`w-4 h-4 ${project.status === 'active' ? 'text-blue-500 fill-blue-500' : 'text-gray-300'}`} />
                                 </div>
                                 <div className="text-right">
-                                    <p className="text-[10px] text-gray-400 uppercase tracking-widest font-black">Nexus Value</p>
+                                    <p className="text-[10px] text-gray-400 uppercase tracking-widest font-black">Platform Value</p>
                                     <p className="text-lg font-black text-gray-950 tabular-nums italic">KES {Number(project.total_value).toLocaleString()}</p>
                                 </div>
                             </div>
@@ -216,14 +218,14 @@ export default function AdminProjectsPage() {
                                             <option value="lead">LEAD</option>
                                             <option value="pending">PENDING</option>
                                             <option value="active">ACTIVE</option>
-                                            <option value="review">REVIEW</option>
+                                            <option value="in_review">REVIEW</option>
                                             <option value="completed">COMPLETED</option>
                                         </select>
                                     </div>
                                     <div className="space-y-1">
                                         <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest pl-1">Assignment</label>
                                         <button
-                                            onClick={() => alert('Assignment overhaul coming soon in Support Portal')}
+                                            onClick={() => setAssignmentProject(project)}
                                             className="w-full flex items-center justify-between p-2 bg-gray-50 rounded-xl text-[10px] font-black uppercase tracking-tighter hover:bg-gray-100 transition-colors"
                                         >
                                             <Users className="w-3 h-3 text-blue-600" />
@@ -261,6 +263,20 @@ export default function AdminProjectsPage() {
                     ))
                 )}
             </div>
+
+            {assignmentProject && (
+                <AssignmentModal
+                    isOpen={!!assignmentProject}
+                    onClose={() => setAssignmentProject(null)}
+                    projectId={assignmentProject.id}
+                    currentDeveloperId={assignmentProject.developer_id}
+                    currentCommissionerId={assignmentProject.commissioner_id}
+                    onSuccess={() => {
+                        fetchProjects();
+                        setAssignmentProject(null);
+                    }}
+                />
+            )}
         </div>
     );
 }

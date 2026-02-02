@@ -19,6 +19,7 @@ import {
     LogOut,
     Bell,
     FileText,
+    LifeBuoy,
     X
 } from 'lucide-react';
 import { signOut, useSession } from 'next-auth/react';
@@ -33,7 +34,10 @@ const menuItems = {
         { name: 'Payments', icon: CreditCard, href: '/dashboard/admin/payments' },
         { name: 'Ledger', icon: FileText, href: '/dashboard/admin/ledger' },
         { name: 'Projects', icon: Briefcase, href: '/dashboard/admin/projects' },
+        { name: 'Support', icon: LifeBuoy, href: '/dashboard/admin/support' },
+        { name: 'Marketing', icon: Megaphone, href: '/dashboard/admin/marketing' },
         { name: 'Users', icon: Users, href: '/dashboard/admin/users' },
+        { name: 'KB Editor', icon: BookOpen, href: '/dashboard/admin/kb' },
         { name: 'Knowledge Base', icon: BookOpen, href: '/dashboard/kb' },
         { name: 'Profile', icon: User, href: '/dashboard/profile' },
     ],
@@ -108,9 +112,9 @@ export function Sidebar({
                         <div className="p-8 pb-4 flex items-center justify-between">
                             <div>
                                 <h1 className="text-3xl font-black bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 tracking-tighter">
-                                    Nexus
+                                    CREATIVE.KE
                                 </h1>
-                                <p className="text-[10px] text-gray-400 mt-1 uppercase tracking-widest font-black">Workspace Engine</p>
+                                <p className="text-[10px] text-gray-400 mt-1 uppercase tracking-widest font-black">Agency Hub</p>
                             </div>
                             <button
                                 onClick={onClose}

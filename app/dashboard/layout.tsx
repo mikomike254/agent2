@@ -28,7 +28,7 @@ export default function DashboardLayout({
         return (
             <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 space-y-4">
                 <div className="w-12 h-12 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin" />
-                <p className="text-sm font-black text-gray-400 uppercase tracking-widest">Nexus Authenticating</p>
+                <p className="text-sm font-black text-gray-400 uppercase tracking-widest">CREATIVE.KE Authenticating</p>
             </div>
         );
     }
@@ -73,7 +73,7 @@ export default function DashboardLayout({
                     {/* Mobile Tab Bar Overlay (Vibrant Accents) */}
                     <div className="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 bg-white/80 backdrop-blur-xl border border-gray-100 px-6 py-3 rounded-3xl shadow-2xl flex items-center gap-8 z-30">
                         <a
-                            href="https://wa.me/254793832286?text=hey%20i%20would%20like%20a%20website"
+                            href="https://wa.me/254793832286?text=Hello%20CREATIVE.KE%20Support,%20I%20need%20assistance%20with..."
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-indigo-600"

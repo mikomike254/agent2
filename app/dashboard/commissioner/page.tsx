@@ -36,7 +36,8 @@ export default function CommissionerDashboard() {
         activeProjects: 0,
         pendingLeads: 0,
         totalRevenue: 0,
-        recentLeads: [] as any[]
+        recentLeads: [] as any[],
+        referralCode: ''
     });
     const [commissionerId, setCommissionerId] = useState<string | null>(null);
 
@@ -45,6 +46,7 @@ export default function CommissionerDashboard() {
             try {
                 // 1. Fetch Profile to get Commissioner ID
                 const profileRes = await fetch('/api/profile');
+                if (!profileRes.ok) throw new Error('Failed to fetch profile');
                 const profileData = await profileRes.json();
 
                 let commId = null;
@@ -53,30 +55,36 @@ export default function CommissionerDashboard() {
                     setCommissionerId(commId);
                 }
 
-                // 2. Fetch Projects
-                const projectsRes = await fetch('/api/projects');
-                const projectsData = await projectsRes.json();
-                const activeProjects = projectsData.success
-                    ? projectsData.data.filter((p: any) => p.status === 'active' || p.status === 'in_progress').length
+                // 2. Fetch Projects (Parallel)
+                const [projectsRes, leadsRes, paymentsRes, teamRes] = await Promise.all([
+                    fetch('/api/projects'),
+                    fetch('/api/leads'),
+                    fetch('/api/payments'),
+                    fetch('/api/commissioner/team')
+                ]);
+
+                const projectsData = projectsRes.ok ? await projectsRes.json() : { success: false };
+                const leadsData = leadsRes.ok ? await leadsRes.json() : { success: false };
+                const paymentsData = paymentsRes.ok ? await paymentsRes.json() : { success: false };
+                const teamData = teamRes.ok ? await teamRes.json() : { success: false, referralCode: '' };
+
+                // Process Projects
+                const activeProjects = (projectsData.success && Array.isArray(projectsData.data))
+                    ? projectsData.data.filter((p: any) => p.status === 'active' || p.status === 'in_progress' || p.status === 'deployed').length
                     : 0;
 
-                // 3. Fetch Leads
-                const leadsRes = await fetch('/api/leads');
-                const leadsData = await leadsRes.json();
+                // Process Leads
                 let myLeads = [];
-                if (leadsData.success) {
-                    // Filter logic: assigned to me or claimed by me
+                if (leadsData.success && Array.isArray(leadsData.data)) {
                     myLeads = leadsData.data.filter((l: any) =>
                         l.commissioner_id === commId || l.claimed_by === commId
                     );
                 }
-                const pendingLeads = myLeads.filter((l: any) => l.status === 'created' || l.status === 'claimed').length;
+                const pendingLeads = myLeads.filter((l: any) => l.status === 'created' || l.status === 'claimed' || l.status === 'active').length;
                 const recentLeads = myLeads.slice(0, 5);
 
-                // 4. Fetch Payments
-                const paymentsRes = await fetch('/api/payments');
-                const paymentsData = await paymentsRes.json();
-                const totalRevenue = paymentsData.success
+                // Process Payments
+                const totalRevenue = (paymentsData.success && Array.isArray(paymentsData.data))
                     ? paymentsData.data.reduce((sum: number, p: any) => sum + (Number(p.amount) || 0), 0)
                     : 0;
 
@@ -84,7 +92,8 @@ export default function CommissionerDashboard() {
                     activeProjects,
                     pendingLeads,
                     totalRevenue,
-                    recentLeads
+                    recentLeads,
+                    referralCode: teamData.referralCode || ''
                 });
 
             } catch (error) {
@@ -141,7 +150,7 @@ export default function CommissionerDashboard() {
                 setStats(prev => ({ ...prev, totalRevenue }));
             }
         });
-    }, [commissionerId, session]);
+    }, [session]);
 
     // Subscribe to real-time changes
     useRealtime(
@@ -265,12 +274,12 @@ export default function CommissionerDashboard() {
                             <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">My Referral Link</p>
                             <div className="flex items-center gap-2 bg-gray-50 p-2 rounded-lg border border-gray-100">
                                 <code className="text-xs text-indigo-600 truncate flex-1">
-                                    {typeof window !== 'undefined' ? `${window.location.origin}/join?ref=${commissionerId || '...'}` : 'Loading...'}
+                                    {typeof window !== 'undefined' ? `${window.location.origin}/join?ref=${stats.referralCode || '...'}` : 'Loading...'}
                                 </code>
                                 <button
                                     onClick={() => {
-                                        if (commissionerId) {
-                                            navigator.clipboard.writeText(`${window.location.origin}/join?ref=${commissionerId}`);
+                                        if (stats.referralCode) {
+                                            navigator.clipboard.writeText(`${window.location.origin}/join?ref=${stats.referralCode}`);
                                             alert('Referral link copied!');
                                         }
                                     }}

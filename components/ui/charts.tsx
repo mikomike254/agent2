@@ -57,7 +57,12 @@ export function LeadBarChart() {
                 <div key={i} className="flex-1 flex flex-col items-center gap-2 group">
                     <div
                         className="w-full bg-indigo-100 rounded-t-lg transition-all duration-700 origin-bottom hover:bg-[#5347CE] relative overflow-hidden"
-                        style={{ height: `${height}%`, animation: `grow 1s ease-out ${i * 0.1}s forwards`, opacity: 0 }}
+                        style={{
+                            height: `${height}%`,
+                            '--h': `${height}%`,
+                            animation: `grow 1s ease-out ${i * 0.1}s forwards`,
+                            opacity: 0
+                        } as React.CSSProperties}
                     >
                         <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                     </div>

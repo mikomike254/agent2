@@ -16,6 +16,7 @@ export default function OnboardClientPage() {
         projectDescription: '',
         budget: 0,
         service: '',
+        projectType: 'direct', // 'direct' or 'open'
         milestones: [
             { title: 'Project Kickoff', description: 'Initial setup and requirements finalization.', percent_amount: 43 },
             { title: 'Final Delivery', description: 'Deployment and hand-over.', percent_amount: 57 }
@@ -168,6 +169,28 @@ export default function OnboardClientPage() {
                             />
                         </div>
                     </div>
+
+                    <div className="space-y-4 pt-4 border-t border-gray-50">
+                        <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Fulfillment Strategy</label>
+                        <div className="grid md:grid-cols-2 gap-4">
+                            <button
+                                type="button"
+                                onClick={() => setFormData({ ...formData, projectType: 'direct' })}
+                                className={`p-4 rounded-2xl border-2 transition-all text-left ${formData.projectType === 'direct' ? 'border-indigo-600 bg-indigo-50' : 'border-gray-100 bg-white hover:border-gray-200'}`}
+                            >
+                                <div className="font-bold text-gray-900">Direct Assignment</div>
+                                <div className="text-xs text-gray-500">I will handle fulfillment or assign specifically.</div>
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setFormData({ ...formData, projectType: 'open' })}
+                                className={`p-4 rounded-2xl border-2 transition-all text-left ${formData.projectType === 'open' ? 'border-indigo-600 bg-indigo-50' : 'border-gray-100 bg-white hover:border-gray-200'}`}
+                            >
+                                <div className="font-bold text-gray-900">Post to Job Board</div>
+                                <div className="text-xs text-gray-500">Allow any qualified developer to claim this.</div>
+                            </button>
+                        </div>
+                    </div>
                 </Card>
 
                 {/* Project Milestones */}
@@ -276,6 +299,6 @@ export default function OnboardClientPage() {
                     </button>
                 </div>
             </form>
-        </div>
+        </div >
     );
 }

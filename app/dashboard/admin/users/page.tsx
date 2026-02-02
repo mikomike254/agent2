@@ -153,7 +153,7 @@ export default function AdminUsersPage() {
 
             <div className="flex justify-between items-end">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Nexus Command Center</h1>
+                    <h1 className="text-3xl font-bold text-gray-900 tracking-tight">CREATIVE.KE Platform Members</h1>
                     <p className="text-gray-500 mt-2">Manage all registered platform members with absolute precision.</p>
                 </div>
                 <div className="flex gap-4">
@@ -203,18 +203,16 @@ export default function AdminUsersPage() {
                                     </tr>
                                 ))
                             ) : filteredUsers.length === 0 ? (
-                                <tr>
-                                    <td colSpan={4} className="px-6 py-12 text-center text-gray-500 italic">No members detected in the Nexus.</td>
-                                </tr>
+                                <td colSpan={4} className="px-6 py-12 text-center text-gray-500 italic">No members detected in CREATIVE.KE system.</td>
                             ) : (
                                 filteredUsers.map((user) => (
                                     <tr key={user.id} className={`group hover:bg-gray-50/80 transition-all ${user.status === 'banned' ? 'opacity-60 bg-red-50/10' : ''}`}>
                                         <td className="px-6 py-6">
                                             <div className="flex items-center gap-4">
                                                 <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black text-lg shadow-sm ${user.role === 'admin' ? 'bg-purple-100 text-purple-700' :
-                                                        user.role === 'developer' ? 'bg-blue-100 text-blue-700' :
-                                                            user.role === 'commissioner' ? 'bg-orange-100 text-orange-700' :
-                                                                'bg-green-100 text-green-700'
+                                                    user.role === 'developer' ? 'bg-blue-100 text-blue-700' :
+                                                        user.role === 'commissioner' ? 'bg-orange-100 text-orange-700' :
+                                                            'bg-green-100 text-green-700'
                                                     }`}>
                                                     {user.name?.[0]?.toUpperCase() || 'U'}
                                                 </div>
@@ -228,9 +226,9 @@ export default function AdminUsersPage() {
                                         <td className="px-6 py-4">
                                             <div className="flex flex-col gap-1">
                                                 <span className={`px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-widest w-fit ${user.role === 'admin' ? 'bg-purple-100 text-purple-700' :
-                                                        user.role === 'developer' ? 'bg-blue-100 text-blue-700' :
-                                                            user.role === 'commissioner' ? 'bg-orange-100 text-orange-700' :
-                                                                'bg-green-100 text-green-700'
+                                                    user.role === 'developer' ? 'bg-blue-100 text-blue-700' :
+                                                        user.role === 'commissioner' ? 'bg-orange-100 text-orange-700' :
+                                                            'bg-green-100 text-green-700'
                                                     }`}>
                                                     {user.role}
                                                 </span>
@@ -278,8 +276,8 @@ export default function AdminUsersPage() {
                                                     title={user.status === 'active' ? 'Ban User' : 'Restore User'}
                                                     disabled={user.id === session?.user?.id || processingAction === user.id}
                                                     className={`p-2 rounded-xl transition-all ${user.status === 'active'
-                                                            ? 'bg-red-50 text-red-600 hover:bg-red-600 hover:text-white'
-                                                            : 'bg-green-50 text-green-600 hover:bg-green-600 hover:text-white'
+                                                        ? 'bg-red-50 text-red-600 hover:bg-red-600 hover:text-white'
+                                                        : 'bg-green-50 text-green-600 hover:bg-green-600 hover:text-white'
                                                         }`}
                                                 >
                                                     <Ban className="w-5 h-5" />

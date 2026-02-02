@@ -35,7 +35,26 @@ export async function GET(req: NextRequest) {
                 .eq('user_id', userId)
                 .single();
             if (developer) {
-                projects = await db.getProjectsByDeveloper(developer.id);
+                const { searchParams } = new URL(req.url);
+                const type = searchParams.get('type');
+
+                if (type === 'open') {
+                    const { data: openProjects } = await supabaseAdmin
+                        .from('projects')
+                        .select(`
+                            *,
+                            commissioner:commissioners(
+                                id,
+                                user:users(name, avatar_url)
+                            )
+                        `)
+                        .eq('project_type', 'open')
+                        .is('developer_id', null)
+                        .order('created_at', { ascending: false });
+                    projects = openProjects || [];
+                } else {
+                    projects = await db.getProjectsByDeveloper(developer.id);
+                }
             }
         } else if (role === 'admin') {
             const { data: allProjects } = await supabaseAdmin

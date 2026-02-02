@@ -50,7 +50,7 @@ export default function SettingsPage() {
         <div className="max-w-4xl mx-auto space-y-8">
             <div>
                 <h1 className="text-3xl font-bold text-gray-900">Account Settings</h1>
-                <p className="text-gray-500 mt-2">Personalize your Nexus experience and communication preferences.</p>
+                <p className="text-gray-500 mt-2">Personalize your CREATIVE.KE experience and communication preferences.</p>
             </div>
 
             <div className="grid gap-6">
@@ -67,7 +67,7 @@ export default function SettingsPage() {
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="font-bold text-gray-800">Theme Preference</p>
-                                <p className="text-sm text-gray-500">Choose how Nexus looks on your device.</p>
+                                <p className="text-sm text-gray-500">Choose how CREATIVE.KE looks on your device.</p>
                             </div>
                             <div className="flex bg-gray-100 p-1 rounded-xl">
                                 {['light', 'dark', 'system'].map((t) => (
@@ -75,8 +75,8 @@ export default function SettingsPage() {
                                         key={t}
                                         onClick={() => saveSettings({ ...settings, theme: t })}
                                         className={`px-4 py-2 rounded-lg text-sm font-medium transition ${settings.theme === t
-                                                ? 'bg-white shadow-sm text-indigo-600'
-                                                : 'text-gray-500 hover:text-gray-700'
+                                            ? 'bg-white shadow-sm text-indigo-600'
+                                            : 'text-gray-500 hover:text-gray-700'
                                             }`}
                                     >
                                         <span className="capitalize">{t}</span>

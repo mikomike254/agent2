@@ -59,10 +59,10 @@ export default function LoginPage() {
             <div className="max-w-md w-full">
                 {/* Logo */}
                 <div className="text-center mb-8">
-                    <h1 className="text-4xl font-bold text-white mb-2">
-                        Tech Developers
+                    <h1 className="text-4xl font-black text-white mb-2 tracking-tighter">
+                        CREATIVE<span className="text-indigo-200">.KE</span>
                     </h1>
-                    <p className="text-white/80">Kenya & East Africa</p>
+                    <p className="text-indigo-100 font-bold uppercase tracking-widest text-[10px]">Kenya & East Africa</p>
                 </div>
 
                 {/* Main Card */}

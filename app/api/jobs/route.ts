@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 });
         }
 
-        const { title, description, budget, timeline, requirements, category } = await req.json();
+        const { title, description, budget, timeline, requirements, category, commissioner_id } = await req.json();
 
         // Get client ID from session
         const { data: userData } = await supabaseAdmin
@@ -74,6 +74,7 @@ export async function POST(req: NextRequest) {
             .from('leads')
             .insert({
                 client_id: client!.id,
+                commissioner_id: commissioner_id || null,
                 title,
                 description,
                 budget,

@@ -110,7 +110,7 @@ export default function DeveloperDashboard() {
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                     <div>
                         <h1 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tighter">
-                            Nexus <span className="text-indigo-600">Workspace</span>
+                            CREATIVE<span className="text-indigo-600">.KE</span> Workspace
                         </h1>
                         <p className="text-gray-500 font-medium mt-2 max-w-lg">
                             Welcome, <span className="text-gray-900 font-bold">{session?.user?.name}</span>.
@@ -170,7 +170,14 @@ export default function DeveloperDashboard() {
                         {projects.length === 0 ? (
                             <div className="p-20 text-center bg-gray-50/50 rounded-[40px] border-2 border-dashed border-gray-100">
                                 <Briefcase className="w-12 h-12 text-gray-200 mx-auto mb-4" />
-                                <p className="text-gray-400 font-bold uppercase tracking-widest text-xs">No active nodes detected in squad pipeline</p>
+                                <p className="text-gray-400 font-bold uppercase tracking-widest text-xs mb-8">No active nodes detected in squad pipeline</p>
+                                <Link
+                                    href="/dashboard/developer/job-board"
+                                    className="px-8 py-4 bg-indigo-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest shadow-lg shadow-indigo-200 hover:bg-indigo-700 transition-all flex items-center justify-center gap-3 w-fit mx-auto group"
+                                >
+                                    Access Job Board
+                                    <ArrowUpRight className="w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                                </Link>
                             </div>
                         ) : (
                             projects.map((project: any) => (

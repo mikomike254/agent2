@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({
             success: true,
             data,
-            message: 'Broadcast transmitted to Nexus nodes'
+            message: 'Broadcast transmitted to CREATIVE.KE nodes'
         });
 
     } catch (error: any) {

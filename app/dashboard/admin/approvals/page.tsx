@@ -59,7 +59,7 @@ export default function AdminApprovalsPage() {
                 <div>
                     <div className="flex items-center gap-3 mb-2">
                         <UserCheck className="w-8 h-8 text-emerald-600" />
-                        <h1 className="text-4xl font-black text-gray-900 tracking-tighter uppercase italic">Gatekeeper <span className="text-emerald-600">Nexus</span></h1>
+                        <h1 className="text-4xl font-black text-gray-900 tracking-tighter uppercase italic">Gatekeeper <span className="text-emerald-600">CREATIVE.KE</span></h1>
                     </div>
                     <p className="text-gray-500 font-medium italic">Arbitrate access and verify entity credentials.</p>
                 </div>

@@ -1,11 +1,22 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { Users, DollarSign, Rocket, CheckCircle, ArrowRight } from 'lucide-react';
+import { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Users, DollarSign, Rocket, CheckCircle, ArrowRight, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 
-export default function JoinPage() {
+function JoinContent() {
+    const searchParams = useSearchParams();
+    const referralCode = searchParams.get('ref');
+
+    useEffect(() => {
+        if (referralCode) {
+            // Store referral code in cookie for 30 days
+            document.cookie = `nexus_ref=${referralCode}; path=/; max-age=${30 * 24 * 60 * 60}; SameSite=Lax`;
+            console.log('Referral captured:', referralCode);
+        }
+    }, [referralCode]);
+
     return (
         <div className="min-h-screen bg-[var(--bg-card)]">
             {/* Navigation */}
@@ -16,7 +27,7 @@ export default function JoinPage() {
                             <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center">
                                 <Rocket className="w-6 h-6 text-white" />
                             </div>
-                            <span className="text-2xl font-black text-gray-900 tracking-tighter uppercase">Nexus</span>
+                            <span className="text-2xl font-black text-gray-900 tracking-tighter uppercase italic">CREATIVE.KE</span>
                         </div>
                         <div className="hidden md:flex items-center gap-8">
                             <Link href="#benefits" className="text-sm font-bold text-gray-500 hover:text-indigo-600 transition-colors uppercase tracking-widest">Benefits</Link>
@@ -127,16 +138,28 @@ export default function JoinPage() {
                         <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
                             <Rocket className="w-5 h-5 text-white" />
                         </div>
-                        <span className="text-xl font-black text-gray-900 tracking-tighter uppercase">Nexus</span>
+                        <span className="text-xl font-black text-gray-900 tracking-tighter uppercase italic">CREATIVE.KE</span>
                     </div>
                     <div className="flex gap-10">
                         <Link href="#" className="text-xs font-bold text-gray-400 hover:text-indigo-600 uppercase tracking-widest">Privacy Policy</Link>
                         <Link href="#" className="text-xs font-bold text-gray-400 hover:text-indigo-600 uppercase tracking-widest">Terms of Service</Link>
                         <Link href="#" className="text-xs font-bold text-gray-400 hover:text-indigo-600 uppercase tracking-widest">Contact Us</Link>
                     </div>
-                    <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">© 2026 Nexus Agency Network</p>
+                    <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">© 2026 CREATIVE.KE Agency Network</p>
                 </div>
             </footer>
         </div>
+    );
+}
+
+export default function JoinPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+                <Loader2 className="w-10 h-10 animate-spin text-indigo-600" />
+            </div>
+        }>
+            <JoinContent />
+        </Suspense>
     );
 }

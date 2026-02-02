@@ -98,19 +98,20 @@ export default function AdminSupportPage() {
                 </div>
             </div>
 
-            {/* Assignment Overhaul Banner */}
-            <div className="bg-gradient-to-r from-violet-600 to-indigo-600 rounded-2xl p-6 shadow-xl shadow-indigo-200 text-white flex items-center justify-between">
+            {/* Assignment Overhaul Active */}
+            <div className="bg-gradient-to-r from-emerald-600 to-teal-600 rounded-2xl p-6 shadow-xl shadow-emerald-200 text-white flex items-center justify-between">
                 <div>
                     <h3 className="text-lg font-black uppercase tracking-tight flex items-center gap-2">
-                        <Zap className="w-5 h-5" />
-                        Assignment Protocol v2.0
+                        <ShieldCheck className="w-5 h-5" />
+                        Assignment Protocol v2.1 [ACTIVE]
                     </h3>
-                    <p className="text-indigo-100 font-medium mt-1">
-                        Automated ticket routing and intelligent agent matching overhaul is coming soon to this portal.
+                    <p className="text-emerald-50 font-medium mt-1">
+                        Automated ticket routing and direct agent assignment is now fully operational across CREATIVE.KE.
                     </p>
                 </div>
-                <div className="bg-white/10 px-4 py-2 rounded-xl backdrop-blur-sm border border-white/20 text-xs font-bold uppercase tracking-widest">
-                    Coming Soon
+                <div className="bg-white/10 px-4 py-2 rounded-xl backdrop-blur-sm border border-white/20 text-xs font-bold uppercase tracking-widest flex items-center gap-2">
+                    <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
+                    Operational
                 </div>
             </div>
 
@@ -140,7 +141,7 @@ export default function AdminSupportPage() {
 
                         <div className="flex items-center gap-3 mb-8">
                             <Megaphone className="w-6 h-6 text-indigo-400" />
-                            <h3 className="text-xl font-black uppercase tracking-tighter">Nexus Broadcast</h3>
+                            <h3 className="text-xl font-black uppercase tracking-tighter">CREATIVE.KE Broadcast</h3>
                         </div>
 
                         <form onSubmit={handleBroadcast} className="space-y-6">

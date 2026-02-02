@@ -127,7 +127,7 @@ export default function AdminLedgerPage() {
                             <tr>
                                 <th className="px-6 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest">Temporal Node</th>
                                 <th className="px-6 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest">Project/Source</th>
-                                <th className="px-6 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest">Nexus Description</th>
+                                <th className="px-6 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest">CREATIVE.KE Description</th>
                                 <th className="px-6 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest">Delta</th>
                                 <th className="px-6 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Balance Post-State</th>
                             </tr>
@@ -152,7 +152,7 @@ export default function AdminLedgerPage() {
                                         </td>
                                         <td className="px-6 py-5">
                                             <div className="flex flex-col">
-                                                <span className="font-black text-gray-900 tracking-tight underline decoration-indigo-200 decoration-2 underline-offset-4">{entry.project?.title || 'Nexus Core'}</span>
+                                                <span className="font-black text-gray-900 tracking-tight underline decoration-indigo-200 decoration-2 underline-offset-4">{entry.project?.title || 'CREATIVE.KE Core'}</span>
                                                 <span className="text-[9px] font-black uppercase tracking-tighter text-indigo-600 mt-1">{entry.transaction_type}</span>
                                             </div>
                                         </td>
@@ -187,7 +187,7 @@ export default function AdminLedgerPage() {
                     <Card className="w-full max-w-lg p-8 animate-in zoom-in duration-200 border-none shadow-3xl bg-white">
                         <div className="flex justify-between items-center mb-8">
                             <div>
-                                <h3 className="text-2xl font-black text-gray-900 tracking-tighter uppercase">Nexus Override</h3>
+                                <h3 className="text-2xl font-black text-gray-900 tracking-tighter uppercase">CREATIVE.KE Override</h3>
                                 <p className="text-gray-500 text-sm mt-1">Manual adjustment of the universal ledger.</p>
                             </div>
                             <button onClick={() => setShowAdjustModal(false)} className="p-2 hover:bg-gray-100 rounded-xl transition-colors">
@@ -242,7 +242,7 @@ export default function AdminLedgerPage() {
                                 disabled={isProcessing}
                                 className="w-full py-5 bg-indigo-600 text-white rounded-2xl font-black uppercase tracking-widest text-xs shadow-xl shadow-indigo-500/30 hover:shadow-indigo-500/50 hover:-translate-y-1 transition-all disabled:opacity-50"
                             >
-                                {isProcessing ? 'Executing Nexus Command...' : 'Execute Override'}
+                                {isProcessing ? 'Executing System Command...' : 'Execute Override'}
                             </button>
                         </form>
                     </Card>

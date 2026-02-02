@@ -18,6 +18,16 @@ export default function SignupPage() {
     });
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState('');
+    const [referralCode, setReferralCode] = useState<string | null>(null);
+
+    useEffect(() => {
+        // Read referral cookie
+        const cookies = document.cookie.split('; ');
+        const refCookie = cookies.find(row => row.startsWith('nexus_ref='));
+        if (refCookie) {
+            setReferralCode(refCookie.split('=')[1]);
+        }
+    }, []);
 
     const handleSignup = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -28,7 +38,7 @@ export default function SignupPage() {
             const response = await fetch('/api/auth/signup', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData)
+                body: JSON.stringify({ ...formData, referralCode })
             });
 
             const result = await response.json();
@@ -81,10 +91,10 @@ export default function SignupPage() {
             <div className="max-w-md w-full">
                 {/* Logo */}
                 <div className="text-center mb-8">
-                    <h1 className="text-4xl font-bold text-white mb-2">
-                        Tech Developers
+                    <h1 className="text-4xl font-black text-white mb-2 tracking-tighter">
+                        CREATIVE<span className="text-indigo-200">.KE</span>
                     </h1>
-                    <p className="text-white/80">Kenya & East Africa</p>
+                    <p className="text-indigo-100 font-bold uppercase tracking-widest text-[10px]">Kenya & East Africa</p>
                 </div>
 
                 {/* Main Card */}

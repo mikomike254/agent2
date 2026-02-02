@@ -33,32 +33,65 @@ export async function GET(request: NextRequest) {
             .single();
 
         // Fetch role-specific data
-        let roleData = {};
+        let roleData: any = {};
 
         if (user.role === 'commissioner') {
-            const { data: commissioner } = await supabaseAdmin
+            const { data: commissioner, error: commError } = await supabaseAdmin
                 .from('commissioners')
                 .select('*')
                 .eq('user_id', userId)
                 .single();
 
-            roleData = commissioner || {};
+            if (commError && commError.code === 'PGRST116') {
+                // Auto-create missing commissioner profile
+                const { data: newComm, error: createError } = await supabaseAdmin
+                    .from('commissioners')
+                    .insert({ user_id: userId, rating: 5.0, completed_count: 0 })
+                    .select()
+                    .single();
+                if (createError) console.error('Error auto-creating commissioner profile:', createError);
+                roleData = newComm || {};
+            } else {
+                roleData = commissioner || {};
+            }
         } else if (user.role === 'developer') {
-            const { data: developer } = await supabaseAdmin
+            const { data: developer, error: devError } = await supabaseAdmin
                 .from('developers')
                 .select('*')
                 .eq('user_id', userId)
                 .single();
 
-            roleData = developer || {};
+            if (devError && devError.code === 'PGRST116') {
+                // Auto-create missing developer profile
+                const { data: newDev, error: createError } = await supabaseAdmin
+                    .from('developers')
+                    .insert({ user_id: userId, reliability_score: 100, availability_status: 'available' })
+                    .select()
+                    .single();
+                if (createError) console.error('Error auto-creating developer profile:', createError);
+                roleData = newDev || {};
+            } else {
+                roleData = developer || {};
+            }
         } else if (user.role === 'client') {
-            const { data: client } = await supabaseAdmin
+            const { data: client, error: clientError } = await supabaseAdmin
                 .from('clients')
                 .select('*')
                 .eq('user_id', userId)
                 .single();
 
-            roleData = client || {};
+            if (clientError && clientError.code === 'PGRST116') {
+                // Auto-create missing client profile
+                const { data: newClient, error: createError } = await supabaseAdmin
+                    .from('clients')
+                    .insert({ user_id: userId, contact_person: user.name || 'Client' })
+                    .select()
+                    .single();
+                if (createError) console.error('Error auto-creating client profile:', createError);
+                roleData = newClient || {};
+            } else {
+                roleData = client || {};
+            }
         }
 
         return NextResponse.json({
