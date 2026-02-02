@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import {
-    Verify,
+    Verified,
     Star,
     MapPin,
     Link as LinkIcon,
@@ -90,7 +90,7 @@ export default function PublicProfilePage() {
 
                             <h1 className="text-2xl font-black text-gray-900 flex items-center justify-center gap-2">
                                 {profile.name}
-                                <Verify className="w-5 h-5 text-blue-500 fill-current" />
+                                <Verified className="w-5 h-5 text-blue-500 fill-current" />
                             </h1>
                             <p className="text-sm font-bold text-[var(--primary)] uppercase tracking-widest mt-1">
                                 {detail.niche_expertise || (isCommissioner ? 'Platform Commissioner' : 'Development Partner')}
