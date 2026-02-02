@@ -5,7 +5,7 @@ import { supabaseAdmin } from '@/lib/db';
 
 export async function POST(
     req: NextRequest,
-    { params }: { params: Promise<{ userId: string }> }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     if (!supabaseAdmin) {
         return NextResponse.json({ error: 'Supabase Admin not initialized' }, { status: 500 });
@@ -18,7 +18,7 @@ export async function POST(
         }
 
         const { action, value } = await req.json();
-        const { userId } = await params;
+        const { id: userId } = await params;
 
         let updateData: any = {};
         let message = '';
