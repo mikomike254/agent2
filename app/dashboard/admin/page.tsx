@@ -305,6 +305,78 @@ export default function AdminDashboard() {
                 </Card>
             </div>
 
+            {/* Visual Analytics */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <Card className="lg:col-span-2 p-6 border-none shadow-xl shadow-indigo-500/5 overflow-hidden relative">
+                    <div className="flex items-center justify-between mb-2">
+                        <div>
+                            <h3 className="text-lg font-black text-gray-900 uppercase tracking-tight">Financial Velocity</h3>
+                            <p className="text-sm text-gray-500 font-medium">Escrow inflow & outflow over time</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <span className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-[#1f7a5a] bg-green-50 px-2 py-1 rounded-full">
+                                <TrendingUp className="w-3 h-3" /> +12.5%
+                            </span>
+                        </div>
+                    </div>
+                    <RevenueLineChart />
+                </Card>
+
+                <Card className="p-6 border-none shadow-xl shadow-indigo-500/5 bg-[#5347CE] text-white relative overflow-hidden">
+                    <div className="relative z-10">
+                        <h3 className="text-lg font-black uppercase tracking-tight mb-1">System Pulse</h3>
+                        <p className="text-indigo-200 text-sm font-medium mb-6">Real-time node health</p>
+
+                        <div className="space-y-4">
+                            <div>
+                                <div className="flex justify-between text-xs font-bold uppercase tracking-widest mb-1">
+                                    <span>Database Load</span>
+                                    <span>24%</span>
+                                </div>
+                                <div className="w-full bg-black/20 rounded-full h-1.5">
+                                    <div className="bg-emerald-400 h-1.5 rounded-full w-[24%]"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div className="flex justify-between text-xs font-bold uppercase tracking-widest mb-1">
+                                    <span>API Latency</span>
+                                    <span>45ms</span>
+                                </div>
+                                <div className="w-full bg-black/20 rounded-full h-1.5">
+                                    <div className="bg-emerald-400 h-1.5 rounded-full w-[15%]"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div className="flex justify-between text-xs font-bold uppercase tracking-widest mb-1">
+                                    <span>Active Workers</span>
+                                    <span>{stats?.projects?.active || 3}</span>
+                                </div>
+                                <div className="w-full bg-black/20 rounded-full h-1.5">
+                                    <div className="bg-white h-1.5 rounded-full w-[60%] animate-pulse"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="mt-8 pt-6 border-t border-white/10 flex justify-between items-center">
+                            <div className="text-center">
+                                <p className="text-2xl font-black">{stats?.users?.total || 12}</p>
+                                <p className="text-[10px] uppercase tracking-widest text-indigo-200">Nodes</p>
+                            </div>
+                            <div className="text-center">
+                                <p className="text-2xl font-black">{stats?.disputes?.open || 0}</p>
+                                <p className="text-[10px] uppercase tracking-widest text-indigo-200">Alerts</p>
+                            </div>
+                            <div className="text-center">
+                                <p className="text-2xl font-black">99.9%</p>
+                                <p className="text-[10px] uppercase tracking-widest text-indigo-200">Uptime</p>
+                            </div>
+                        </div>
+                    </div>
+                    {/* Abstract bg decoration */}
+                    <div className="absolute -bottom-10 -right-10 w-48 h-48 bg-indigo-500 rounded-full blur-3xl opacity-50"></div>
+                </Card>
+            </div>
+
             <div className="grid lg:grid-cols-2 gap-8">
                 {/* Pending User Registrations */}
                 <Card className="p-0 overflow-hidden border-none shadow-xl shadow-indigo-500/5">
