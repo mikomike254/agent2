@@ -1,44 +1,45 @@
 @import "tailwindcss";
 
 :root {
-  /* Light Mode (Default) */
-  --primary: #6366f1;
-  /* Indigo-500 */
-  --primary-light: #818cf8;
-  /* Indigo-400 */
-  --secondary: #3b82f6;
-  /* Blue-500 */
-  --accent: #14b8a6;
-  /* Teal-500 */
-  --gold: #f59e0b;
-  /* Amber-500 */
+  /* creative.ke - Clean Theme (Shopeers Style) */
+  --primary: #2563eb;
+  /* Royal Blue */
+  --primary-light: #60a5fa;
+  /* Soft Blue */
+  --secondary: #0f172a;
+  /* Slate 900 */
+  --accent: #f59e0b;
+  /* Amber (Action highlights) */
 
   /* Functional Colors */
   --success: #10b981;
   --warning: #f59e0b;
   --danger: #ef4444;
 
-  /* Backgrounds - Light Clean */
-  --bg-app: #f9fafb;
-  /* Gray-50 */
+  /* Backgrounds - Clean Light */
+  --bg-app: #f8f9fc;
+  /* Very light cool gray */
   --bg-card: #ffffff;
-  /* White */
-  --bg-sidebar: #f8fafc;
-  /* Slate-50 */
-  --bg-input: #f3f4f6;
-  /* Gray-100 */
+  /* Pure white */
+  --bg-sidebar: #ffffff;
+  /* White sidebar */
+  --bg-input: #f1f5f9;
+  /* Slate 100 */
 
-  /* Text - High Contrast */
-  --text-primary: #111827;
-  /* Gray-900 */
-  --text-secondary: #4b5563;
-  /* Gray-600 */
-  --text-muted: #9ca3af;
-  /* Gray-400 */
+  /* Text - Sharp & Accessible */
+  --text-primary: #0f172a;
+  /* Most content */
+  --text-secondary: #64748b;
+  /* Subtitles */
+  --text-muted: #94a3b8;
+  /* Placeholders */
+  --border-color: #e2e8f0;
+  /* Slate 200 */
 
-  /* Shadows */
-  --shadow-soft: 0 4px 20px -2px rgba(99, 102, 241, 0.1);
-  --shadow-hover: 0 10px 30px -5px rgba(99, 102, 241, 0.2);
+  /* Modern Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-soft: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+  --shadow-hover: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
 }
 
 .font-serif {

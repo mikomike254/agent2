@@ -10,8 +10,8 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: "Tech Developers - Kenya & East Africa",
-  description: "Premier marketplace for vetted developers with escrow protection and 110% refund guarantee",
+  title: "creative.ke | Premier Tech Talent Marketplace",
+  description: "Securely hire verified developers in Kenya & East Africa. Escrow protection, 110% refund guarantee.",
 };
 
 export default function RootLayout({

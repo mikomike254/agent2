@@ -8,11 +8,11 @@ export default function HomePage() {
     <div className="min-h-screen bg-[#f4f4f4]">
       <div className="max-w-7xl mx-auto px-6 py-6">
         <nav className="flex justify-between items-center mb-8">
-          <div className="flex items-center gap-2 font-semibold text-sm">
-            <div className="w-8 h-8 bg-black rounded-full flex items-center justify-center text-white text-xs">
-              T
+          <div className="flex items-center gap-2 font-bold text-xl tracking-tight">
+            <div className="w-8 h-8 bg-[#2563eb] rounded-lg flex items-center justify-center text-white text-lg">
+              C
             </div>
-            <span>Tech Developers KE & EA</span>
+            <span>creative.ke</span>
           </div>
 
           <div className="hidden md:flex items-center gap-8 text-sm text-gray-700">
@@ -77,8 +77,8 @@ export default function HomePage() {
               <div className="relative w-full max-w-[420px]">
                 <div className="relative w-full aspect-[4/5] bg-gradient-to-br from-[#1f7a5a] to-[#14b8a6] rounded-[30px] overflow-hidden">
                   <img
-                    src="https://images.pexels.com/photos/3184292/pexels-photo-3184292.jpeg?auto=compress&cs=tinysrgb&w=800"
-                    alt="Developer"
+                    src="https://images.pexels.com/photos/7752846/pexels-photo-7752846.jpeg?auto=compress&cs=tinysrgb&w=800"
+                    alt="Corporate Professional"
                     className="w-full h-full object-cover"
                   />
 
