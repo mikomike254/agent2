@@ -5,9 +5,12 @@ import { Search, Bell, ChevronDown, Menu } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { motion } from 'framer-motion';
 import { ConnectionStatus } from '@/components/ConnectionStatus';
+import UserAvatar from '@/components/UserAvatar';
+import Link from 'next/link';
 
 export function TopBar({ onMenuClick }: { onMenuClick: () => void }) {
     const { data: session } = useSession();
+    const userId = (session?.user as any)?.id;
 
     return (
         <header className="h-20 bg-white/70 backdrop-blur-xl border-b border-gray-100 flex items-center justify-between px-6 md:px-10 sticky top-0 z-40">
@@ -45,13 +48,9 @@ export function TopBar({ onMenuClick }: { onMenuClick: () => void }) {
                 <div className="h-10 w-px bg-gray-100 hidden md:block"></div>
 
                 {/* Profile */}
-                <button className="flex items-center gap-3 py-1.5 px-1.5 pr-4 rounded-3xl bg-gray-50/50 hover:bg-gray-100 border border-transparent hover:border-gray-200 transition-all active:scale-98">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 p-[2px] shadow-lg shadow-indigo-500/20">
-                        <div className="w-full h-full rounded-full bg-white flex items-center justify-center shadow-inner">
-                            <span className="font-black text-indigo-600 text-sm">
-                                {session?.user?.name ? session.user.name[0] : 'U'}
-                            </span>
-                        </div>
+                <Link href={`/profile/${userId}`} className="flex items-center gap-3 py-1.5 px-1.5 pr-4 rounded-3xl bg-gray-50/50 hover:bg-gray-100 border border-transparent hover:border-gray-200 transition-all active:scale-98">
+                    <div className="w-10 h-10 rounded-2xl overflow-hidden shadow-lg shadow-indigo-500/10 border-2 border-white">
+                        <UserAvatar user={session?.user as any} size="md" />
                     </div>
 
                     <div className="text-left hidden md:block">
@@ -61,12 +60,11 @@ export function TopBar({ onMenuClick }: { onMenuClick: () => void }) {
                         >
                             {session?.user?.name || 'Authorized User'}
                         </motion.p>
-                        <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest leading-none mt-0.5">
-                            {(session?.user as any)?.role || 'Access Tier'}
+                        <p className="text-[10px] text-[var(--primary)] font-black uppercase tracking-widest leading-none mt-0.5">
+                            {(session?.user as any)?.role || 'Member'}
                         </p>
                     </div>
-                    <ChevronDown className="w-4 h-4 text-gray-300 ml-1 hidden sm:block" />
-                </button>
+                </Link>
             </div>
         </header>
     );

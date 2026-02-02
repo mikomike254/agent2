@@ -18,6 +18,7 @@ import {
 import Link from 'next/link';
 import { useRealtime } from '@/hooks/useRealtime';
 import { TopUpModal } from '@/components/projects/TopUpModal';
+import MeetingCalendar from '@/components/dashboard/MeetingCalendar';
 
 // Mock Data for "Recommended Talent" (until API is fully linked)
 const RECOMMENDED_TALENT = [
@@ -278,6 +279,9 @@ export default function ClientDashboard() {
                             View All Talent
                         </Link>
                     </div>
+
+                    {/* Meeting Scheduler Widget */}
+                    <MeetingCalendar />
 
                     {/* Quick Activity */}
                     <div className="bg-white rounded-3xl border border-[var(--border-color)] p-6 shadow-sm">

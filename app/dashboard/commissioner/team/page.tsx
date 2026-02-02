@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Users, DollarSign, TrendingUp, Award, Loader2 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { getLevelBadgeRaw, CommissionerLevel } from '@/lib/commission';
+import ReferralTree from '@/components/features/ReferralTree';
 
 export default function TeamPage() {
     const [loading, setLoading] = useState(true);
@@ -68,6 +69,12 @@ export default function TeamPage() {
                         <span>Commissions</span>
                     </div>
                 </Card>
+            </div>
+
+            {/* Referral Tree Visualization */}
+            <div className="pt-4">
+                <h3 className="text-xl font-black text-gray-900 mb-6">Network Visualization</h3>
+                <ReferralTree />
             </div>
 
             {/* Team Table */}

@@ -6,17 +6,14 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { ArrowLeft, ArrowRight, CheckCircle, Loader2, Briefcase, UserCheck } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 
-const BUDGET_RANGES = [
-    { label: 'Under 50,000 KES', value: '0-50000' },
-    { label: '50,000 - 150,000 KES', value: '50000-150000' },
-    { label: '150,000 - 300,000 KES', value: '150000-300000' },
-    { label: '300,000 - 500,000 KES', value: '300000-500000' },
-    { label: 'Above 500,000 KES', value: '500000+' },
-];
-
-const SKILLS_OPTIONS = [
-    'React', 'Next.js', 'Node.js', 'Python', 'Django', 'Flutter',
-    'React Native', 'UI/UX Design', 'AWS', 'PostgreSQL', 'MongoDB'
+const CATEGORIES = [
+    { id: 'web', title: 'Web Application', icon: '🌐' },
+    { id: 'mobile', title: 'Mobile App', icon: '📱' },
+    { id: 'crm', title: 'CRM System', icon: '📊' },
+    { id: 'erp', title: 'ERP Solution', icon: '🏢' },
+    { id: 'ecommerce', title: 'E-commerce', icon: '🛍️' },
+    { id: 'ai', title: 'AI & Automation', icon: '🤖' },
+    { id: 'saas', title: 'SaaS Platform', icon: '☁️' },
 ];
 
 export default function NewProjectPage() {
@@ -31,13 +28,16 @@ export default function NewProjectPage() {
     const [step, setStep] = useState(1);
     const [submitting, setSubmitting] = useState(false);
     const [formData, setFormData] = useState({
+        category: '',
         projectType: '', // 'direct' or 'open'
         title: '',
         description: '',
-        budget: '',
+        budget: 10000,
         timeline: '',
         skills: [] as string[],
         commissionerId: '',
+        phone: '',
+        email: session?.user?.email || '',
     });
 
     // Auto-select Direct Booking if ID is present
@@ -48,19 +48,20 @@ export default function NewProjectPage() {
                 projectType: 'direct',
                 commissionerId: preSelectedCommissionerId
             }));
-            // Optional: Auto-advance to step 2? 
-            // setStep(2); 
-            // Better to let user see "Direct Booking" is selected conceptually
         }
     }, [preSelectedCommissionerId]);
 
     const handleNext = () => {
-        if (step === 1 && !formData.projectType) {
-            alert('Please select a project type');
+        if (step === 1 && !formData.category) {
+            alert('Please select a category');
             return;
         }
-        if (step === 2 && (!formData.title || !formData.description)) {
-            alert('Please fill in all required fields');
+        if (step === 2 && !formData.projectType) {
+            alert('Please select how you want to work');
+            return;
+        }
+        if (step === 3 && (!formData.title || !formData.description)) {
+            alert('Please fill in project details');
             return;
         }
         setStep(step + 1);
@@ -68,45 +69,20 @@ export default function NewProjectPage() {
 
     const handleBack = () => setStep(step - 1);
 
-    const toggleSkill = (skill: string) => {
-        setFormData({
-            ...formData,
-            skills: formData.skills.includes(skill)
-                ? formData.skills.filter((s) => s !== skill)
-                : [...formData.skills, skill],
-        });
-    };
-
     const handleSubmit = async () => {
         setSubmitting(true);
         try {
-            // Parse numeric budget
-            let numericBudget = 0;
-            if (formData.budget) {
-                const match = formData.budget.match(/\d+/);
-                if (match) numericBudget = parseInt(match[0]);
-            }
-
             const response = await fetch('/api/projects', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     ...formData,
-                    budget: numericBudget,
                     client_id: (session?.user as any)?.id,
                 }),
             });
 
             if (response.ok) {
-                // Determine redirect based on type
-                if (formData.projectType === 'direct') {
-                    // Maybe go to payment/deposit page directly? For now back to projects.
-                    router.push('/dashboard/client/projects');
-                } else {
-                    router.push('/dashboard/client/projects');
-                }
-                // Use a toast properly in real app
-                // alert('Project created successfully!');
+                router.push('/dashboard/client/projects');
             } else {
                 const err = await response.json();
                 alert(err.error || 'Failed to create project');
@@ -128,7 +104,7 @@ export default function NewProjectPage() {
 
             {/* Progress Indicator */}
             <div className="flex items-center justify-between mb-8 px-4">
-                {[1, 2, 3, 4].map((s) => (
+                {[1, 2, 3, 4, 5].map((s) => (
                     <div key={s} className="flex items-center flex-1">
                         <div
                             className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-all ${step >= s
@@ -138,7 +114,7 @@ export default function NewProjectPage() {
                         >
                             {step > s ? <CheckCircle className="w-6 h-6" /> : s}
                         </div>
-                        {s < 4 && (
+                        {s < 5 && (
                             <div
                                 className={`flex-1 h-1 mx-2 rounded-full ${step > s ? 'bg-[var(--primary)]' : 'bg-[var(--bg-input)]'
                                     }`}
@@ -149,198 +125,199 @@ export default function NewProjectPage() {
             </div>
 
             <Card className="p-8 border-[var(--border-color)] shadow-sm">
-                {/* Step 1: Project Type */}
+                {/* Step 1: Category */}
                 {step === 1 && (
                     <div>
-                        <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-2">Choose Project Type</h2>
-                        <p className="text-[var(--text-secondary)] mb-8">
-                            How would you like to start your project?
-                        </p>
+                        <h2 className="text-2xl font-black text-gray-900 mb-2">What are we building?</h2>
+                        <p className="text-gray-500 mb-8">Select the category that best fits your project.</p>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            {CATEGORIES.map((cat) => (
+                                <button
+                                    key={cat.id}
+                                    onClick={() => setFormData({ ...formData, category: cat.id })}
+                                    className={`p-6 rounded-2xl border-2 transition-all flex flex-col items-center gap-3 ${formData.category === cat.id
+                                        ? 'border-[var(--primary)] bg-[var(--primary)]/5 shadow-md scale-105'
+                                        : 'border-gray-100 hover:border-gray-200 bg-white'
+                                        }`}
+                                >
+                                    <span className="text-3xl">{cat.icon}</span>
+                                    <span className="font-bold text-sm text-center text-gray-800">{cat.title}</span>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {/* Step 2: Work Mode */}
+                {step === 2 && (
+                    <div>
+                        <h2 className="text-2xl font-black text-gray-900 mb-2">How do you want to work?</h2>
+                        <p className="text-gray-500 mb-8">Choose between direct booking or open requirement.</p>
 
                         {preSelectedCommissionerId && (
                             <div className="mb-8 bg-indigo-50 border border-indigo-100 p-4 rounded-xl flex items-center gap-4">
-                                <div className="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center">
-                                    <UserCheck className="w-6 h-6 text-indigo-600" />
-                                </div>
-                                <div>
-                                    <h4 className="font-bold text-indigo-900">Pre-selected Commissioner</h4>
-                                    <p className="text-sm text-indigo-700">You are booking <strong>{preSelectedCommissionerName || 'a verified talent'}</strong> directly.</p>
-                                </div>
+                                <UserCheck className="w-6 h-6 text-indigo-600" />
+                                <p className="text-sm text-indigo-900">Directly hiring <strong>{preSelectedCommissionerName || 'Verified Talent'}</strong></p>
                             </div>
                         )}
 
                         <div className="grid md:grid-cols-2 gap-6">
                             <button
                                 onClick={() => setFormData({ ...formData, projectType: 'direct' })}
-                                className={`p-8 rounded-2xl border-2 transition-all text-left relative overflow-hidden ${formData.projectType === 'direct'
-                                    ? 'border-[var(--primary)] bg-[var(--primary)]/5 ring-1 ring-[var(--primary)]'
-                                    : 'border-[var(--bg-input)] hover:border-[var(--primary)]/30 hover:bg-[var(--bg-app)]'
-                                    }`}
+                                className={`p-8 rounded-2xl border-2 transition-all text-left ${formData.projectType === 'direct' ? 'border-[var(--primary)] bg-[var(--primary)]/5' : 'border-gray-100'}`}
                             >
-                                <Briefcase className={`w-12 h-12 mb-4 ${formData.projectType === 'direct' ? 'text-[var(--primary)]' : 'text-gray-400'}`} />
-                                <h3 className="text-xl font-bold text-[var(--text-primary)] mb-2">Direct Booking</h3>
-                                <p className="text-sm text-[var(--text-secondary)]">
-                                    Hire a specific commissioner directly. Perfect if you already know who you want.
-                                </p>
+                                <Briefcase className="w-10 h-10 mb-4 text-[var(--primary)]" />
+                                <h3 className="text-xl font-bold mb-2 text-gray-900">Direct Booking</h3>
+                                <p className="text-sm text-gray-500">Work with your pre-selected commissioner immediately.</p>
                             </button>
                             <button
-                                onClick={() => {
-                                    setFormData({ ...formData, projectType: 'open', commissionerId: '' }); // Clear ID if switching to open
-                                }}
-                                className={`p-8 rounded-2xl border-2 transition-all text-left ${formData.projectType === 'open'
-                                    ? 'border-[var(--accent)] bg-[var(--accent)]/5 ring-1 ring-[var(--accent)]'
-                                    : 'border-[var(--bg-input)] hover:border-[var(--accent)]/30 hover:bg-[var(--bg-app)]'
-                                    }`}
+                                onClick={() => setFormData({ ...formData, projectType: 'open', commissionerId: '' })}
+                                className={`p-8 rounded-2xl border-2 transition-all text-left ${formData.projectType === 'open' ? 'border-[var(--accent)] bg-[var(--accent)]/5' : 'border-gray-100'}`}
                             >
-                                <Briefcase className={`w-12 h-12 mb-4 ${formData.projectType === 'open' ? 'text-[var(--accent)]' : 'text-gray-400'}`} />
-                                <h3 className="text-xl font-bold text-[var(--text-primary)] mb-2">Post Requirement</h3>
-                                <p className="text-sm text-[var(--text-secondary)]">
-                                    Post your project details and let qualified commissioners send you proposals.
-                                </p>
+                                <Briefcase className="w-10 h-10 mb-4 text-[var(--accent)]" />
+                                <h3 className="text-xl font-bold mb-2 text-gray-900">Post Requirement</h3>
+                                <p className="text-sm text-gray-500">Get proposals from all available commissioners.</p>
                             </button>
                         </div>
                     </div>
                 )}
 
-                {/* Step 2: Project Details */}
-                {step === 2 && (
+                {/* Step 3: Specifics */}
+                {step === 3 && (
                     <div>
-                        <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-2">Project Details</h2>
-                        <p className="text-[var(--text-secondary)] mb-8">Tell us about your project</p>
+                        <h2 className="text-2xl font-black text-gray-900 mb-2">Project Details</h2>
+                        <p className="text-gray-500 mb-8">What should we call this project?</p>
                         <div className="space-y-6">
-                            <div>
-                                <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
-                                    Project Title *
-                                </label>
-                                <input
-                                    type="text"
-                                    value={formData.title}
-                                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                                    className="w-full px-4 py-3 border border-[var(--border-color)] rounded-xl focus:ring-2 focus:ring-[var(--primary)] outline-none bg-[var(--bg-input)] text-[var(--text-primary)]"
-                                    placeholder="e.g., E-commerce Mobile App"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
-                                    Description *
-                                </label>
-                                <textarea
-                                    value={formData.description}
-                                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                    rows={6}
-                                    className="w-full px-4 py-3 border border-[var(--border-color)] rounded-xl focus:ring-2 focus:ring-[var(--primary)] outline-none bg-[var(--bg-input)] text-[var(--text-primary)]"
-                                    placeholder="Describe your project requirements, goals, and any specific features..."
-                                />
-                            </div>
+                            <input
+                                type="text"
+                                value={formData.title}
+                                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                                className="w-full px-5 py-4 border-2 border-gray-100 rounded-2xl focus:border-[var(--primary)] outline-none bg-gray-50 font-bold text-lg"
+                                placeholder="E.g. My Next Billion Dollar App"
+                            />
+                            <textarea
+                                value={formData.description}
+                                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                rows={6}
+                                className="w-full px-5 py-4 border-2 border-gray-100 rounded-2xl focus:border-[var(--primary)] outline-none bg-gray-50 text-gray-700"
+                                placeholder="Describe your vision, requirements, and features..."
+                            />
                         </div>
                     </div>
                 )}
 
-                {/* Step 3: Budget & Timeline */}
-                {step === 3 && (
+                {/* Step 4: Budget & Timeline */}
+                {step === 4 && (
                     <div>
-                        <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-2">Budget & Timeline</h2>
-                        <p className="text-[var(--text-secondary)] mb-8">Set your project expectations</p>
-                        <div className="space-y-6">
-                            <div>
-                                <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
-                                    Budget Range
-                                </label>
-                                <div className="grid gap-3">
-                                    {BUDGET_RANGES.map((range) => (
+                        <h2 className="text-2xl font-black text-gray-900 mb-2">Budget & Timing</h2>
+                        <p className="text-gray-500 mb-8">Slide to set your budget (increments of 10k KES).</p>
+                        <div className="space-y-12 py-6">
+                            <div className="space-y-4">
+                                <div className="flex justify-between items-end">
+                                    <label className="text-sm font-bold text-gray-600 uppercase tracking-widest">Est. Budget</label>
+                                    <span className="text-3xl font-black text-[var(--primary)]">KES {formData.budget.toLocaleString()}</span>
+                                </div>
+                                <input
+                                    type="range"
+                                    min="10000"
+                                    max="1000000"
+                                    step="10000"
+                                    value={formData.budget}
+                                    onChange={(e) => setFormData({ ...formData, budget: parseInt(e.target.value) })}
+                                    className="w-full h-3 bg-gray-100 rounded-lg appearance-none cursor-pointer accent-[var(--primary)]"
+                                />
+                                <div className="flex justify-between text-xs font-bold text-gray-400">
+                                    <span>10,000</span>
+                                    <span>500,000</span>
+                                    <span>1,000,000+</span>
+                                </div>
+                            </div>
+
+                            <div className="space-y-4">
+                                <label className="text-sm font-bold text-gray-600 uppercase tracking-widest">Target Timeline</label>
+                                <div className="grid grid-cols-3 gap-3">
+                                    {['2 Weeks', '1 Month', '3 Months+', 'ASAP'].map(t => (
                                         <button
-                                            key={range.value}
-                                            onClick={() => setFormData({ ...formData, budget: range.value })}
-                                            className={`p-4 rounded-xl border text-left transition-all ${formData.budget === range.value
-                                                ? 'border-[var(--primary)] bg-[var(--primary)]/5 font-bold text-[var(--primary)]'
-                                                : 'border-[var(--bg-input)] hover:border-[var(--primary)]/30'
-                                                }`}
+                                            key={t}
+                                            onClick={() => setFormData({ ...formData, timeline: t })}
+                                            className={`py-3 rounded-xl border-2 font-bold transition-all ${formData.timeline === t ? 'border-[var(--primary)] bg-[var(--primary)]/5 text-[var(--primary)]' : 'border-gray-100 text-gray-500'}`}
                                         >
-                                            {range.label}
+                                            {t}
                                         </button>
                                     ))}
                                 </div>
                             </div>
-                            <div>
-                                <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
-                                    Expected Timeline
-                                </label>
-                                <input
-                                    type="text"
-                                    value={formData.timeline}
-                                    onChange={(e) => setFormData({ ...formData, timeline: e.target.value })}
-                                    className="w-full px-4 py-3 border border-[var(--border-color)] rounded-xl focus:ring-2 focus:ring-[var(--primary)] outline-none bg-[var(--bg-input)] text-[var(--text-primary)]"
-                                    placeholder="e.g., 2 months, 8 weeks, ASAP"
-                                />
-                            </div>
                         </div>
                     </div>
                 )}
 
-                {/* Step 4: Skills Required */}
-                {step === 4 && (
+                {/* Step 5: Contact Info */}
+                {step === 5 && (
                     <div>
-                        <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-2">Skills Required</h2>
-                        <p className="text-[var(--text-secondary)] mb-8">Select the technologies needed</p>
-                        <div className="flex flex-wrap gap-3 mb-8">
-                            {SKILLS_OPTIONS.map((skill) => (
-                                <button
-                                    key={skill}
-                                    onClick={() => toggleSkill(skill)}
-                                    className={`px-4 py-2 rounded-xl font-medium transition-all ${formData.skills.includes(skill)
-                                        ? 'bg-[var(--primary)] text-white'
-                                        : 'bg-[var(--bg-input)] text-[var(--text-secondary)] hover:bg-[var(--bg-input)]/70'
-                                        }`}
-                                >
-                                    {skill}
-                                </button>
-                            ))}
-                        </div>
-                        <div className="bg-[var(--bg-input)] p-6 rounded-xl space-y-3">
-                            <h3 className="font-bold text-[var(--text-primary)]">Review Your Project</h3>
-                            <div className="space-y-2 text-sm text-[var(--text-secondary)]">
-                                <p><strong className="text-[var(--text-primary)]">Type:</strong> {formData.projectType === 'direct' ? 'Direct Booking' : 'Post Requirement'}</p>
-                                {formData.projectType === 'direct' && <p><strong className="text-[var(--text-primary)]">Commissioner:</strong> {preSelectedCommissionerName || 'ID: ' + formData.commissionerId}</p>}
-                                <p><strong className="text-[var(--text-primary)]">Title:</strong> {formData.title}</p>
-                                <p><strong className="text-[var(--text-primary)]">Budget:</strong> {BUDGET_RANGES.find(r => r.value === formData.budget)?.label || 'Not set'}</p>
-                                <p><strong className="text-[var(--text-primary)]">Skills:</strong> {formData.skills.join(', ') || 'None selected'}</p>
+                        <h2 className="text-2xl font-black text-gray-900 mb-2">Final Step: Contact Info</h2>
+                        <p className="text-gray-500 mb-8">How should the commissioner reach you?</p>
+                        <div className="space-y-6">
+                            <div className="grid md:grid-cols-2 gap-6">
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-gray-400 uppercase">Phone Number</label>
+                                    <input
+                                        type="tel"
+                                        value={formData.phone}
+                                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                                        className="w-full px-5 py-4 border-2 border-gray-100 rounded-2xl focus:border-[var(--primary)] outline-none bg-gray-50 font-bold"
+                                        placeholder="+254..."
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-gray-400 uppercase">Best Email</label>
+                                    <input
+                                        type="email"
+                                        value={formData.email}
+                                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                        className="w-full px-5 py-4 border-2 border-gray-100 rounded-2xl focus:border-[var(--primary)] outline-none bg-gray-50 font-bold"
+                                        placeholder="email@example.com"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="bg-gray-900 text-white p-6 rounded-3xl space-y-4">
+                                <h4 className="font-bold flex items-center gap-2">🚀 Summary</h4>
+                                <div className="grid grid-cols-2 gap-y-2 text-sm">
+                                    <span className="text-gray-400">Category:</span> <span className="font-bold capitalize">{formData.category}</span>
+                                    <span className="text-gray-400">Budget:</span> <span className="font-bold">KES {formData.budget.toLocaleString()}</span>
+                                    <span className="text-gray-400">Timeline:</span> <span className="font-bold">{formData.timeline || 'Flexible'}</span>
+                                    <span className="text-gray-400">Booking:</span> <span className="font-bold">{formData.projectType === 'direct' ? 'Direct' : 'Open Pool'}</span>
+                                </div>
                             </div>
                         </div>
                     </div>
                 )}
 
                 {/* Navigation */}
-                <div className="flex justify-between mt-8 pt-6 border-t border-[var(--border-color)]">
+                <div className="flex justify-between mt-12 pt-8 border-t border-gray-50">
                     <button
                         onClick={handleBack}
                         disabled={step === 1}
-                        className="px-6 py-3 border border-[var(--border-color)] rounded-xl hover:bg-[var(--bg-input)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 font-medium"
+                        className="px-8 py-3 rounded-2xl font-bold text-gray-400 hover:text-gray-900 disabled:opacity-0 transition-all flex items-center gap-2"
                     >
                         <ArrowLeft className="w-5 h-5" />
                         Back
                     </button>
-                    {step < 4 ? (
+                    {step < 5 ? (
                         <button
                             onClick={handleNext}
-                            className="btn-primary px-6 py-3 rounded-xl flex items-center gap-2"
+                            className="bg-gray-900 text-white px-10 py-4 rounded-2xl font-bold hover:bg-black transition-all shadow-lg hover:shadow-gray-200 flex items-center gap-2"
                         >
-                            Next
+                            Continue
                             <ArrowRight className="w-5 h-5" />
                         </button>
                     ) : (
                         <button
                             onClick={handleSubmit}
                             disabled={submitting}
-                            className="btn-primary px-8 py-3 rounded-xl flex items-center gap-2"
+                            className="bg-[var(--primary)] text-white px-10 py-4 rounded-2xl font-bold hover:brightness-110 transition-all shadow-lg shadow-[var(--primary)]/30 flex items-center gap-2 disabled:opacity-50"
                         >
-                            {submitting ? (
-                                <>
-                                    <Loader2 className="w-5 h-5 animate-spin" />
-                                    Creating...
-                                </>
-                            ) : (
-                                'Create Project'
-                            )}
+                            {submitting ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Launch Project'}
                         </button>
                     )}
                 </div>

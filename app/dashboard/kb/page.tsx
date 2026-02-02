@@ -1,233 +1,131 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Book, Search, ChevronRight, HelpCircle, FileText, Zap, Shield, CreditCard, Users, Loader2, ArrowLeft } from 'lucide-react';
+import React, { useState } from 'react';
+import {
+    Search,
+    BookOpen,
+    FileText,
+    Video,
+    MessageCircle,
+    HelpCircle,
+    ChevronRight,
+    ArrowUpRight,
+    Play
+} from 'lucide-react';
 import { Card } from '@/components/ui/card';
 
-interface Category {
-    id: string;
-    name: string;
-    icon: string;
-}
+const CATEGORIES = [
+    { id: 'onboarding', title: 'Onboarding', count: 12, icon: BookOpen, color: 'text-blue-600', bg: 'bg-blue-50' },
+    { id: 'projects', title: 'Project Management', count: 24, icon: FileText, color: 'text-purple-600', bg: 'bg-purple-50' },
+    { id: 'payments', title: 'Payments & Escrow', count: 8, icon: HelpCircle, color: 'text-green-600', bg: 'bg-green-50' },
+    { id: 'video', title: 'Video Tutorials', count: 15, icon: Video, color: 'text-orange-600', bg: 'bg-orange-50' },
+];
 
-interface Article {
-    id: string;
-    title: string;
-    slug: string;
-    content: string;
-    view_count: number;
-    updated_at: string;
-}
+const ARTICLES = [
+    { title: 'How to create your first project', category: 'onboarding', duration: '5 min read' },
+    { title: 'Understanding the Escrow system', category: 'payments', duration: '8 min read' },
+    { title: 'Collaborating with Commissioners', category: 'projects', duration: '6 min read' },
+    { title: 'Setting up your payment method', category: 'payments', duration: '3 min read' },
+];
 
 export default function KnowledgeBasePage() {
-    const [data, setData] = useState<{ categories: Category[], featured: Article[] } | null>(null);
-    const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
-    const [articles, setArticles] = useState<Article[]>([]);
-    const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [searchTerm, setSearchTerm] = useState('');
-
-    useEffect(() => {
-        fetchInitial();
-    }, []);
-
-    const fetchInitial = async () => {
-        setLoading(true);
-        try {
-            const res = await fetch('/api/kb');
-            const result = await res.json();
-            if (result.success) setData(result.data);
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const fetchCategoryArticles = async (category: Category) => {
-        setLoading(true);
-        setSelectedCategory(category);
-        setSelectedArticle(null);
-        try {
-            const res = await fetch(`/api/kb?categoryId=${category.id}`);
-            const result = await res.json();
-            if (result.success) setArticles(result.data);
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const fetchDetail = async (slug: string) => {
-        setLoading(true);
-        try {
-            const res = await fetch(`/api/kb?slug=${slug}`);
-            const result = await res.json();
-            if (result.success) setSelectedArticle(result.data);
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const getIcon = (name: string) => {
-        const icons: Record<string, any> = {
-            'getting-started': Zap,
-            'billing': CreditCard,
-            'security': Shield,
-            'commissioners': Users,
-            'clients': FileText,
-            'default': HelpCircle
-        };
-        const Icon = icons[name.toLowerCase().replace(' ', '-')] || icons.default;
-        return <Icon className="w-6 h-6" />;
-    };
-
-    if (loading && !data) return (
-        <div className="flex items-center justify-center min-h-[60vh]">
-            <Loader2 className="w-8 h-8 animate-spin text-[var(--primary)]" />
-        </div>
-    );
+    const [searchQuery, setSearchQuery] = useState('');
 
     return (
         <div className="max-w-6xl mx-auto space-y-12 pb-20">
-            {/* Header / Hero */}
+            {/* Hero Section */}
             <div className="text-center py-12 space-y-6">
-                <h1 className="text-4xl md:text-5xl font-black text-[var(--text-primary)] tracking-tight">
-                    How can we help you today?
-                </h1>
+                <h1 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tight">How can we help?</h1>
+                <p className="text-[var(--text-secondary)] max-w-2xl mx-auto">
+                    Search our knowledge base for guides, tutorials, and common questions.
+                </p>
                 <div className="max-w-2xl mx-auto relative group">
-                    <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-[var(--primary)] transition-colors" />
+                    <div className="absolute inset-y-0 left-6 flex items-center pointer-events-none">
+                        <Search className="w-5 h-5 text-gray-400 group-focus-within:text-[var(--primary)] transition-colors" />
+                    </div>
                     <input
                         type="text"
-                        placeholder="Search for articles, guides, or keywords..."
-                        className="w-full pl-14 pr-8 py-5 bg-[var(--bg-card)] border border-[var(--bg-input)] rounded-3xl shadow-xl shadow-indigo-500/5 outline-none focus:ring-2 focus:ring-[var(--primary)]/20 transition-all text-lg"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
+                        placeholder="Search for articles, guides..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="w-full pl-16 pr-6 py-6 bg-white border-2 border-gray-100 rounded-[2rem] shadow-xl focus:border-[var(--primary)] outline-none transition-all font-medium text-lg"
                     />
                 </div>
             </div>
 
-            {selectedArticle ? (
-                <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                    <button
-                        onClick={() => setSelectedArticle(null)}
-                        className="flex items-center gap-2 text-[var(--text-secondary)] hover:text-[var(--primary)] font-bold uppercase tracking-widest text-xs transition-colors"
-                    >
-                        <ArrowLeft className="w-4 h-4" /> Back to KB
-                    </button>
-                    <Card className="p-10 border-none shadow-2xl bg-[var(--bg-card)]">
-                        <h1 className="text-4xl font-black text-[var(--text-primary)] mb-6">{selectedArticle.title}</h1>
-                        <div className="flex items-center gap-4 text-xs font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-10 pb-6 border-b border-[var(--bg-input)]">
-                            <span className="bg-indigo-50 px-3 py-1 rounded-full text-indigo-600">Article</span>
-                            <span>Updated {new Date(selectedArticle.updated_at).toLocaleDateString()}</span>
-                            <span>•</span>
-                            <span>{selectedArticle.view_count} Views</span>
+            {/* Category Grid */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                {CATEGORIES.map((cat) => (
+                    <Card key={cat.id} className="p-8 border-none shadow-sm hover:shadow-xl transition-all cursor-pointer group text-center rounded-[2.5rem] bg-white">
+                        <div className={`w-16 h-16 ${cat.bg} ${cat.color} rounded-[1.5rem] flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform`}>
+                            <cat.icon className="w-8 h-8" />
                         </div>
-                        <div className="prose prose-indigo max-w-none text-[var(--text-secondary)] leading-loose text-lg">
-                            {selectedArticle.content || "This article content is coming soon."}
-                        </div>
+                        <h3 className="font-bold text-gray-900 mb-1">{cat.title}</h3>
+                        <p className="text-xs font-bold text-gray-400 uppercase tracking-tighter">{cat.count} Articles</p>
                     </Card>
-                </div>
-            ) : selectedCategory ? (
-                <div className="space-y-8">
-                    <button
-                        onClick={() => setSelectedCategory(null)}
-                        className="flex items-center gap-2 text-[var(--text-secondary)] hover:text-[var(--primary)] font-bold uppercase tracking-widest text-xs transition-colors"
-                    >
-                        <ArrowLeft className="w-4 h-4" /> All Categories
-                    </button>
-                    <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600">
-                            {getIcon(selectedCategory.name)}
-                        </div>
-                        <h2 className="text-3xl font-black text-[var(--text-primary)] uppercase tracking-tight">{selectedCategory.name}</h2>
+                ))}
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-8">
+                {/* Popular Articles */}
+                <div className="md:col-span-2 space-y-6">
+                    <div className="flex justify-between items-center">
+                        <h2 className="text-2xl font-black text-gray-900 font-primary">Popular Articles</h2>
+                        <button className="text-xs font-bold text-[var(--primary)] hover:underline uppercase tracking-widest">View All</button>
                     </div>
-                    <div className="grid gap-4">
-                        {articles.length > 0 ? articles.map(article => (
-                            <button
-                                key={article.id}
-                                onClick={() => fetchDetail(article.slug)}
-                                className="w-full text-left p-6 bg-[var(--bg-card)] rounded-2xl border border-[var(--bg-input)] hover:border-[var(--primary)] transition-all flex justify-between items-center group shadow-sm hover:shadow-lg"
-                            >
-                                <div className="flex items-center gap-4">
-                                    <FileText className="w-5 h-5 text-gray-300 group-hover:text-[var(--primary)] transition-colors" />
-                                    <span className="font-bold text-[var(--text-primary)] text-lg">{article.title}</span>
+                    <div className="space-y-4">
+                        {ARTICLES.map((art, i) => (
+                            <div key={i} className="flex items-center gap-4 p-6 bg-white hover:bg-gray-50 border border-gray-100 rounded-3xl transition-all cursor-pointer group">
+                                <div className="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center text-gray-400 group-hover:bg-[var(--primary)] group-hover:text-white transition-colors">
+                                    <FileText className="w-6 h-6" />
                                 </div>
-                                <ChevronRight className="w-5 h-5 text-gray-300 group-hover:translate-x-1 transition-all" />
-                            </button>
-                        )) : (
-                            <p className="text-center py-10 text-[var(--text-secondary)]">No articles in this category yet.</p>
-                        )}
-                    </div>
-                </div>
-            ) : (
-                <>
-                    {/* Categories Grid */}
-                    <div className="grid md:grid-cols-3 gap-8">
-                        {data?.categories.map((cat) => (
-                            <button
-                                key={cat.id}
-                                onClick={() => fetchCategoryArticles(cat)}
-                                className="p-8 bg-[var(--bg-card)] rounded-[2.5rem] border border-[var(--bg-input)] shadow-xl shadow-indigo-500/5 hover:border-[var(--primary)] hover:translate-y-[-8px] transition-all duration-300 text-center flex flex-col items-center gap-4"
-                            >
-                                <div className="w-16 h-16 bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-2xl flex items-center justify-center text-indigo-600 shadow-inner">
-                                    {getIcon(cat.name)}
+                                <div className="flex-1">
+                                    <h4 className="font-bold text-gray-900 group-hover:text-[var(--primary)] transition-colors">{art.title}</h4>
+                                    <div className="flex items-center gap-3 mt-1">
+                                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-tighter">{art.category}</span>
+                                        <span className="w-1 h-1 bg-gray-200 rounded-full"></span>
+                                        <span className="text-[10px] font-bold text-gray-400">{art.duration}</span>
+                                    </div>
                                 </div>
-                                <div>
-                                    <h3 className="text-xl font-black text-[var(--text-primary)] mb-2 uppercase tracking-tight">{cat.name}</h3>
-                                    <p className="text-sm text-[var(--text-secondary)]">Browse guides and common questions.</p>
-                                </div>
-                            </button>
+                                <ArrowUpRight className="w-5 h-5 text-gray-300 group-hover:text-gray-900 transition-colors" />
+                            </div>
                         ))}
                     </div>
+                </div>
 
-                    {/* Featured / Popular */}
-                    <div className="pt-12">
-                        <h2 className="text-2xl font-black text-[var(--text-primary)] mb-8 flex items-center gap-3">
-                            <Book className="w-6 h-6 text-[var(--primary)]" />
-                            Popular Guides
-                        </h2>
-                        <div className="grid md:grid-cols-2 gap-6">
-                            {data?.featured.map((article) => (
-                                <Card
-                                    key={article.id}
-                                    className="p-6 bg-gradient-to-r from-gray-50 to-white hover:from-white border-[var(--bg-input)] cursor-pointer hover:shadow-xl transition-all flex items-start gap-4"
-                                    onClick={() => fetchDetail(article.slug)}
-                                >
-                                    <div className="p-3 bg-white rounded-xl shadow-sm border border-gray-100">
-                                        <FileText className="w-6 h-6 text-indigo-500" />
-                                    </div>
-                                    <div>
-                                        <h3 className="font-bold text-[var(--text-primary)]">{article.title}</h3>
-                                        <p className="text-xs text-[var(--text-secondary)] mt-1 font-bold">
-                                            {article.view_count} people found this useful
-                                        </p>
-                                    </div>
-                                </Card>
-                            ))}
+                {/* Right Panel: Support Teaser */}
+                <div className="space-y-6">
+                    <h2 className="text-2xl font-black text-gray-900 font-primary">Need Support?</h2>
+                    <Card className="bg-gray-900 text-white p-8 rounded-[2.5rem] shadow-2xl relative overflow-hidden">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-[var(--primary)] rounded-full blur-[70px] opacity-30"></div>
+                        <div className="relative z-10 space-y-6">
+                            <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center">
+                                <MessageCircle className="w-6 h-6 text-[var(--primary)]" />
+                            </div>
+                            <h3 className="text-xl font-bold">Talk to a specialist</h3>
+                            <p className="text-gray-400 text-sm leading-relaxed">
+                                Can't find what you're looking for? Our dedicated support team is available 24/7.
+                            </p>
+                            <button className="w-full bg-[var(--primary)] text-white py-4 rounded-2xl font-bold hover:brightness-110 transition-all flex items-center justify-center gap-2">
+                                Contact Support
+                                <ChevronRight className="w-4 h-4" />
+                            </button>
                         </div>
-                    </div>
-                </>
-            )}
+                    </Card>
 
-            {/* Support CTA */}
-            <Card className="p-12 bg-white rounded-[3rem] border border-indigo-100 text-center space-y-6 shadow-2xl flex flex-col items-center">
-                <div className="w-20 h-20 bg-indigo-50 rounded-full flex items-center justify-center">
-                    <HelpCircle className="w-10 h-10 text-indigo-600" />
+                    {/* Tutorial Box */}
+                    <Card className="p-8 border-none shadow-xl rounded-[2.5rem] bg-indigo-600 text-white">
+                        <div className="flex items-center gap-4 mb-4">
+                            <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+                                <Play className="w-5 h-5 fill-current" />
+                            </div>
+                            <h4 className="font-bold">Next Tutorials</h4>
+                        </div>
+                        <p className="text-xs text-indigo-100 mb-6">Learn how to maximize your agency with our weekly masterclasses.</p>
+                        <button className="text-sm font-bold border-b-2 border-white/30 hover:border-white transition-all pb-1">Watch Now</button>
+                    </Card>
                 </div>
-                <div className="max-w-xl">
-                    <h2 className="text-3xl font-black text-gray-900 mb-2">Still need help?</h2>
-                    <p className="text-gray-500 text-lg">
-                        Can't find what you're looking for? Our dedicated support team is here to assist you 24/7 with any questions or technical issues.
-                    </p>
-                </div>
-                <button className="px-10 py-5 bg-[#5347CE] text-white rounded-[1.5rem] font-bold text-sm uppercase tracking-widest hover:scale-105 transition-all shadow-xl shadow-indigo-200">
-                    Contact Support Team
-                </button>
-            </Card>
+            </div>
         </div>
     );
 }

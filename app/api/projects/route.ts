@@ -159,6 +159,7 @@ export async function POST(request: NextRequest) {
                 skills: skills || [],
                 status: projectType === 'direct' ? 'active' : 'lead',
                 project_type: projectType || 'open',
+                category: body.category || 'general',
                 currency: 'KES'
             })
             .select()
