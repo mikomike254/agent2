@@ -2,7 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { supabaseAdmin } from '@/lib/db';
+import { supabaseAdmin, db } from '@/lib/db';
 
 // GET: List all approval requests
 export async function GET(req: NextRequest) {
@@ -129,7 +129,14 @@ export async function POST(req: NextRequest) {
 
         if (error) throw error;
 
-        // TODO: Send email notification to admin
+        // Send notification to admin
+        // Note: Real email sending would go here via EmailJS or similar if configured for admin alerts
+        const { data: admins } = await supabaseAdmin.from('users').select('id').eq('role', 'admin');
+        if (admins) {
+            for (const admin of admins) {
+                await db.createNotification(admin.id, 'system', 'New Approval Request', `A new ${requestType} request requires review.`);
+            }
+        }
         // await sendAdminApprovalEmail(approval);
 
         return NextResponse.json({ success: true, data: approval });

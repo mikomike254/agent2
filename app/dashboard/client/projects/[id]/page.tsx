@@ -3,7 +3,7 @@
 import { useParams, useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { useState, useEffect } from 'react';
-import { ArrowLeft, Users, DollarSign, Calendar, CheckCircle, Clock, MessageSquare, Loader2 } from 'lucide-react';
+import { ArrowLeft, Users, DollarSign, Calendar, CheckCircle, Clock, MessageSquare, Loader2, CreditCard, FileText, ArrowRight } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { useRealtime } from '@/hooks/useRealtime';
 import { useCallback } from 'react';
@@ -12,6 +12,9 @@ import ProjectFileManager from '@/components/projects/ProjectFileManager';
 import ProjectChat from '@/components/dashboard/ProjectChat';
 import MilestoneProgress from '@/components/client/MilestoneProgress';
 import DisputeWidget from '@/components/disputes/DisputeWidget';
+import ProjectVersionManager from '@/components/projects/ProjectVersionManager';
+import WorkStream from '@/components/projects/WorkStream';
+import AIAuditPanel from '@/components/projects/AIAuditPanel';
 
 interface Project {
     id: string;
@@ -210,7 +213,10 @@ export default function ProjectDetailPage() {
                         )}
                     </Card>
 
-                    <ProjectFileManager projectId={params.id as string} />
+                    <WorkStream projectId={project.id} />
+
+                    {/* Project Versions */}
+                    <ProjectVersionManager projectId={params.id as string} role="client" />
 
                     {/* Project Chat */}
                     <ProjectChat projectId={params.id as string} currentUserId={(session?.user as any)?.id} />
@@ -218,6 +224,8 @@ export default function ProjectDetailPage() {
 
                 {/* Sidebar */}
                 <div className="space-y-6">
+                    <AIAuditPanel projectId={project.id} />
+
                     {/* Team */}
                     <Card className="p-6">
                         <h3 className="font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
@@ -267,10 +275,33 @@ export default function ProjectDetailPage() {
                             <Calendar className="w-5 h-5" />
                             Timeline
                         </h3>
-                        <div className="space-y-2 text-sm">
+                        <div className="space-y-4 text-sm">
                             <p className="text-[var(--text-secondary)]">
                                 <strong>Started:</strong> {new Date(project.created_at).toLocaleDateString()}
                             </p>
+                        </div>
+                    </Card>
+
+                    {/* Billing & Receipts */}
+                    <Card className="p-6 border-2 border-green-500/10 bg-green-50/20">
+                        <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
+                            <CreditCard className="w-5 h-5 text-green-600" />
+                            Billing & Receipts
+                        </h3>
+                        <div className="space-y-3">
+                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Recent Invoices</p>
+                            <Link
+                                href={`/invoices/mock-id/print`}
+                                target="_blank"
+                                className="flex items-center justify-between p-3 bg-white border border-gray-100 rounded-xl hover:border-indigo-500 transition-all group"
+                            >
+                                <div className="flex items-center gap-2">
+                                    <FileText className="w-4 h-4 text-gray-400 group-hover:text-indigo-500" />
+                                    <span className="text-xs font-bold text-gray-700">Project Deposit</span>
+                                </div>
+                                <ArrowRight className="w-3 h-3 text-gray-300" />
+                            </Link>
+                            <p className="text-[10px] text-gray-400 italic mt-2">Professional receipts generated for every secure payout.</p>
                         </div>
                     </Card>
                 </div>

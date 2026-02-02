@@ -18,20 +18,35 @@ export default function MarketingAssetsPage() {
     const [assets, setAssets] = useState<Asset[]>([]);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState('all');
+    const [currentTier, setCurrentTier] = useState('bronze');
+
+    const TIER_LEVELS: Record<string, number> = {
+        'bronze': 1,
+        'silver': 2,
+        'gold': 3,
+        'platinum': 4
+    };
 
     useEffect(() => {
-        fetchAssets();
+        fetchData();
     }, []);
 
-    const fetchAssets = async () => {
+    const fetchData = async () => {
         try {
-            const res = await fetch('/api/assets');
-            const data = await res.json();
-            if (data.success) {
-                setAssets(data.data);
+            const [assetsRes, profileRes] = await Promise.all([
+                fetch('/api/assets'),
+                fetch('/api/commissioner/profile')
+            ]);
+
+            const assetsData = await assetsRes.json();
+            const profileData = await profileRes.json();
+
+            if (assetsData.success) setAssets(assetsData.data);
+            if (profileData.success && profileData.data?.tier) {
+                setCurrentTier(profileData.data.tier.toLowerCase());
             }
         } catch (error) {
-            console.error('Error fetching assets:', error);
+            console.error('Error fetching data:', error);
         } finally {
             setLoading(false);
         }
@@ -49,6 +64,12 @@ export default function MarketingAssetsPage() {
     const filteredAssets = filter === 'all'
         ? assets
         : assets.filter(a => a.asset_type === filter);
+
+    const hasAccess = (required: string) => {
+        const requiredLevel = TIER_LEVELS[required?.toLowerCase()] || 0;
+        const currentLevel = TIER_LEVELS[currentTier] || 1;
+        return currentLevel >= requiredLevel;
+    };
 
     if (loading) return (
         <div className="flex items-center justify-center min-h-[60vh]">
@@ -69,8 +90,8 @@ export default function MarketingAssetsPage() {
                             key={f}
                             onClick={() => setFilter(f)}
                             className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest transition-all ${filter === f
-                                    ? 'bg-[var(--primary)] text-white shadow-lg'
-                                    : 'bg-[var(--bg-card)] text-[var(--text-secondary)] hover:bg-[var(--bg-input)]'
+                                ? 'bg-[var(--primary)] text-white shadow-lg'
+                                : 'bg-[var(--bg-card)] text-[var(--text-secondary)] hover:bg-[var(--bg-input)]'
                                 }`}
                         >
                             {f.replace('_', ' ')}
@@ -90,13 +111,18 @@ export default function MarketingAssetsPage() {
                         <Card key={asset.id} className="overflow-hidden group border-none shadow-xl bg-[var(--bg-card)] hover:translate-y-[-4px] transition-all duration-300">
                             <div className="aspect-video bg-gray-100 relative overflow-hidden">
                                 {asset.thumbnail_url ? (
-                                    <img src={asset.thumbnail_url} alt={asset.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                                    <img
+                                        src={asset.thumbnail_url}
+                                        alt={asset.title}
+                                        className={`w-full h-full object-cover transition-transform duration-500 ${!hasAccess(asset.tier_required) ? 'blur-sm grayscale' : 'group-hover:scale-110'}`}
+                                    />
                                 ) : (
                                     <div className="w-full h-full flex items-center justify-center text-gray-300">
                                         {getIcon(asset.asset_type)}
                                     </div>
                                 )}
-                                <div className="absolute top-4 right-4 px-3 py-1 bg-white/90 backdrop-blur rounded-full text-[10px] font-black uppercase text-indigo-600 shadow-sm">
+                                <div className={`absolute top-4 right-4 px-3 py-1 rounded-full text-[10px] font-black uppercase shadow-sm ${hasAccess(asset.tier_required) ? 'bg-white/90 text-indigo-600' : 'bg-gray-900 text-white flex items-center gap-1'}`}>
+                                    {!hasAccess(asset.tier_required) && <div className="w-2 h-2 rounded-full bg-red-500" />}
                                     {asset.tier_required}
                                 </div>
                             </div>
@@ -109,13 +135,20 @@ export default function MarketingAssetsPage() {
                                     {asset.description}
                                 </p>
                                 <div className="flex gap-2">
-                                    <a
-                                        href={asset.url}
-                                        target="_blank"
-                                        className="flex-1 py-3 bg-indigo-600 text-white rounded-xl text-xs font-bold text-center hover:bg-indigo-700 transition"
-                                    >
-                                        Download
-                                    </a>
+                                    {hasAccess(asset.tier_required) ? (
+                                        <a
+                                            href={asset.url}
+                                            target="_blank"
+                                            className="flex-1 py-3 bg-indigo-600 text-white rounded-xl text-xs font-bold text-center hover:bg-indigo-700 transition shadow-lg shadow-indigo-200"
+                                        >
+                                            Download Asset
+                                        </a>
+                                    ) : (
+                                        <button disabled className="flex-1 py-3 bg-gray-100 text-gray-400 rounded-xl text-[10px] font-black uppercase tracking-widest cursor-not-allowed flex items-center justify-center gap-2">
+                                            <div className="w-2 h-2 rounded-full bg-orange-400 animate-pulse" />
+                                            {asset.tier_required} Tier Locked
+                                        </button>
+                                    )}
                                     <button className="p-3 bg-[var(--bg-input)] text-[var(--text-primary)] rounded-xl hover:bg-gray-200 transition">
                                         <Share2 className="w-4 h-4" />
                                     </button>

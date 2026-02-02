@@ -1,5 +1,6 @@
 // API Route: Create Lead & Fetch Public Leads
 // Leads are simple contact inquiries (like messages) - no intake links
+export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin, db } from '@/lib/db';
 

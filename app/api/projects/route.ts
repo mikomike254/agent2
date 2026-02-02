@@ -1,4 +1,5 @@
 // app/api/projects/route.ts
+export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
@@ -157,6 +158,14 @@ export async function POST(request: NextRequest) {
 
         if (!client) {
             return NextResponse.json({ error: 'Client profile not found. Please contact support.' }, { status: 400 });
+        }
+
+        // Update Client Phone if provided and different
+        if (body.phoneNumber) {
+            await supabaseAdmin
+                .from('clients')
+                .update({ phone: body.phoneNumber })
+                .eq('id', client.id);
         }
 
         // Validate required fields

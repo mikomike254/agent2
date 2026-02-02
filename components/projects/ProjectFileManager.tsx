@@ -55,7 +55,7 @@ export default function ProjectFileManager({ projectId }: { projectId: string })
         // For this demo/implementation, we'll simulate the storage URL 
         // but save the metadata to the DB.
 
-        const mockUrl = `https://storage.nexus-agency.com/projects/${projectId}/${file.name}`;
+        const mockUrl = `https://storage.creative.ke/projects/${projectId}/${file.name}`;
 
         try {
             const res = await fetch(`/api/projects/${projectId}/files`, {

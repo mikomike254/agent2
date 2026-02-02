@@ -103,6 +103,15 @@ export default function AdminProjectsPage() {
                     <p className="text-gray-500 font-medium italic">Universal control over every work node in CREATIVE.KE.</p>
                 </div>
                 <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
+                    <button
+                        onClick={() => {
+                            import('@/lib/exporter').then(m => m.exportToCSV(projects, 'all_projects_report'));
+                        }}
+                        className="px-6 py-3 bg-white border-2 border-gray-100 rounded-2xl font-bold text-[10px] uppercase tracking-widest text-gray-500 hover:bg-gray-50 flex items-center gap-2 transition-all shadow-sm"
+                    >
+                        <Layers className="w-4 h-4" />
+                        Export Data
+                    </button>
                     <div className="relative group">
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-blue-600 transition-colors" />
                         <input
@@ -162,7 +171,7 @@ export default function AdminProjectsPage() {
                         >
                             {/* God Mode Badge */}
                             <div className="absolute top-0 right-0 p-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <ShieldAlert className="w-5 h-5 text-red-500 animate-pulse" />
+                                <ShieldAlert className="w-5 h-5 text-red-500" />
                             </div>
 
                             <div className="flex justify-between items-start mb-6">
@@ -226,7 +235,7 @@ export default function AdminProjectsPage() {
                                         <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest pl-1">Assignment</label>
                                         <button
                                             onClick={() => setAssignmentProject(project)}
-                                            className="w-full flex items-center justify-between p-2 bg-gray-50 rounded-xl text-[10px] font-black uppercase tracking-tighter hover:bg-gray-100 transition-colors"
+                                            className="w-full flex items-center justify-between p-2 bg-gray-50 rounded-xl text-[10px] font-black uppercase tracking-tighter hover:bg-gray-100 transition-colors border border-transparent hover:border-gray-200"
                                         >
                                             <Users className="w-3 h-3 text-blue-600" />
                                             <span>{project.developer_id ? 'MANAGE' : 'ASSIGN'}</span>

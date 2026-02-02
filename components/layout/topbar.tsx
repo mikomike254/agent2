@@ -40,11 +40,6 @@ export function TopBar({ onMenuClick }: { onMenuClick: () => void }) {
                 {/* Connection Status */}
                 <ConnectionStatus />
 
-                <button className="relative p-3 rounded-2xl bg-gray-50/50 hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-all active:scale-95">
-                    <Bell className="w-5 h-5" />
-                    <span className="absolute top-2.5 right-2.5 w-2.5 h-2.5 bg-indigo-500 rounded-full border-2 border-white shadow-sm animate-pulse"></span>
-                </button>
-
                 <div className="h-10 w-px bg-gray-100 hidden md:block"></div>
 
                 {/* Profile */}

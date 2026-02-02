@@ -372,8 +372,10 @@ export default function HomePage() {
           <div className="grid md:grid-cols-4 gap-8 mb-12">
             <div>
               <div className="flex items-center gap-2 font-semibold mb-6">
-                <div className="w-8 h-8 bg-black rounded-full flex items-center justify-center text-white text-xs">T</div>
-                <span>Tech Developers</span>
+                <div className="w-10 h-10 bg-black rounded-2xl flex items-center justify-center text-white font-black text-xl rotate-3">
+                  K
+                </div>
+                <span className="text-xl font-black tracking-tighter">CREATIVE<span className="text-gray-400">.KE</span></span>
               </div>
               <p className="text-sm text-gray-600">Secure development projects with escrow protection across Kenya and East Africa.</p>
             </div>
@@ -407,7 +409,7 @@ export default function HomePage() {
           </div>
 
           <div className="border-t border-gray-200 pt-8 text-center text-sm text-gray-600">
-            <p>&copy; 2026 Tech Developers KE & EA. All rights reserved.</p>
+            <p>&copy; {new Date().getFullYear()} CREATIVE.KE | Built for the East African Digital Economy.</p>
           </div>
         </footer>
       </div>

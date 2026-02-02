@@ -12,7 +12,7 @@ interface ActivityLog {
     user_agent?: string;
 }
 
-export async function logNexusActivity(log: ActivityLog) {
+export async function logCreativeActivity(log: ActivityLog) {
     if (!supabaseAdmin) {
         console.warn('Logging attempt failed: Supabase Admin not initialized');
         return;
@@ -37,6 +37,6 @@ export async function logNexusActivity(log: ActivityLog) {
             console.error('Database logging error:', error);
         }
     } catch (err) {
-        console.error('Nexus audit logging failed unexpectedly:', err);
+        console.error('Creative audit logging failed unexpectedly:', err);
     }
 }

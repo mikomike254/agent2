@@ -31,6 +31,7 @@ export default function CreateProjectPage() {
         budget: '',
         timeline: '',
         skills: '',
+        phoneNumber: '', // [NEW] Added for client contact
         attachments: [] as File[] // Handling files separately usually
     });
 
@@ -63,6 +64,7 @@ export default function CreateProjectPage() {
                 budget: parseFloat(formData.budget) || 0,
                 timeline: formData.timeline,
                 skills: formData.skills.split(',').map(s => s.trim()).filter(Boolean),
+                phoneNumber: formData.phoneNumber,
                 // attachments: handled separately or via another endpoint if schema supports links
             };
 

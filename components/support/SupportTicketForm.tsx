@@ -49,7 +49,7 @@ export default function SupportTicketForm({ role }: { role: string }) {
 
             <div>
                 <h1 className="text-3xl font-black text-gray-900 tracking-tight">Create New Support Ticket</h1>
-                <p className="text-gray-500 mt-2 font-medium">Describe your issue and the Nexus team will get back to you shortly.</p>
+                <p className="text-gray-500 mt-2 font-medium">Describe your issue and the CREATIVE.KE team will get back to you shortly.</p>
             </div>
 
             <Card className="p-8 border-gray-100 shadow-xl shadow-gray-100">

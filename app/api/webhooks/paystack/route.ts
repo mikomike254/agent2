@@ -44,28 +44,105 @@ export async function POST(request: NextRequest) {
                 .single();
 
             if (payment) {
-                // Update payment with actual transaction ID from Paystack
+                // 1. Update payment to VERIFIED immediately (Auto-Verify)
                 await supabaseAdmin
                     .from('payments')
                     .update({
                         tx_hash: reference,
-                        status: 'pending_verification', // Keeps original flow (Awaits admin verification)
+                        status: 'verified',
                         updated_at: new Date().toISOString()
                     })
                     .eq('id', payment.id);
 
-                // Update lead status to deposit_paid (redundant but safe)
+                // 2. Update lead status
                 await supabaseAdmin
                     .from('leads')
                     .update({ status: 'deposit_paid' })
                     .eq('id', projectId);
 
+                // 3. COMMISSION DISTRIBUTION LOGIC
+                try {
+                    // Fetch Project to get Commissioner
+                    const { data: project } = await supabaseAdmin
+                        .from('projects')
+                        .select('commissioner_id, title')
+                        .eq('id', projectId)
+                        .single();
+
+                    if (project?.commissioner_id) {
+                        const amountPaid = data.amount / 100; // Convert kobo/cents to main currency
+
+                        // Fetch Commissioner Details (including parent for override)
+                        const { data: commissioner } = await supabaseAdmin
+                            .from('commissioners')
+                            .select('id, user_id, tier, parent_commissioner_id')
+                            .eq('id', project.commissioner_id)
+                            .single();
+
+                        if (commissioner) {
+                            // A. Direct Commission (10%)
+                            const directRate = 0.10;
+                            const directComm = amountPaid * directRate;
+
+                            await supabaseAdmin.from('commissions').insert({
+                                commissioner_id: commissioner.id,
+                                project_id: projectId,
+                                amount: directComm,
+                                status: 'pending', // Pending real payout release
+                                note: `Direct Commission (10%) for ${project.title}`
+                            });
+
+                            // Notify Commissioner
+                            await db.createNotification(
+                                commissioner.user_id,
+                                'financial',
+                                'Commission Earned! 💰',
+                                `You earned KES ${directComm.toLocaleString()} from ${project.title}.`
+                            );
+
+                            // B. Override Commission (5%) if Parent exists
+                            if (commissioner.parent_commissioner_id) {
+                                // Fetch Parent User ID for notification
+                                const { data: parent } = await supabaseAdmin
+                                    .from('commissioners')
+                                    .select('id, user_id')
+                                    .eq('id', commissioner.parent_commissioner_id)
+                                    .single();
+
+                                if (parent) {
+                                    const overrideRate = 0.05;
+                                    const overrideComm = amountPaid * overrideRate;
+
+                                    await supabaseAdmin.from('commissions').insert({
+                                        commissioner_id: parent.id,
+                                        project_id: projectId,
+                                        amount: overrideComm,
+                                        status: 'pending',
+                                        note: `Override Commission (5%) from downline project: ${project.title}`
+                                    });
+
+                                    // Notify Parent
+                                    await db.createNotification(
+                                        parent.user_id,
+                                        'financial',
+                                        'Override Commission! 🚀',
+                                        `You earned KES ${overrideComm.toLocaleString()} from your team's activity.`
+                                    );
+                                }
+                            }
+                        }
+                    }
+                } catch (commError) {
+                    console.error('Commission Calculation Failed:', commError);
+                    // Don't fail the webhook, just log it. Admin can fix manually.
+                }
+
                 // Create audit log
                 await db.createAuditLog(
                     payment.payer_id || projectId,
                     'client',
-                    'payment_webhook_received',
-                    { payment_id: payment.id, gateway: 'paystack', reference }
+                    'payment_verified_auto',
+                    { payment_id: payment.id, gateway: 'paystack', reference, amount: data.amount / 100 }
                 );
 
                 // Send email receipt
@@ -88,8 +165,8 @@ export async function POST(request: NextRequest) {
                         await db.createNotification(
                             admin.id,
                             'in_app',
-                            'New Paystack Payment Received',
-                            `A deposit of ${data.currency} ${data.amount / 100} has been paid and is pending verification.`
+                            'Payment Verified & Commissions Distributed',
+                            `Deposit of ${data.currency} ${data.amount / 100} received and commissions allocated.`
                         );
                     }
                 }

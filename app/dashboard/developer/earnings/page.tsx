@@ -108,7 +108,12 @@ export default function DeveloperEarningsPage() {
                         <History className="w-4 h-4 text-indigo-500" />
                         Payout History
                     </h3>
-                    <button className="text-xs font-bold text-indigo-600 hover:text-indigo-700 flex items-center gap-1">
+                    <button
+                        onClick={() => {
+                            import('@/lib/exporter').then(m => m.exportToCSV(earnings, 'earnings_report'));
+                        }}
+                        className="text-xs font-bold text-indigo-600 hover:text-indigo-700 flex items-center gap-1"
+                    >
                         <Download className="w-4 h-4" />
                         CSV Export
                     </button>

@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { supabaseAdmin } from '@/lib/db';
+import { sendEmail } from '@/lib/emailjs';
 
 export async function POST(request: NextRequest) {
     try {
@@ -46,8 +47,18 @@ export async function POST(request: NextRequest) {
 
         if (invoiceError) throw invoiceError;
 
-        // TODO: Send email with invoice (integrate with email service)
-        // For now, we just create the record
+        // Send invoice email
+        try {
+            await sendEmail({
+                to_email: email,
+                to_name: session.user.name || 'Client',
+                subject: `Invoice for ${payment.projects?.title || 'Your Project'}`,
+                message: `Your invoice for KES ${payment.amount.toLocaleString()} has been generated. Please check your dashboard for details.`,
+            });
+        } catch (emailError) {
+            console.error('Failed to send invoice email:', emailError);
+            // Continue even if email fails
+        }
 
         return NextResponse.json({
             success: true,

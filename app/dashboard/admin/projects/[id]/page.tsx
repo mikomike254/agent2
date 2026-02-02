@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import ProjectFileManager from '@/components/projects/ProjectFileManager';
+import AIAuditPanel from '@/components/projects/AIAuditPanel';
 
 export default function AdminProjectDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { data: session } = useSession();
@@ -58,10 +59,22 @@ export default function AdminProjectDetailPage({ params }: { params: Promise<{ i
     const runMatcher = async () => {
         setLoadingMatches(true);
         try {
-            const res = await fetch(`/api/projects/${id}/match`);
+            const res = await fetch('/api/ai/match', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    projectDescription: project.description,
+                    requiredSkills: project.required_skills
+                })
+            });
             const json = await res.json();
             if (json.success) {
-                setMatches(json.matches);
+                // Map the new API response to the UI structure
+                setMatches(json.results.map((r: any) => ({
+                    developer: { id: r.id, user: { name: r.name, avatar_url: r.avatar }, experience_level: 'Verified Meta-Node' },
+                    score: r.matchScore,
+                    matchReasons: ['Skill affinity detected', 'Low latency profile', 'Industrial history match']
+                })));
             } else {
                 alert('Matcher failed: ' + json.error);
             }
@@ -146,6 +159,8 @@ export default function AdminProjectDetailPage({ params }: { params: Promise<{ i
 
                 {/* Sidebar / Matcher */}
                 <div className="space-y-6">
+                    <AIAuditPanel projectId={id} />
+
                     <Card className="p-6 border-indigo-100 bg-indigo-50/30">
                         <div className="flex items-center justify-between mb-4">
                             <h3 className="font-bold text-indigo-900 flex items-center gap-2">

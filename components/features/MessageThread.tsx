@@ -4,6 +4,7 @@ import { useSession } from 'next-auth/react';
 import { useState, useEffect, useRef } from 'react';
 import { Send, Loader2, User } from 'lucide-react';
 import { Card } from '@/components/ui/card';
+import UserAvatar from '@/components/UserAvatar';
 
 interface Message {
     id: string;
@@ -13,6 +14,7 @@ interface Message {
     sender: {
         name: string;
         role: string;
+        avatar_url?: string;
     };
 }
 
@@ -113,9 +115,19 @@ export function MessageThread({ conversationId }: MessageThreadProps) {
                                         } rounded-2xl px-4 py-3 shadow-sm`}
                                 >
                                     {!isOwn && (
-                                        <p className="text-xs font-semibold mb-1 opacity-70">
-                                            {msg.sender.name}
-                                        </p>
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <UserAvatar
+                                                user={{
+                                                    name: msg.sender.name,
+                                                    avatar_url: msg.sender.avatar_url,
+                                                    role: msg.sender.role
+                                                }}
+                                                size="sm"
+                                            />
+                                            <p className="text-xs font-semibold opacity-70">
+                                                {msg.sender.name}
+                                            </p>
+                                        </div>
                                     )}
                                     <p className="text-sm whitespace-pre-wrap break-words">
                                         {msg.content}

@@ -65,10 +65,12 @@ export function RealtimeProvider({ children }: { children: React.ReactNode }) {
                     filter: config.filter,
                 },
                 (payload) => {
+                    console.log(`[Realtime] Event received on ${config.table}:`, payload);
                     config.callback(payload);
                 }
             )
             .subscribe((status) => {
+                console.log(`[Realtime] Subscription status for ${uniqueChannelName}:`, status);
                 if (status === 'SUBSCRIBED') {
                     setConnectionStatus('connected');
                 } else if (status === 'CLOSED' || status === 'CHANNEL_ERROR') {

@@ -1,46 +1,42 @@
 @import "tailwindcss";
 
 :root {
-  /* CREATIVE.KE - Crextio Aesthetic (Warm & Premium) */
-  --primary: #1a1a1a;
-  /* Dark Onyx */
-  --primary-light: #404040;
-  /* Charcoal Gray */
-  --secondary: #eae6d8;
-  /* Warm Beige (App Background) */
-  --accent: #fbbf24;
-  /* Gold (State/Action Highlights) */
+  /* Light Mode - Cyan Gradient Theme */
+  --primary: #00D4FF;
+  --secondary: #020024;
+  --accent: #00D4FF;
+
+  /* Gradient Definitions */
+  --gradient-primary: linear-gradient(135deg, #00D4FF 0%, #020024 100%);
+  --gradient-glow: linear-gradient(135deg, #00D4FF 0%, #0099CC 50%, #020024 100%);
 
   /* Functional Colors */
-  --success: #059669;
-  --warning: #d97706;
-  --danger: #dc2626;
+  --success: #00FF88;
+  --warning: #FFD700;
+  --danger: #FF006E;
 
-  /* Backgrounds */
-  --bg-app: #eae6d8;
-  /* Warm Beige Base */
-  --bg-card: #ffffff;
-  /* Pure White for offset */
-  --bg-sidebar: #eae6d8;
-  /* Sidebar matches app bg for "Integrated" look */
-  --bg-input: #f5f4ef;
-  /* Slightly darker beige */
+  /* Backgrounds - Crisp White */
+  --bg-app: #FFFFFF;
+  --bg-card: #FFFFFF;
+  --bg-sidebar: #FFFFFF;
+  --bg-input: #FAFAFA;
 
-  /* Text */
-  --text-primary: #1a1a1a;
-  /* Sharp Dark */
-  --text-secondary: #737373;
-  /* Neutral Muted */
-  --text-muted: #a3a3a3;
-  /* Subtle Placeholders */
-  --border-color: rgba(26, 26, 26, 0.05);
+  /* Text - Black for Light Mode */
+  --text-primary: #000000;
+  --text-secondary: #4A4A4A;
+  --text-muted: #808080;
+
+  /* Borders - Thin Black */
+  --border-color: #000000;
+  --border-subtle: rgba(0, 0, 0, 0.12);
+  --border-light: rgba(0, 0, 0, 0.06);
 
   /* Modern Shadows & Smooth Radii */
   --radius-xl: 3rem;
-  /* Crextio Signature Radii */
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-soft: 0 4px 20px -2px rgba(0, 0, 0, 0.03), 0 2px 10px -2px rgba(0, 0, 0, 0.02);
-  --shadow-hover: 0 25px 50px -12px rgba(26, 26, 26, 0.08);
+  --shadow-sm: 0 1px 2px 0 rgba(0, 212, 255, 0.05);
+  --shadow-soft: 0 4px 20px -2px rgba(0, 212, 255, 0.1), 0 2px 10px -2px rgba(0, 212, 255, 0.05);
+  --shadow-hover: 0 25px 50px -12px rgba(0, 212, 255, 0.25);
+  --shadow-glow: 0 0 30px rgba(0, 212, 255, 0.3);
 }
 
 .font-serif {
@@ -48,25 +44,35 @@
 }
 
 :root[class~="dark"] {
-  /* Dark Mode - Improved Colors */
-  --bg-app: #0f1419;
-  /* Softer dark background */
-  --bg-card: #1a1f2e;
-  /* Balanced card background */
-  --bg-sidebar: #14181f;
-  /* Slightly lighter sidebar */
-  --bg-input: #242b3a;
-  /* Softer input background */
+  /* Dark Mode - Purple Gradient Theme */
+  --primary: #3A0CA3;
+  --secondary: #050505;
+  --accent: #3A0CA3;
 
-  --text-primary: #e8eaf0;
-  /* Softer white */
-  --text-secondary: #a8abb7;
-  /* Better mid-tone */
-  --text-muted: #6b7280;
-  /* Muted gray */
+  /* Gradient Definitions */
+  --gradient-primary: linear-gradient(135deg, #3A0CA3 0%, #050505 100%);
+  --gradient-glow: linear-gradient(135deg, #3A0CA3 0%, #7209B7 50%, #050505 100%);
 
-  --shadow-soft: 0 4px 20px -2px rgba(0, 0, 0, 0.3);
-  --shadow-hover: 0 10px 30px -5px rgba(99, 102, 241, 0.4);
+  /* Backgrounds - Pure Black */
+  --bg-app: #000000;
+  --bg-card: #000000;
+  --bg-sidebar: #000000;
+  --bg-input: #0A0A0A;
+
+  /* Text - White for Dark Mode */
+  --text-primary: #FFFFFF;
+  --text-secondary: #D4D4D4;
+  --text-muted: #8F8F8F;
+
+  /* Borders - White */
+  --border-color: #FFFFFF;
+  --border-subtle: rgba(255, 255, 255, 0.18);
+  --border-light: rgba(255, 255, 255, 0.1);
+
+  /* Shadows */
+  --shadow-soft: 0 4px 20px -2px rgba(58, 12, 163, 0.3);
+  --shadow-hover: 0 10px 30px -5px rgba(58, 12, 163, 0.5);
+  --shadow-glow: 0 0 40px rgba(58, 12, 163, 0.4);
 }
 
 @theme inline {
@@ -98,15 +104,78 @@ body {
 }
 
 :root[class~="dark"] .card-soft {
-  background: rgba(26, 26, 26, 0.7);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.03);
+  background: #000000;
+  box-shadow: 0 4px 24px -2px rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--border-color);
 }
 
 .card-soft:hover {
   transform: translateY(-4px);
   box-shadow: var(--shadow-hover);
-  border-color: rgba(99, 102, 241, 0.2);
+  border-color: var(--primary);
+}
+
+/* Gradient Utilities - Clean Professional Look */
+.gradient-bg {
+  background: var(--gradient-primary);
+}
+
+.gradient-text {
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-icon {
+  background: var(--gradient-glow);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-border {
+  position: relative;
+  background: var(--bg-card);
+  background-clip: padding-box;
+  border: 1px solid var(--border-subtle);
+}
+
+/* Hover effects instead of glows */
+.sidebar-item.active {
+  background: var(--gradient-primary);
+  color: #ffffff;
+  font-weight: 700;
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-primary {
+  background: var(--gradient-primary);
+  color: white;
+  border-radius: 12px;
+  padding: 0.75rem 1.75rem;
+  font-weight: 700;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-hover);
+  opacity: 0.95;
+}
+
+.gradient-border::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 2px;
+  background: var(--gradient-primary);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
 }
 
 .glass-morphism {
@@ -117,8 +186,9 @@ body {
 }
 
 :root[class~="dark"] .glass-morphism {
-  background: rgba(17, 24, 39, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(16px) saturate(180%);
 }
 
 .custom-scrollbar::-webkit-scrollbar {
@@ -130,16 +200,18 @@ body {
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(99, 102, 241, 0.1);
+  background: var(--primary);
+  opacity: 0.2;
   border-radius: 10px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(99, 102, 241, 0.2);
+  background: var(--primary);
+  opacity: 0.4;
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #6366f1, #8b5cf6, #d946ef);
+  background: var(--gradient-primary);
   background-size: 200% auto;
   color: white;
   border-radius: 16px;
@@ -148,32 +220,47 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.025em;
   transition: all 0.4s ease;
-  box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.4);
+  box-shadow: var(--shadow-glow);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--gradient-glow);
+  opacity: 0;
+  transition: opacity 0.4s ease;
 }
 
 .btn-primary:hover {
   transform: translateY(-2px);
   background-position: right center;
-  box-shadow: 0 15px 25px -5px rgba(99, 102, 241, 0.5);
+  box-shadow: var(--shadow-hover);
+}
+
+.btn-primary:hover::before {
+  opacity: 1;
 }
 
 .sidebar-item {
   border-radius: 100px;
-  /* Pill Shape */
   color: var(--text-secondary);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   margin-bottom: 2px;
+  position: relative;
 }
 
 .sidebar-item.active {
-  background: var(--primary);
+  background: var(--gradient-primary);
   color: #ffffff;
   font-weight: 700;
-  box-shadow: var(--shadow-soft);
+  box-shadow: var(--shadow-glow);
 }
 
 .sidebar-item:hover:not(.active) {
-  background: rgba(26, 26, 26, 0.05);
+  background: rgba(var(--primary), 0.05);
   color: var(--text-primary);
 }
 
@@ -323,4 +410,51 @@ body {
 
 .delay-400 {
   animation-delay: 0.4s;
+}
+
+/* Enhanced UI Animations */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes border-pulse {
+
+  0%,
+  100% {
+    border-color: var(--border-subtle);
+  }
+
+  50% {
+    border-color: var(--border-color);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.5s ease-out forwards;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.6s ease-out forwards;
+}
+
+.animate-border-pulse {
+  animation: border-pulse 2s ease-in-out infinite;
 }

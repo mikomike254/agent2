@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { supabaseAdmin } from '@/lib/db';
-import { logNexusActivity } from '@/lib/audit';
+import { logCreativeActivity } from '@/lib/audit';
 
 export async function POST(
     req: NextRequest,
@@ -41,7 +41,7 @@ export async function POST(
         if (updateError) throw updateError;
 
         // Log the arbitration activity
-        await logNexusActivity({
+        await logCreativeActivity({
             actor_id: (session.user as any).id,
             actor_email: session.user.email || undefined,
             actor_role: 'admin',

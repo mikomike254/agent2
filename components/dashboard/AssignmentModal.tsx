@@ -191,7 +191,7 @@ export default function AssignmentModal({
                 {isUpdating && (
                     <div className="absolute inset-0 bg-white/60 backdrop-blur-sm z-10 flex items-center justify-center flex-col gap-4">
                         <Loader2 className="w-12 h-12 text-blue-600 animate-spin" />
-                        <p className="text-xs font-black text-gray-900 uppercase tracking-widest animate-pulse">Re-routing Nexus Assignments</p>
+                        <p className="text-xs font-black text-gray-900 uppercase tracking-widest animate-pulse">Re-routing CREATIVE.KE Assignments</p>
                     </div>
                 )}
             </Card>

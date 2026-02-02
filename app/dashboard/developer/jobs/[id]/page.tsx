@@ -10,6 +10,9 @@ import ProjectFileManager from '@/components/projects/ProjectFileManager';
 import ProjectChat from '@/components/dashboard/ProjectChat';
 import MilestoneChecklist from '@/components/developer/MilestoneChecklist';
 import DisputeWidget from '@/components/disputes/DisputeWidget';
+import ProjectVersionManager from '@/components/projects/ProjectVersionManager';
+import TimeTracker from '@/components/projects/TimeTracker';
+import AIAuditPanel from '@/components/projects/AIAuditPanel';
 
 export default function DeveloperProjectDetailPage() {
     const params = useParams();
@@ -114,10 +117,16 @@ export default function DeveloperProjectDetailPage() {
                             </div>
                         </Card>
                     )}
+
+                    {/* Version History Section */}
+                    <ProjectVersionManager projectId={params.id as string} role="developer" />
                 </div>
 
                 {/* Sidebar */}
                 <div className="space-y-8">
+                    <TimeTracker projectId={project.id} />
+                    <AIAuditPanel projectId={project.id} />
+
                     <Card className="p-8 border-gray-100 bg-gradient-to-br from-indigo-600 to-indigo-800 text-white">
                         <div className="flex items-center justify-between mb-6">
                             <h3 className="font-bold">Project Financials</h3>

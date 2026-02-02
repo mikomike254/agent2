@@ -65,7 +65,10 @@ export const db = {
       `)
             .eq('id', id)
             .single();
-        if (error) throw error;
+        if (error) {
+            console.error(`Error fetching project ${id}:`, error);
+            return null;
+        }
         return data;
     },
 
@@ -204,6 +207,21 @@ export const db = {
             .select()
             .single();
         if (error) throw error;
+        return data;
+    },
+
+    async getNotifications(userId: string) {
+        if (!supabaseAdmin) throw new Error('Supabase Admin not initialized');
+        const { data, error } = await supabaseAdmin
+            .from('notifications')
+            .select('*')
+            .eq('user_id', userId)
+            .order('created_at', { ascending: false })
+            .limit(30);
+        if (error) {
+            console.error('Error fetching notifications:', error);
+            return [];
+        }
         return data;
     }
 };

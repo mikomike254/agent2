@@ -21,12 +21,26 @@ import { Button } from "@/components/ui/button";
 
 export default function CRMDashboard() {
     const [leads, setLeads] = useState<any[]>([]);
+    const [activities, setActivities] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const supabase = createClient();
 
     useEffect(() => {
         fetchCRMData();
+        fetchActivities();
     }, []);
+
+    async function fetchActivities() {
+        try {
+            const res = await fetch('/api/admin/activity?limit=5');
+            const data = await res.json();
+            if (data.success) {
+                setActivities(data.activities);
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    }
 
     async function fetchCRMData() {
         setLoading(true);
@@ -205,27 +219,26 @@ export default function CRMDashboard() {
                     </CardHeader>
                     <CardContent className="p-0">
                         <div className="divide-y divide-slate-50">
-                            {[
-                                { type: 'conversion', text: 'Lead converted to active project', client: 'Green School', time: '2 hours ago', icon: Briefcase, color: 'bg-emerald-50 text-emerald-600' },
-                                { type: 'payment', text: 'Deposit verified & escrow secured', client: 'M-Gas Portal', time: '5 hours ago', icon: ShieldCheck, color: 'bg-blue-50 text-blue-600' },
-                                { type: 'milestone', text: 'Milestone 1 delivered (UX Design)', client: 'Equity Dev', time: 'Yesterday', icon: CheckCircle2, color: 'bg-purple-50 text-purple-600' },
-                                { type: 'new_lead', text: 'New project inquiry received', client: 'Aisha J.', time: 'Jan 26', icon: User, color: 'bg-slate-50 text-slate-600' }
-                            ].map((event, i) => (
-                                <div key={i} className="flex gap-4 p-6 hover:bg-slate-50/30 transition-colors">
-                                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${event.color}`}>
-                                        <event.icon className="w-5 h-5" />
-                                    </div>
-                                    <div className="flex-1">
-                                        <div className="flex justify-between items-start">
-                                            <p className="text-sm font-semibold text-slate-900">{event.text}</p>
-                                            <span className="text-[10px] font-medium text-slate-400 flex items-center gap-1 uppercase">
-                                                <Clock className="w-3 h-3" /> {event.time}
-                                            </span>
+                            {activities.length === 0 ? (
+                                <div className="p-6 text-center text-slate-400 text-sm">No recent activity</div>
+                            ) : (
+                                activities.map((event, i) => (
+                                    <div key={i} className="flex gap-4 p-6 hover:bg-slate-50/30 transition-colors">
+                                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-indigo-50 text-indigo-600`}>
+                                            <Briefcase className="w-5 h-5" />
                                         </div>
-                                        <p className="text-xs text-slate-500 mt-1">Project: <span className="font-medium text-slate-700">{event.client}</span></p>
+                                        <div className="flex-1">
+                                            <div className="flex justify-between items-start">
+                                                <p className="text-sm font-semibold text-slate-900">{event.action}</p>
+                                                <span className="text-[10px] font-medium text-slate-400 flex items-center gap-1 uppercase">
+                                                    <Clock className="w-3 h-3" /> {new Date(event.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                </span>
+                                            </div>
+                                            <p className="text-xs text-slate-500 mt-1">Actor: <span className="font-medium text-slate-700">{event.actor_name || event.actor_email}</span></p>
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
+                                ))
+                            )}
                         </div>
                     </CardContent>
                 </Card>

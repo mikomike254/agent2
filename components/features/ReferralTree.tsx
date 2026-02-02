@@ -44,6 +44,16 @@ export default function ReferralTree() {
         </div>
     );
 
+    const totalReferrals = referrals.length;
+    const recentReferrals = referrals.filter(r => {
+        const joinDate = new Date(r.created_at);
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        return joinDate > thirtyDaysAgo;
+    }).length;
+
+    const growthRate = totalReferrals > 0 ? Math.round((recentReferrals / totalReferrals) * 100) : 0;
+
     return (
         <div className="space-y-8">
             {/* Stats Bar */}
@@ -55,7 +65,7 @@ export default function ReferralTree() {
                         </div>
                         <div>
                             <p className="text-xs font-black text-indigo-400 uppercase tracking-widest">Network Size</p>
-                            <h3 className="text-2xl font-black text-indigo-900">{referrals.length}</h3>
+                            <h3 className="text-2xl font-black text-indigo-900">{totalReferrals} Members</h3>
                         </div>
                     </div>
                 </Card>
@@ -65,8 +75,8 @@ export default function ReferralTree() {
                             <TrendingUp className="w-6 h-6" />
                         </div>
                         <div>
-                            <p className="text-xs font-black text-green-400 uppercase tracking-widest">Growth Rate</p>
-                            <h3 className="text-2xl font-black text-green-900">+12%</h3>
+                            <p className="text-xs font-black text-green-400 uppercase tracking-widest">30D Growth</p>
+                            <h3 className="text-2xl font-black text-green-900">+{growthRate}%</h3>
                         </div>
                     </div>
                 </Card>
@@ -76,8 +86,8 @@ export default function ReferralTree() {
                             <Star className="w-6 h-6" />
                         </div>
                         <div>
-                            <p className="text-xs font-black text-orange-400 uppercase tracking-widest">Trust Score</p>
-                            <h3 className="text-2xl font-black text-orange-900">Elite</h3>
+                            <p className="text-xs font-black text-orange-400 uppercase tracking-widest">Active nodes</p>
+                            <h3 className="text-2xl font-black text-orange-900">{recentReferrals} Recent</h3>
                         </div>
                     </div>
                 </Card>

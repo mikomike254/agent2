@@ -12,8 +12,7 @@ function JoinContent() {
     useEffect(() => {
         if (referralCode) {
             // Store referral code in cookie for 30 days
-            document.cookie = `nexus_ref=${referralCode}; path=/; max-age=${30 * 24 * 60 * 60}; SameSite=Lax`;
-            console.log('Referral captured:', referralCode);
+            document.cookie = `creative_ref=${referralCode}; path=/; max-age=${30 * 24 * 60 * 60}; SameSite=Lax`;
         }
     }, [referralCode]);
 

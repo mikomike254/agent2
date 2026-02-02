@@ -4,41 +4,7 @@ import { useState, useEffect } from 'react';
 import { DollarSign, CheckCircle, AlertTriangle, ShieldCheck, ChevronRight, Loader2 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { supabaseClient } from '@/lib/db';
-const MOCK_PAYOUTS = [
-    {
-        id: 101,
-        requestor: 'Mark Ochieng',
-        role: 'Direct Commissioner',
-        amount: 25000,
-        project: 'E-commerce Redesign (Proj-102)',
-        reason: '25% Direct Commission',
-        status: 'pending',
-        project_status: 'completed',
-        date: '2h ago'
-    },
-    {
-        id: 102,
-        requestor: 'Alice Wambui (Parent)',
-        role: 'Referrer (Silver)',
-        amount: 5000,
-        project: 'E-commerce Redesign (Proj-102)',
-        reason: '5% Multi-Level Override',
-        status: 'pending',
-        project_status: 'completed',
-        date: '2h ago'
-    },
-    {
-        id: 103,
-        requestor: 'Sarah K.',
-        role: 'Direct Commissioner',
-        amount: 15000,
-        project: 'Logo Design (Proj-105)',
-        reason: '30% Direct Commission',
-        status: 'approved',
-        project_status: 'completed',
-        date: '1d ago'
-    }
-];
+
 
 export default function AdminPayoutsPage() {
     const [payouts, setPayouts] = useState<any[]>([]);

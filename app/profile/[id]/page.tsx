@@ -1,201 +1,200 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
 import {
-    Verified,
     Star,
-    MapPin,
-    Link as LinkIcon,
-    Twitter,
-    Github,
     Briefcase,
+    Zap,
     Calendar,
+    ChevronRight,
+    Search,
+    Code,
     MessageSquare,
-    CheckCircle2,
-    ArrowLeft
+    Link as LinkIcon,
+    ArrowUpRight,
+    MapPin,
+    ShieldCheck
 } from 'lucide-react';
-import { Card } from '@/components/ui/card';
+import { useParams } from 'next/navigation';
+import UserAvatar from '@/components/UserAvatar';
+import { UniversalProjectModal } from '@/components/projects/UniversalProjectModal';
 
-export default function PublicProfilePage() {
+export default function PublicProfile() {
     const { id } = useParams();
-    const router = useRouter();
     const [profile, setProfile] = useState<any>(null);
     const [loading, setLoading] = useState(true);
+    const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
 
     useEffect(() => {
         const fetchProfile = async () => {
             try {
-                const res = await fetch(`/api/profiles/${id}`);
+                const res = await fetch(`/api/profile/${id}`);
                 const data = await res.json();
                 if (data.success) {
                     setProfile(data.data);
                 }
             } catch (error) {
-                console.error('Error fetching profile:', error);
+                console.error(error);
             } finally {
                 setLoading(false);
             }
         };
-
-        if (id) fetchProfile();
+        fetchProfile();
     }, [id]);
 
     if (loading) return (
-        <div className="min-h-screen flex items-center justify-center bg-[var(--bg-app)]">
-            <div className="w-12 h-12 border-4 border-[var(--primary)] border-t-transparent rounded-full animate-spin"></div>
+        <div className="flex h-screen items-center justify-center">
+            <div className="w-10 h-10 border-4 border-indigo-100 border-t-indigo-600 rounded-full animate-spin"></div>
         </div>
     );
 
     if (!profile) return (
-        <div className="min-h-screen flex flex-col items-center justify-center bg-[var(--bg-app)] p-4 text-center">
-            <h1 className="text-6xl font-black text-gray-200 mb-4">404</h1>
-            <h2 className="text-2xl font-bold text-gray-900">Profile Not Found</h2>
-            <p className="text-gray-500 mt-2 mb-8">The profile you're looking for doesn't exist or has been moved.</p>
-            <button onClick={() => router.push('/')} className="btn-primary px-8 py-3 rounded-2xl font-bold">Return Home</button>
-        </div>
+        <div className="text-center py-20">Profile not found.</div>
     );
 
     const isCommissioner = profile.role === 'commissioner';
-    const detail = profile.profile || {};
+    const roleData = profile.roleData || {};
 
     return (
-        <div className="min-h-screen bg-gray-50/50">
-            {/* Header / Banner */}
-            <div className="h-64 bg-[var(--primary)] relative">
-                <div className="absolute inset-0 bg-gradient-to-b from-black/20 to-transparent"></div>
-                <button
-                    onClick={() => router.back()}
-                    className="absolute top-8 left-8 p-3 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-2xl text-white transition-all border border-white/20"
-                >
-                    <ArrowLeft className="w-5 h-5" />
-                </button>
-            </div>
+        <div className="max-w-7xl mx-auto pb-20 space-y-12">
+            {/* 1. Hero / Header Card */}
+            <div className="relative bg-white rounded-[3rem] border border-gray-100 p-8 lg:p-16 shadow-2xl shadow-indigo-100/50 overflow-hidden">
+                <div className="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-indigo-50/50 to-transparent"></div>
 
-            <div className="max-w-5xl mx-auto px-4 -mt-32 relative pb-20">
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Sidebar: Profile Info */}
-                    <div className="lg:col-span-1 space-y-6">
-                        <Card className="p-8 border-none shadow-2xl rounded-[2.5rem] bg-white text-center">
-                            <div className="relative inline-block mb-6">
-                                <img
-                                    src={profile.avatar_url || 'https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg'}
-                                    alt={profile.name}
-                                    className="w-32 h-32 rounded-[2.5rem] object-cover border-4 border-white shadow-xl"
-                                />
-                                <div className="absolute -bottom-2 -right-2 bg-[var(--primary)] p-2 rounded-xl text-white shadow-lg">
-                                    <CheckCircle2 className="w-5 h-5" />
-                                </div>
-                            </div>
-
-                            <h1 className="text-2xl font-black text-gray-900 flex items-center justify-center gap-2">
-                                {profile.name}
-                                <Verified className="w-5 h-5 text-blue-500 fill-current" />
-                            </h1>
-                            <p className="text-sm font-bold text-[var(--primary)] uppercase tracking-widest mt-1">
-                                {detail.niche_expertise || (isCommissioner ? 'Platform Commissioner' : 'Development Partner')}
-                            </p>
-
-                            <div className="flex items-center justify-center gap-1 mt-4">
-                                {[1, 2, 3, 4, 5].map(s => (
-                                    <Star key={s} className="w-4 h-4 text-orange-400 fill-current" />
-                                ))}
-                                <span className="text-xs font-bold text-gray-400 ml-1">5.0 (24 reviews)</span>
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-4 mt-8 pt-8 border-t border-gray-100">
-                                <div>
-                                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-tighter">Projects</p>
-                                    <p className="text-lg font-black text-gray-900">42</p>
-                                </div>
-                                <div>
-                                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-tighter">Reliability</p>
-                                    <p className="text-lg font-black text-gray-900">99%</p>
-                                </div>
-                            </div>
-
-                            <div className="mt-8 space-y-3">
-                                <button className="w-full bg-gray-900 text-white py-4 rounded-2xl font-bold hover:bg-black transition-all flex items-center justify-center gap-2">
-                                    <MessageSquare className="w-5 h-5" />
-                                    Send Message
-                                </button>
-                                <button
-                                    onClick={() => router.push(`/dashboard/client/new-project?commissionerId=${id}&name=${encodeURIComponent(profile.name)}`)}
-                                    className="w-full bg-[var(--primary)] text-white py-4 rounded-2xl font-bold hover:brightness-110 transition-all flex items-center justify-center gap-2"
-                                >
-                                    <Briefcase className="w-5 h-5" />
-                                    Book Direct
-                                </button>
-                            </div>
-                        </Card>
-
-                        <Card className="p-8 border-none shadow-xl rounded-[2.5rem] bg-white">
-                            <h3 className="text-sm font-black text-gray-900 uppercase tracking-widest mb-6">Contact & Social</h3>
-                            <div className="space-y-4">
-                                <div className="flex items-center gap-3 text-gray-600">
-                                    <MapPin className="w-5 h-5 text-gray-400" />
-                                    <span className="text-sm font-medium">{detail.location || 'Nairobi, Kenya'}</span>
-                                </div>
-                                <div className="flex items-center gap-3 text-gray-600">
-                                    <LinkIcon className="w-5 h-5 text-gray-400" />
-                                    <span className="text-sm font-medium text-[var(--primary)] cursor-pointer hover:underline">portfolio.ke</span>
-                                </div>
-                                <div className="flex items-center gap-3 text-gray-600">
-                                    <Twitter className="w-5 h-5 text-gray-400" />
-                                    <span className="text-sm font-medium">@creative_expert</span>
-                                </div>
-                            </div>
-                        </Card>
+                <div className="relative z-10 flex flex-col lg:flex-row gap-12 items-start lg:items-center">
+                    <div className="w-32 h-32 lg:w-48 lg:h-48 rounded-[3rem] overflow-hidden shadow-2xl border-4 border-white shrink-0">
+                        <UserAvatar user={{ name: profile.name, avatar_url: profile.avatar_url }} size="xl" />
                     </div>
 
-                    {/* Main Content */}
-                    <div className="lg:col-span-2 space-y-8">
-                        <Card className="p-10 border-none shadow-xl rounded-[2.5rem] bg-white">
-                            <h2 className="text-2xl font-black text-gray-900 mb-6 font-primary">About {profile.name}</h2>
-                            <p className="text-gray-600 leading-relaxed">
-                                {detail.bio || `${profile.name} is a verified ${profile.role} on the creative.ke platform, specializing in high-quality software delivery and project management. Committed to excellence and transparent communication.`}
-                            </p>
-
-                            <div className="mt-10 grid md:grid-cols-2 gap-8">
-                                <div className="p-6 bg-gray-50 rounded-3xl border border-gray-100">
-                                    <h4 className="font-bold text-gray-900 mb-2 flex items-center gap-2">
-                                        <CheckCircle2 className="w-5 h-5 text-green-500" />
-                                        Verified Role
-                                    </h4>
-                                    <p className="text-xs text-gray-500">Identity and qualifications verified by creative.ke quality assurance team.</p>
-                                </div>
-                                <div className="p-6 bg-gray-50 rounded-3xl border border-gray-100">
-                                    <h4 className="font-bold text-gray-900 mb-2 flex items-center gap-2">
-                                        <Calendar className="w-5 h-5 text-[var(--primary)]" />
-                                        Availability
-                                    </h4>
-                                    <p className="text-xs text-gray-500">Available for new direct bookings starting this week.</p>
-                                </div>
+                    <div className="flex-1 space-y-6">
+                        <div className="space-y-2">
+                            <div className="flex items-center gap-3">
+                                <h1 className="text-4xl lg:text-6xl font-black text-gray-900 tracking-tighter">{profile.name}</h1>
+                                <ShieldCheck className="w-8 h-8 text-indigo-600" />
                             </div>
-                        </Card>
-
-                        <Card className="p-10 border-none shadow-xl rounded-[2.5rem] bg-white">
-                            <div className="flex justify-between items-center mb-10">
-                                <h2 className="text-2xl font-black text-gray-900">Experience</h2>
-                                <span className="px-4 py-1.5 bg-gray-100 rounded-full text-xs font-bold text-gray-500">6 Years Exp.</span>
+                            <div className="flex flex-wrap items-center gap-4 text-sm font-bold text-gray-400 uppercase tracking-widest">
+                                <span className="text-indigo-600 font-black">{profile.role}</span>
+                                <span className="w-1.5 h-1.5 bg-gray-200 rounded-full"></span>
+                                <span className="flex items-center gap-2">
+                                    <MapPin className="w-4 h-4" /> Nairobi, Kenya
+                                </span>
+                                <span className="w-1.5 h-1.5 bg-gray-200 rounded-full"></span>
+                                <span className="flex items-center gap-2 text-amber-500">
+                                    <Star className="w-4 h-4 fill-current" /> {roleData.rating || '5.0'}
+                                </span>
                             </div>
+                        </div>
 
-                            <div className="space-y-10 border-l-2 border-gray-100 ml-4 pl-8 relative">
-                                {[1, 2].map(i => (
-                                    <div key={i} className="relative">
-                                        <div className="absolute -left-10 top-0 w-4 h-4 bg-[var(--primary)] rounded-full border-4 border-white shadow-md"></div>
-                                        <h4 className="font-bold text-gray-900">Lead Project Commissioner</h4>
-                                        <p className="text-xs font-bold text-gray-400 mb-3 uppercase tracking-tighter">creative.ke • 2022 - Present</p>
-                                        <p className="text-sm text-gray-600 leading-loose">
-                                            Managing end-to-end delivery of complex software projects, ensuring 100% client satisfaction and technical excellence.
-                                        </p>
-                                    </div>
-                                ))}
-                            </div>
-                        </Card>
+                        <p className="text-lg text-gray-500 font-medium max-w-2xl leading-relaxed">
+                            {roleData.bio || 'Veteran digital lead focused on delivering high-impact solutions for startups and enterprise clients across East Africa.'}
+                        </p>
+
+                        <div className="flex flex-wrap gap-4 pt-4">
+                            <button
+                                onClick={() => setIsProjectModalOpen(true)}
+                                className="px-10 py-5 bg-indigo-600 text-white rounded-3xl font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-indigo-200 hover:scale-105 active:scale-95 transition-all"
+                            >
+                                Start Project with {profile.name.split(' ')[0]}
+                            </button>
+                            <button
+                                onClick={async () => {
+                                    try {
+                                        const res = await fetch('/api/messages', {
+                                            method: 'POST',
+                                            headers: { 'Content-Type': 'application/json' },
+                                            body: JSON.stringify({ recipientId: profile.user_id })
+                                        });
+                                        const data = await res.json();
+                                        if (data.success) {
+                                            window.location.href = `/dashboard/messages?conversation=${data.data.id}`;
+                                        } else {
+                                            alert('Failed to start conversation');
+                                        }
+                                    } catch (err) {
+                                        console.error(err);
+                                        alert('Error starting conversation');
+                                    }
+                                }}
+                                className="px-10 py-5 bg-white border-2 border-indigo-50 text-indigo-600 rounded-3xl font-black text-xs uppercase tracking-[0.2em] hover:bg-indigo-50 transition-all flex items-center gap-3 shadow-sm hover:shadow-md"
+                            >
+                                <MessageSquare className="w-4 h-4" /> Message
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
+
+            {/* 2. Stats & Metrics Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {[
+                    { label: 'Completed Projects', value: roleData.projects_completed || '47', icon: Briefcase, color: 'indigo' },
+                    { label: 'Success Rate', value: '100%', icon: Zap, color: 'blue' },
+                    { label: 'Avg. Delivery', value: '4 Weeks', icon: Calendar, color: 'purple' },
+                    { label: 'Reliability', value: 'Elite', icon: ShieldCheck, color: 'green' },
+                ].map((stat, i) => (
+                    <div key={i} className="p-10 bg-white rounded-[2.5rem] border border-gray-100 hover:border-indigo-100 transition-colors group">
+                        <div className="w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors mb-6">
+                            <stat.icon className="w-5 h-5" />
+                        </div>
+                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">{stat.label}</p>
+                        <h3 className="text-4xl font-black text-gray-900 tracking-tighter">{stat.value}</h3>
+                    </div>
+                ))}
+            </div>
+
+            {/* 3. Expertise & Portfolio Row */}
+            <div className="grid lg:grid-cols-3 gap-12">
+                <div className="lg:col-span-2 space-y-8">
+                    <div className="flex items-center gap-4 mb-8">
+                        <div className="w-1.5 h-8 bg-indigo-600 rounded-full"></div>
+                        <h2 className="text-3xl font-black text-gray-900 tracking-tight uppercase">Core Expertise</h2>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-2xl">
+                        {roleData.specialization ? (
+                            <div className="p-8 bg-white rounded-3xl border border-gray-50 hover:bg-indigo-50/30 transition-all flex items-center justify-between group col-span-2">
+                                <span className="font-extrabold text-gray-700">{roleData.specialization}</span>
+                                <ArrowUpRight className="w-5 h-5 text-gray-300 group-hover:text-indigo-600" />
+                            </div>
+                        ) : (
+                            ['Enterprise Web Apps', 'Fintech Infrastructure', 'High-Load Backend', 'E-commerce Ops', 'Cloud Architecture', 'Mobile Strategy'].map((exp) => (
+                                <div key={exp} className="p-8 bg-white rounded-3xl border border-gray-50 hover:bg-indigo-50/30 transition-all flex items-center justify-between group">
+                                    <span className="font-extrabold text-gray-700">{exp}</span>
+                                    <ArrowUpRight className="w-5 h-5 text-gray-300 group-hover:text-indigo-600" />
+                                </div>
+                            ))
+                        )}
+                    </div>
+                </div>
+
+                <div className="space-y-8">
+                    <div className="p-10 bg-black rounded-[3rem] text-white space-y-8">
+                        <h3 className="text-2xl font-black tracking-tight flex items-center gap-3">
+                            <Zap className="w-6 h-6 text-indigo-400" />
+                            Availability
+                        </h3>
+                        <div className="p-6 bg-white/10 rounded-2xl border border-white/10 space-y-4">
+                            <div className="flex justify-between items-center">
+                                <span className="text-gray-400 font-bold text-xs uppercase">Current Status</span>
+                                <span className="px-3 py-1 bg-green-500 rounded-full text-[10px] font-black uppercase">Active</span>
+                            </div>
+                            <div className="flex justify-between items-center">
+                                <span className="text-gray-400 font-bold text-xs uppercase">Queue Capacity</span>
+                                <span className="text-lg font-black">2 Slots</span>
+                            </div>
+                        </div>
+                        <button className="w-full py-5 bg-indigo-600 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-indigo-500 transition-all">
+                            Reserve Priority Call
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <UniversalProjectModal
+                isOpen={isProjectModalOpen}
+                onClose={() => setIsProjectModalOpen(false)}
+                role="client" // Assuming a visitor is a client or wants to be
+            />
         </div>
     );
 }

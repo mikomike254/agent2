@@ -20,7 +20,8 @@ import {
     Bell,
     FileText,
     LifeBuoy,
-    X
+    X,
+    Palette
 } from 'lucide-react';
 import { signOut, useSession } from 'next-auth/react';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
@@ -32,7 +33,7 @@ const menuItems = {
         { name: 'Dashboard', icon: LayoutDashboard, href: '/dashboard/admin' },
         { name: 'Approvals', icon: Shield, href: '/dashboard/admin/approvals' },
         { name: 'Payments', icon: CreditCard, href: '/dashboard/admin/payments' },
-        { name: 'Ledger', icon: FileText, href: '/dashboard/admin/ledger' },
+        { name: 'Ledger', icon: FileText, href: '/dashboard/admin/finances' },
         { name: 'Projects', icon: Briefcase, href: '/dashboard/admin/projects' },
         { name: 'Support', icon: LifeBuoy, href: '/dashboard/admin/support' },
         { name: 'Marketing', icon: Megaphone, href: '/dashboard/admin/marketing' },
@@ -43,6 +44,7 @@ const menuItems = {
     ],
     client: [
         { name: 'Dashboard', icon: LayoutDashboard, href: '/dashboard/client' },
+        { name: 'Browse Partners', icon: Search, href: '/dashboard/client/commissioners' },
         { name: 'Payments', icon: CreditCard, href: '/dashboard/client/payments' },
         { name: 'My Projects', icon: Briefcase, href: '/dashboard/client/projects' },
         { name: 'Messages', icon: MessageSquare, href: '/dashboard/client/messages' },
@@ -55,6 +57,7 @@ const menuItems = {
         { name: 'Leads', href: '/dashboard/commissioner/leads', icon: Target },
         { name: 'Invoices', href: '/dashboard/commissioner/invoices', icon: CreditCard },
         { name: 'Marketing', href: '/dashboard/commissioner/marketing', icon: Megaphone },
+        { name: 'Branding', href: '/dashboard/commissioner/branding', icon: Palette },
         { name: 'Team', href: '/dashboard/commissioner/team', icon: Users },
         { name: 'Messages', href: '/dashboard/commissioner/messages', icon: MessageSquare },
         { name: 'Profile', href: '/dashboard/profile', icon: User },
@@ -111,7 +114,7 @@ export function Sidebar({
                         {/* Brand */}
                         <div className="p-8 pb-4 flex items-center justify-between">
                             <div>
-                                <h1 className="text-3xl font-black bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 tracking-tighter">
+                                <h1 className="text-3xl font-black gradient-text tracking-tighter">
                                     CREATIVE.KE
                                 </h1>
                                 <p className="text-[10px] text-gray-400 mt-1 uppercase tracking-widest font-black">Agency Hub</p>
@@ -127,7 +130,7 @@ export function Sidebar({
                         {/* User Profile Snippet */}
                         <div className="px-8 pb-6">
                             <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-2xl border border-gray-100">
-                                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold shadow-md ring-2 ring-white">
+                                <div className="w-10 h-10 rounded-full gradient-bg flex items-center justify-center text-white font-bold shadow-md ring-2 ring-white">
                                     {session?.user?.image ? (
                                         <img src={session.user.image} alt="Profile" className="w-full h-full rounded-full object-cover" />
                                     ) : (
@@ -188,7 +191,7 @@ export function Sidebar({
                                 <ThemeToggle />
                             </div>
                             <button
-                                onClick={() => signOut({ callbackUrl: 'https://nighaa.netlify.app/' })}
+                                onClick={() => signOut({ callbackUrl: '/' })}
                                 className="flex items-center gap-4 px-4 py-4 w-full rounded-2xl text-gray-500 hover:bg-red-50 hover:text-red-600 transition-all duration-300 group font-bold text-sm"
                             >
                                 <LogOut className="w-5 h-5 transition-transform group-hover:-translate-x-1" />

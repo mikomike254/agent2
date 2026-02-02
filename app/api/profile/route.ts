@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
                 // Auto-create missing commissioner profile
                 const { data: newComm, error: createError } = await supabaseAdmin
                     .from('commissioners')
-                    .insert({ user_id: userId, rating: 5.0, completed_count: 0 })
+                    .insert({ user_id: userId, rating: 5.0, projects_completed: 0 })
                     .select()
                     .single();
                 if (createError) console.error('Error auto-creating commissioner profile:', createError);
@@ -148,6 +148,8 @@ export async function POST(request: NextRequest) {
             mpesa_number,
             company_size,
             specialization,
+            projects_completed,
+            rating,
             years_experience,
 
             // Settings
@@ -189,6 +191,8 @@ export async function POST(request: NextRequest) {
             if (bio !== undefined) roleUpdates.bio = bio;
             if (specialization !== undefined) roleUpdates.specialization = specialization;
             if (years_experience !== undefined) roleUpdates.years_experience = years_experience;
+            if (projects_completed !== undefined) roleUpdates.projects_completed = projects_completed;
+            if (rating !== undefined) roleUpdates.rating = rating;
 
             if (Object.keys(roleUpdates).length > 0) {
                 await supabaseAdmin

@@ -27,14 +27,36 @@ export async function GET(
                 team_members:project_team_members(
                     user:users(name, avatar_url)
                 ),
-                milestones:project_milestones(id, title, status, deliverable_link)
+                milestones:project_milestones(id, title, status, deliverable_link, due_date)
             `)
             .eq('id', projectId)
             .single();
 
         if (error) throw error;
 
-        return NextResponse.json({ success: true, data: project });
+        // --- Predictive Health Logic ---
+        let healthScore = 100;
+        const now = new Date();
+
+        if (project.milestones) {
+            project.milestones.forEach((m: any) => {
+                const dueDate = m.due_date ? new Date(m.due_date) : null;
+                if (m.status !== 'completed' && dueDate && dueDate < now) {
+                    healthScore -= 20; // Overdue penalty
+                }
+            });
+        }
+
+        if (project.status === 'on_hold') healthScore -= 30;
+        if (project.status === 'in_dispute') healthScore -= 50;
+
+        // Clamp between 0 and 100
+        healthScore = Math.max(0, Math.min(100, healthScore));
+
+        return NextResponse.json({
+            success: true,
+            data: { ...project, health_score: healthScore }
+        });
     } catch (error: any) {
         console.error('Error fetching project:', error);
         return NextResponse.json(

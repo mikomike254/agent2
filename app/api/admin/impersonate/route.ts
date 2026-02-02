@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
 
             // Set impersonation cookie
             // We use a prefix that matches what NextAuth might expect or just a custom one
-            (await cookies()).set('nexus-impersonation-id', userId, {
+            (await cookies()).set('creative-impersonation-id', userId, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
                 sameSite: 'lax',
@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
 
             return NextResponse.json({ success: true, message: `Now impersonating ${user.name}` });
         } else if (action === 'stop') {
-            (await cookies()).delete('nexus-impersonation-id');
+            (await cookies()).delete('creative-impersonation-id');
             return NextResponse.json({ success: true, message: 'Stopped impersonating' });
         }
 

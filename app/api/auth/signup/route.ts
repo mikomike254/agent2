@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/db';
 import crypto from 'crypto';
+import { sendEmail } from '@/lib/emailjs';
 
 export async function POST(req: NextRequest) {
     if (!supabaseAdmin) {
@@ -113,6 +114,24 @@ export async function POST(req: NextRequest) {
             action: 'user_registration',
             details: { role, email }
         });
+
+        // 5. Send Welcome Email
+        try {
+            const requiresApproval = role !== 'client';
+            const welcomeMessage = requiresApproval
+                ? `Welcome to CREATIVE.KE, ${name}! Your account as a ${role} is currently pending admin approval. We will notify you once your profile has been verified.`
+                : `Welcome to CREATIVE.KE, ${name}! Your client account is active. You can now start proposing projects and connecting with top-tier talent.`;
+
+            await sendEmail({
+                to_email: email,
+                to_name: name,
+                subject: 'Welcome to CREATIVE.KE',
+                message: welcomeMessage,
+                cta_link: `${process.env.NEXTAUTH_URL || 'https://aaaaaaasshh33.netlify.app'}/dashboard`
+            });
+        } catch (emailError) {
+            console.error('Failed to send welcome email:', emailError);
+        }
 
         return NextResponse.json({
             success: true,

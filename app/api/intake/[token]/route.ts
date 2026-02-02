@@ -44,7 +44,7 @@ export async function GET(
             commissioner: {
                 name: lead.commissioner.user.name,
                 photo: lead.commissioner.user.avatar_url,
-                rating: 4.8, // TODO: Calculate from reviews
+                rating: lead.commissioner.rating || 5.0,
                 contact: lead.commissioner.user.phone
             },
             projectSummary: lead.project_summary || 'Custom development project',

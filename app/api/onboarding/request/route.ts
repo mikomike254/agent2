@@ -1,8 +1,8 @@
-// app/api/onboarding/request/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { supabaseAdmin } from '@/lib/db';
+import { emailjsService } from '@/lib/emailjs';
 
 export async function POST(req: NextRequest) {
     if (!supabaseAdmin) {
@@ -16,6 +16,7 @@ export async function POST(req: NextRequest) {
         }
 
         const commissionerUserId = (session.user as any).id;
+        const commissionerName = session.user.name || 'Your Commissioner';
         const body = await req.json();
         const {
             clientName,
@@ -132,10 +133,17 @@ export async function POST(req: NextRequest) {
                 );
             if (milestoneError) {
                 console.error('Milestone creation error:', milestoneError);
-                // We don't necessarily want to fail the whole request if milestones fail,
-                // but for onboarding it's better to ensure they are there.
             }
         }
+
+        // 6. Send Invitation Email via EmailJS
+        await emailjsService.sendUniversalEmail({
+            subject: `Welcome to Tech Developers - Project Proposal from ${commissionerName}`,
+            client_name: clientName,
+            to_email: clientEmail,
+            message_body: `Hello ${clientName}, ${commissionerName} has created a new project proposal for you: "${projectTitle}". You can review the details, milestones, and budget on your private dashboard.`,
+            call_to_action_link: `${process.env.NEXTAUTH_URL}/login`
+        });
 
         return NextResponse.json({
             success: true,

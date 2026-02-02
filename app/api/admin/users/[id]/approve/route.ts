@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/db';
 import { getServerSession } from 'next-auth';
+import { sendEmail } from '@/lib/emailjs';
 
 export async function POST(
     req: NextRequest,
@@ -60,8 +61,18 @@ export async function POST(
                 }
             });
 
-            // TODO: Send approval email to user
-            // "Your account has been approved! You can now login."
+            // Send approval email to user
+            try {
+                await sendEmail({
+                    to_email: user.email,
+                    to_name: user.name || 'User',
+                    subject: 'Account Approved - CREATIVE.KE',
+                    message: 'Congratulations! Your account has been approved. You can now login and start using the platform.',
+                    cta_link: process.env.NEXTAUTH_URL || 'https://aaaaaaasshh33.netlify.app',
+                });
+            } catch (emailError) {
+                console.error('Failed to send approval email:', emailError);
+            }
 
             return NextResponse.json({
                 success: true,
@@ -91,8 +102,17 @@ export async function POST(
                 }
             });
 
-            // TODO: Send rejection email
-            // "Your application has been reviewed..."
+            // Send rejection email
+            try {
+                await sendEmail({
+                    to_email: user.email,
+                    to_name: user.name || 'User',
+                    subject: 'Application Status - CREATIVE.KE',
+                    message: `Your application has been reviewed. Unfortunately, we cannot approve your account at this time. Reason: ${notes || 'Please contact support for more information.'}`,
+                });
+            } catch (emailError) {
+                console.error('Failed to send rejection email:', emailError);
+            }
 
             return NextResponse.json({
                 success: true,

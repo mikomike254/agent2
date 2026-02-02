@@ -38,3 +38,29 @@ export async function POST(req: Request) {
         return NextResponse.json({ message: error.message }, { status: 500 });
     }
 }
+
+export async function GET(req: Request) {
+    if (!supabaseAdmin) {
+        return NextResponse.json({ message: 'Supabase Admin not initialized' }, { status: 500 });
+    }
+    try {
+        const session = await getServerSession(authOptions);
+        if (!session?.user || (session.user as any).role !== 'commissioner') {
+            return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+        }
+
+        const userId = (session.user as any).id;
+
+        const { data, error } = await supabaseAdmin
+            .from('commissioners')
+            .select('*')
+            .eq('user_id', userId)
+            .single();
+
+        if (error) throw error;
+
+        return NextResponse.json({ success: true, data });
+    } catch (error: any) {
+        return NextResponse.json({ message: error.message }, { status: 500 });
+    }
+}

@@ -57,7 +57,7 @@ export async function POST(
             .update(updateData)
             .eq('id', projectId)
             .select()
-            .single();
+            .maybeSingle();
 
         if (error) throw error;
 

@@ -16,8 +16,8 @@ export async function GET(req: NextRequest) {
         const action = searchParams.get('action');
 
         let query = supabaseAdmin!
-            .from('nexus_activity_logs')
-            .select('*')
+            .from('audit_logs')
+            .select('*, actor:users(email, name)')
             .order('created_at', { ascending: false })
             .limit(limit);
 
@@ -28,7 +28,20 @@ export async function GET(req: NextRequest) {
 
         if (error) throw error;
 
-        return NextResponse.json({ success: true, activities: data });
+        // Map standard audit_logs to frontend expected format
+        const activities = data.map((log: any) => ({
+            id: log.id,
+            action: log.action,
+            actor_role: log.actor_role,
+            actor_email: log.actor?.email || 'System',
+            actor_name: log.actor?.name,
+            entity_type: log.details?.gateway ? 'payment' : 'unknown', // Simple heuristic
+            entity_id: log.details?.payment_id || log.details?.project_id,
+            created_at: log.created_at,
+            details: log.details
+        }));
+
+        return NextResponse.json({ success: true, activities });
 
     } catch (error: any) {
         console.error('Activity fetch error:', error);

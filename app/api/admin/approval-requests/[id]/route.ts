@@ -2,7 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { supabaseAdmin } from '@/lib/db';
+import { supabaseAdmin, db } from '@/lib/db';
 
 // PUT: Approve or reject approval request
 export async function PUT(
@@ -63,7 +63,16 @@ export async function PUT(
 
         if (error) throw error;
 
-        // TODO: Send email notification to commissioner
+        // Notify Commissioner
+        // Notify Commissioner
+        if (approval.commissioner_id) {
+            await db.createNotification(
+                approval.commissioner_id,
+                'system',
+                `Request ${status === 'approved' ? 'Approved' : 'Rejected'}`,
+                `Your request for ${approval.request_type} has been ${status}.`
+            );
+        }
         // await sendApprovalDecisionEmail(approval);
 
         // If it's a payment verification and approved, update the payment status

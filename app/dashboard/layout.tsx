@@ -7,6 +7,7 @@ import { redirect, usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { RealtimeProvider } from '@/contexts/RealtimeProvider';
+import GlobalCommand from '@/components/dashboard/GlobalCommand';
 
 export default function DashboardLayout({
     children,
@@ -42,6 +43,7 @@ export default function DashboardLayout({
     return (
         <RealtimeProvider>
             <div className="min-h-[100dvh] bg-gray-50/50 font-sans text-gray-900 selection:bg-indigo-100 selection:text-indigo-900">
+                <GlobalCommand />
                 {/* Navigation Components */}
                 <Sidebar
                     role={role}
